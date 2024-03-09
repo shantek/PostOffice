@@ -66,6 +66,16 @@ public class PostOffice extends JavaPlugin implements Listener {
 
     public void onEnable() {
 
+        // Ensure the data folder exists
+        if (!getDataFolder().exists()) {
+            if (getDataFolder().mkdir()) {
+                getLogger().info("Data folder created successfully.");
+            } else {
+                getLogger().warning("Failed to create data folder.");
+            }
+        }
+
+
         this.mailFile = new File(getDataFolder(), "mail.txt");
         this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getPluginManager().registerEvents(new BarrelProtection(this), this);
