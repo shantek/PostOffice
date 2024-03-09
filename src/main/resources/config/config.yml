@@ -1,0 +1,28 @@
+# The name of your barrel. Any barrel renamed to this in an anvil
+# will be treated as a Post Box
+custom-barrel-name: "pobox"
+
+# Message sent to the sender when closing the Post Box
+sent-message: "&a[Post Office] &aMail sent to %receiver%."
+
+# Message sent to the receiver if they are online
+received-message: "&a[Post Office] &eYou received mail from %sender%!"
+
+# Message sent to the receiver next time they log on to the server
+got-mail-message: "&a[Post Office] &fYou got mail!"
+
+# Error shown when the player attempts to stack items in a post box
+cant-stack-items: "&a[Post Office] &4You don't have permission to do that."
+
+# Error shown when a player attempts to remove items without permission
+remove-item-error: "&a[Post Office] &4You don't have permission to remove items."
+
+# Error shown when trying to use their offhand while in a Post Box
+offhand-error: "&a[Post Office] &4No offhand usage while in a Post Box!"
+
+# Error shown when trying to swap items to their hotbar
+hotbar-error: "&a[Post Office] &4No hot bar usage while in a Post Box!"
+
+# Do you want to check for updates when restarting the server?
+# This will also message any server ops to notify them each time they log on.
+update-notification: true

@@ -1,0 +1,17 @@
+name: PostOffice
+api-version: 1.15
+version: 1.6.0
+author: Shantek.io
+main: io.shantek.PostOffice
+
+commands:
+  postoffice:
+    description: Reload the PostOffice plugin
+    usage: /postoffice reload
+    permission: shantek.postoffice.reload
+    default: op
+  barrelname:
+    description: Set the custom barrel name
+    usage: /postoffice barrelname <name>
+    permission: shantek.postoffice.setname
+    default: op
