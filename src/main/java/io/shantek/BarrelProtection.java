@@ -83,9 +83,6 @@ public class BarrelProtection implements Listener {
         }
     }
 
-
-
-
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         if (!postOffice.postBoxProtection) {

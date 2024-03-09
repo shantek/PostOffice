@@ -40,8 +40,6 @@ public class PostOffice extends JavaPlugin implements Listener {
     private File mailFile;
     int previousItemCount = 0;
     int newItemCount = 0;
-
-    // Set of players who have mail
     private Set<String> playersWithMail = new HashSet<>();
 
     public String sentMessage = "&a[Post Office] &aMail sent to %receiver%.";
@@ -154,8 +152,6 @@ public class PostOffice extends JavaPlugin implements Listener {
         }
     }
 
-
-
     public void onDisable() {
         File configFile = new File(this.getDataFolder(), "config.yml");
         if (!configFile.exists()) {
@@ -267,14 +263,12 @@ public class PostOffice extends JavaPlugin implements Listener {
         Player player = (Player) event.getWhoClicked();
         Inventory inventory = event.getInventory();
 
-
-// IF THEY DON'T HAVE A BARREL OPEN, IGNORE IT
+        // IF THEY DON'T HAVE A BARREL OPEN, IGNORE IT
         if (event.getClickedInventory() == null || inventory.getType() != InventoryType.BARREL) {
             return;
         }
 
         Block clickedBlock = Objects.requireNonNull(event.getClickedInventory().getLocation()).getBlock();
-
 
         if (clickedBlock.getType() == Material.BARREL) {
             BlockState blockState = clickedBlock.getState();
@@ -333,8 +327,6 @@ public class PostOffice extends JavaPlugin implements Listener {
                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', hotBarError));
                             return;
                         }
-
-
                     }
 
                     // Check if item is already in the barrel
@@ -373,7 +365,6 @@ public class PostOffice extends JavaPlugin implements Listener {
 
                         boolean isOwner = false;
                         String ownerName = "";
-
 
                         for (BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST}) {
                             Block relativeBlock = clickedBlock.getRelative(face);
@@ -444,5 +435,4 @@ public class PostOffice extends JavaPlugin implements Listener {
         }
         return count;
     }
-
 }

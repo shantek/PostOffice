@@ -52,7 +52,6 @@ public class UpdateChecker {
         }
     }
 
-
     public static boolean isNewVersionAvailable(String currentVersion, String remoteVersion) {
         // Directly compare the version strings
         return !currentVersion.equals(remoteVersion);

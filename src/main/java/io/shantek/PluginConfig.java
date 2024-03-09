@@ -12,7 +12,6 @@ import java.util.*;
 @SuppressWarnings("SameParameterValue")
 public class PluginConfig {
 
-
     private final PostOffice postOffice;
 
     public PluginConfig(PostOffice postOffice) {
@@ -196,7 +195,6 @@ public class PluginConfig {
         }
     }
 
-
     private void saveConfigSilently(FileConfiguration config) {
         try {
             config.save(new File(postOffice.getDataFolder(), "config.yml"));
@@ -204,4 +202,5 @@ public class PluginConfig {
             // Log the exception or handle it as needed (e.g., printStackTrace())
         }
     }
+
 }
