@@ -1,0 +1,20 @@
+            - name: Maven Jar Publish
+  # You may pin to the exact commit or the version.
+  # uses: eric2788/maven-jar-publish@dc4d9b863c487cf71fd834b0e74444e443633256
+  uses: eric2788/maven-jar-publish@v3
+  with:
+    # the java version to build (if not provied, it will use the ${ maven.compiler.target } properties
+    java-version: # optional, default is NONE
+    # the location of pom.xml (to build)
+    locate: # optional, default is .
+    # the module path that to upload the artifact. (the module name must same as the module path)
+    upload-module: # optional, default is .
+    # The release content
+    body: # optional
+    # The release content by file (if specificed then body will be ignored)
+    body-path: # optional
+    # whether the release is draft
+    draft: # optional
+    # whether the release is pre-release
+    pre-release: # optional
+          
