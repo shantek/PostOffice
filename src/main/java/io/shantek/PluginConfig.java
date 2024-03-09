@@ -57,6 +57,10 @@ public class PluginConfig {
                 postOffice.sentMessage = getString(config, "sent-message", postOffice.sentMessage);
                 postOffice.receivedMessage = getString(config, "received-message", postOffice.receivedMessage);
                 postOffice.gotMailMessage = getString(config, "got-mail-message", postOffice.gotMailMessage);
+                postOffice.createError = getString(config, "create-error", postOffice.createError);
+                postOffice.breakError = getString(config, "break-error", postOffice.breakError);
+
+                postOffice.postBoxProtection = getBoolean(config, "postbox-protection", true);
                 postOffice.updateNotificationEnabled = getBoolean(config, "update-notification", true);
             }
 
@@ -72,7 +76,7 @@ public class PluginConfig {
         List<String> keysToCheck = Arrays.asList(
                 "custom-barrel-name", "cant-stack-items", "remove-item-error",
                 "offhand-error", "hotbar-error", "sent-message", "received-message",
-                "got-mail-message", "update-notification");
+                "got-mail-message", "update-notification", "postbox-protection", "create-error", "break-error");
 
         // Check for missing keys
         for (String key : keysToCheck) {
@@ -92,7 +96,7 @@ public class PluginConfig {
         List<String> keysToCheck = Arrays.asList(
                 "custom-barrel-name", "cant-stack-items", "remove-item-error",
                 "offhand-error", "hotbar-error", "sent-message", "received-message",
-                "got-mail-message", "update-notification");
+                "got-mail-message", "update-notification", "postbox-protection", "create-error", "break-error");
 
         // Save existing values of missing keys
         for (String key : keysToCheck) {

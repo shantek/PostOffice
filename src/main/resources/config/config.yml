@@ -23,6 +23,16 @@ offhand-error: "&a[Post Office] &4No offhand usage while in a Post Box!"
 # Error shown when trying to swap items to their hotbar
 hotbar-error: "&a[Post Office] &4No hot bar usage while in a Post Box!"
 
+# Error shown when the player tries to create a Post Box
+create-error: "&a[Post Office] &4You can't create a Post Box."
+
+# Error shown when a player tries to break a Post Box
+break-error: "&a[Post Office] &4You can't break this Post Box."
+
+# Do you want to use the built-in protection to prevent players breaking
+# Post Boxes? Disable if you prefer to use something like WorldGuard
+postbox-protection: true
+
 # Do you want to check for updates when restarting the server?
 # This will also message any server ops to notify them each time they log on.
 update-notification: true

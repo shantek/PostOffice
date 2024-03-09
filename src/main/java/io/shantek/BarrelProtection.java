@@ -1,6 +1,8 @@
 package io.shantek;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.block.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
@@ -8,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 
 public class BarrelProtection implements Listener {
@@ -20,78 +23,128 @@ public class BarrelProtection implements Listener {
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
+        if (!postOffice.postBoxProtection) {
+            return;
+        }
+
         Player player = event.getPlayer();
         Block signBlock = event.getBlock();
-        Block attachedBlock = signBlock.getRelative(getAttachedFace(signBlock));
 
-        if (!(attachedBlock.getState() instanceof Barrel)) {
-            return;
+        if (hasBarrelNearby(signBlock)) {
+
+            if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.createError));
+                event.setCancelled(true);
+            }
+
         }
-
-        Barrel barrel = (Barrel) attachedBlock.getState();
-        String barrelCustomName = barrel.getCustomName();
-
-        if (barrelCustomName == null || (!barrelCustomName.equals(postOffice.customBarrelName))) {
-            return;
-        }
-
-        if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
-            player.sendMessage(ChatColor.RED + "[Post Office] " + ChatColor.RED + "You don't have permission to create a Post Box.");
-            //signBlock.breakNaturally();
-            event.setCancelled(true);
-            return;
-        }
-
 
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
+        if (!postOffice.postBoxProtection) {
+            return;
+        }
+
         Player player = event.getPlayer();
         Block brokenBlock = event.getBlock();
 
-        if (brokenBlock.getState() instanceof Sign) {
-            // Check if the broken block is a sign
-            Sign sign = (Sign) brokenBlock.getState();
-            Block attachedBlock = brokenBlock.getRelative(getAttachedFace(brokenBlock));
-
-            if (attachedBlock.getState() instanceof Barrel) {
-                // Check if the sign is attached to a barrel
-                Barrel barrel = (Barrel) attachedBlock.getState();
-                String barrelCustomName = barrel.getCustomName();
-
-                if (barrelCustomName != null && barrelCustomName.equals(postOffice.customBarrelName)) {
-                    // Check if the barrel has the custom name
-                    if (!player.isOp() && !player.hasPermission("shantek.postoffice.breaksign")) {
-                        // Player doesn't have permission to break the sign
-                        player.sendMessage(ChatColor.RED + "[Post Office] " + ChatColor.RED + "You don't have permission to break this Post Box sign.");
-                        event.setCancelled(true);
-                    }
-                }
-            }
-        } else if (brokenBlock.getState() instanceof Barrel) {
-            // Check if the broken block is a barrel
+        // Check if the broken block is a barrel
+        if (brokenBlock.getState() instanceof Barrel) {
             Barrel barrel = (Barrel) brokenBlock.getState();
             String barrelCustomName = barrel.getCustomName();
 
-            if (barrelCustomName != null && barrelCustomName.equals(postOffice.customBarrelName)) {
-                // Check if the barrel has the custom name
-                if (!player.isOp() && !player.hasPermission("shantek.postoffice.breakbox")) {
-                    // Player doesn't have permission to break the barrel
-                    player.sendMessage(ChatColor.RED + "[Post Office] " + ChatColor.RED + "You don't have permission to break this Post Box.");
+            // Check if it's a custom post box and the player has permission
+            if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+
+                if (!player.isOp() && !player.hasPermission("shantek.postoffice.break")) {
+
                     event.setCancelled(true);
                 }
+
             }
+
+        }
+
+        // Check if the broken block is a sign
+        if (brokenBlock.getState() instanceof Sign) {
+
+            if (hasBarrelNearby(brokenBlock))
+
+
+                if (!player.isOp() && !player.hasPermission("shantek.postoffice.break")) {
+
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.breakError));
+                    event.setCancelled(true);
+                }
+
+
         }
     }
 
 
 
+
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if (!postOffice.postBoxProtection) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        Block placedBlock = event.getBlockPlaced();
+
+        if (!(placedBlock.getState() instanceof Sign)) {
+            return; // Ignore blocks that are not signs
+        }
+
+        if (hasBarrelNearby(placedBlock)) {
+            if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
+                // Player doesn't have permission to place a sign on the barrel
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.createError));
+
+                placedBlock.breakNaturally();
+                // event.setCancelled(true);
+            }
+        }
+
+    }
+
+    private boolean hasBarrelNearby(Block block) {
+        // Check if the given block is a barrel with the custom name
+        if (block.getType() == Material.BARREL) {
+            Barrel barrel = (Barrel) block.getState();
+            String barrelCustomName = barrel.getCustomName();
+
+            if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+                return true;
+            }
+        }
+
+        // Check if any nearby block is a barrel with the custom name
+        for (BlockFace blockFace : BlockFace.values()) {
+            Block relativeBlock = block.getRelative(blockFace);
+
+            if (relativeBlock.getType() == Material.BARREL) {
+                Barrel barrel = (Barrel) relativeBlock.getState();
+                String barrelCustomName = barrel.getCustomName();
+
+                if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private BlockFace getAttachedFace(Block block) {
         BlockData blockData = block.getBlockData();
         if (blockData instanceof Directional) {
             Directional directional = (Directional) blockData;
-            return directional.getFacing().getOppositeFace();
+            BlockFace facing = directional.getFacing();
+            return facing != null ? facing.getOppositeFace() : null;
         }
         return null;
     }

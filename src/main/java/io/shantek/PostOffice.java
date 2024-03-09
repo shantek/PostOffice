@@ -2,8 +2,7 @@ package io.shantek;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,8 +13,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -25,8 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
@@ -56,19 +51,20 @@ public class PostOffice extends JavaPlugin implements Listener {
     public String removeItemError = "&a[Post Office] &4You don't have permission to remove items.";
     public String offHandError = "&a[Post Office] &4No offhand usage while in a Post Box!";
     public String hotBarError = "&a[Post Office] &4No hot bar usage while in a Post Box!";
+    public String breakError = "&a[Post Office] &4You can't break a Post Box.";
+    public String createError = "&a[Post Office] &4You can't create a Post Box.";
     public UpdateChecker updateChecker;
     public PluginConfig pluginConfig;
-    //endregion
 
-    //region Public Print Logger
-    public final Logger logger = Logger.getLogger(PostOffice.class.getName());
+    public PostOffice() {
 
-    public Logger getLogger() {
-        return logger;
+        // Other initialization code
     }
 
     //endregion
+
     public boolean updateNotificationEnabled = true;
+    public boolean postBoxProtection = true;
 
     public void onEnable() {
 
@@ -76,23 +72,12 @@ public class PostOffice extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getPluginManager().registerEvents(new BarrelProtection(this), this);
 
-
-        /*
-        PluginCommand customBarrelNameCommand = this.getCommand("setcustombarrelname");
-        if (customBarrelNameCommand != null) {
-            customBarrelNameCommand.setExecutor(this);
-        } else {
-            getLogger().warning("Command 'setcustombarrelname' not found!");
-        }
-*/
-
         PluginCommand barrelNameCommand = this.getCommand("postoffice");
         if (barrelNameCommand != null) {
             barrelNameCommand.setExecutor(this);
         } else {
             getLogger().warning("Command 'postoffice' not found!");
         }
-
 
         // Create an instance of UpdateChecker
         this.updateChecker = new UpdateChecker();
@@ -105,13 +90,13 @@ public class PostOffice extends JavaPlugin implements Listener {
         PluginManager pm = getServer().getPluginManager();
         pm.addPermission(removeItemsPermission);
 
-        // Permission for breaking Post Box signs
-        Permission breakSignPermission = new Permission("shantek.postoffice.breaksign");
-        pm.addPermission(breakSignPermission);
-
         // Permission for breaking Post Boxes
-        Permission breakBoxPermission = new Permission("shantek.postoffice.breakbox");
-        pm.addPermission(breakBoxPermission);
+        Permission breakPermission = new Permission("shantek.postoffice.break");
+        pm.addPermission(breakPermission);
+
+        // Permission for creating Post Boxes
+        Permission createBoxPermission = new Permission("shantek.postoffice.create");
+        pm.addPermission(createBoxPermission);
 
         // Permission for breaking Post Boxes
         Permission updateNotificationPermission = new Permission("shantek.postoffice.updatenotification");
@@ -125,18 +110,18 @@ public class PostOffice extends JavaPlugin implements Listener {
                         .filter(line -> !line.isEmpty()) // Only non-empty lines
                         .collect(Collectors.toCollection(HashSet::new));
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "Could not read mail file", e);
+                getLogger().log(Level.SEVERE, "Could not read mail file", e);
             }
         } else {
             try {
                 boolean fileCreated = this.mailFile.createNewFile();
                 if (fileCreated) {
-                    logger.info("Mail file created successfully.");
+                    getLogger().info("Mail file created successfully.");
                 } else {
-                    logger.warning("Mail file creation failed. It may already exist.");
+                    getLogger().warning("Mail file creation failed. It may already exist.");
                 }
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "Could not create mail file", e);
+                getLogger().log(Level.SEVERE, "Could not create mail file", e);
             }
         }
 
@@ -177,13 +162,13 @@ public class PostOffice extends JavaPlugin implements Listener {
             try {
                 if (configFile.createNewFile()) {
                     // File created successfully
-                    logger.info("Config file created successfully.");
+                    getLogger().info("Config file created successfully.");
                 } else {
                     // File already exists
-                    logger.warning("Config file already exists.");
+                    getLogger().warning("Config file already exists.");
                 }
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "Could not create config file", e);
+                getLogger().log(Level.SEVERE, "Could not create config file", e);
             }
         }
 
@@ -193,13 +178,13 @@ public class PostOffice extends JavaPlugin implements Listener {
         try {
             config.save(configFile);
         } catch (IOException var4) {
-            logger.log(Level.SEVERE, "Could not save config file", var4);
+            getLogger().log(Level.SEVERE, "Could not save config file", var4);
         }
 
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("postoffice") && sender instanceof Player) {
+        if (cmd.getName().equalsIgnoreCase("postoffice")) {
             if (args.length == 2 && args[0].equalsIgnoreCase("barrelname")) {
                 // Check if the second argument is present
                 String name = args[1];
@@ -236,16 +221,23 @@ public class PostOffice extends JavaPlugin implements Listener {
 
         if (cmd.getName().equalsIgnoreCase("postoffice")) {
             if (args.length == 1) {
-                completions.add("reload");
-                completions.add("barrelname");
+                // Check the first argument
+                if ("reload".startsWith(args[0].toLowerCase())) {
+                    completions.add("reload");
+                }
+                if ("barrelname".startsWith(args[0].toLowerCase()) && sender.hasPermission("shantek.postoffice.setname")) {
+                    completions.add("barrelname");
+                }
             } else if (args.length == 2 && args[0].equalsIgnoreCase("barrelname") && sender.hasPermission("shantek.postoffice.setname")) {
-                completions.add("<name>");
+                // Check the second argument for "barrelname" subcommand
+                if (args[1].isEmpty()) {
+                    completions.add("<name>");
+                }
             }
         }
 
         return completions;
     }
-
 
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent event) {
@@ -435,10 +427,10 @@ public class PostOffice extends JavaPlugin implements Listener {
 
     private void saveMailFile() {
         try {
-            getLogger().info("[PostOffice] Mail list updated: " + playersWithMail);
+            getLogger().info("Mail list updated: " + playersWithMail);
             Files.write(this.mailFile.toPath(), this.playersWithMail);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Could not save mail file", e);
+            getLogger().log(Level.SEVERE, "Could not save mail file", e);
         }
     }
 
@@ -451,95 +443,6 @@ public class PostOffice extends JavaPlugin implements Listener {
             }
         }
         return count;
-    }
-
-
-
-
-    @EventHandler
-    public void onSignChange(SignChangeEvent event) {
-
-
-        Player player = event.getPlayer();
-        Block signBlock = event.getBlock();
-        Block attachedBlock = signBlock.getRelative(getAttachedFace(signBlock));
-
-
-        player.sendMessage(ChatColor.RED + "[Post Office] " + ChatColor.RED + "Changing sign.");
-
-
-        if (!(attachedBlock.getState() instanceof Barrel)) {
-            return;
-        }
-
-        Barrel barrel = (Barrel) attachedBlock.getState();
-        String barrelCustomName = barrel.getCustomName();
-
-        if (barrelCustomName == null || (!barrelCustomName.equals(customBarrelName))) {
-            return;
-        }
-
-        if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
-            player.sendMessage(ChatColor.RED + "[Post Office] " + ChatColor.RED + "You don't have permission to create a Post Box.");
-            //signBlock.breakNaturally();
-            event.setCancelled(true);
-            return;
-        }
-
-
-    }
-
-    @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
-        Player player = event.getPlayer();
-        Block brokenBlock = event.getBlock();
-
-        player.sendMessage(ChatColor.RED + "[Post Office] " + ChatColor.RED + "Broke block.");
-
-        if (brokenBlock.getState() instanceof Sign) {
-            // Check if the broken block is a sign
-            Sign sign = (Sign) brokenBlock.getState();
-            Block attachedBlock = brokenBlock.getRelative(getAttachedFace(brokenBlock));
-
-            if (attachedBlock.getState() instanceof Barrel) {
-                // Check if the sign is attached to a barrel
-                Barrel barrel = (Barrel) attachedBlock.getState();
-                String barrelCustomName = barrel.getCustomName();
-
-                if (barrelCustomName != null && barrelCustomName.equals(customBarrelName)) {
-                    // Check if the barrel has the custom name
-                    if (!player.isOp() && !player.hasPermission("shantek.postoffice.breaksign")) {
-                        // Player doesn't have permission to break the sign
-                        player.sendMessage(ChatColor.RED + "[Post Office] " + ChatColor.RED + "You don't have permission to break this Post Box sign.");
-                        event.setCancelled(true);
-                    }
-                }
-            }
-        } else if (brokenBlock.getState() instanceof Barrel) {
-            // Check if the broken block is a barrel
-            Barrel barrel = (Barrel) brokenBlock.getState();
-            String barrelCustomName = barrel.getCustomName();
-
-            if (barrelCustomName != null && barrelCustomName.equals(customBarrelName)) {
-                // Check if the barrel has the custom name
-                if (!player.isOp() && !player.hasPermission("shantek.postoffice.breakbox")) {
-                    // Player doesn't have permission to break the barrel
-                    player.sendMessage(ChatColor.RED + "[Post Office] " + ChatColor.RED + "You don't have permission to break this Post Box.");
-                    event.setCancelled(true);
-                }
-            }
-        }
-    }
-
-
-
-    private BlockFace getAttachedFace(Block block) {
-        BlockData blockData = block.getBlockData();
-        if (blockData instanceof Directional) {
-            Directional directional = (Directional) blockData;
-            return directional.getFacing().getOppositeFace();
-        }
-        return null;
     }
 
 }
