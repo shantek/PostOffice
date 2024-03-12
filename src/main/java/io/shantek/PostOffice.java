@@ -195,6 +195,8 @@ public class PostOffice extends JavaPlugin implements Listener {
                 // Check if the second argument is present
                 String name = args[1];
                 this.customBarrelName = name;
+
+                pluginConfig.setCustomBarrelName(this.customBarrelName);
                 sender.sendMessage("Custom barrel name set to " + this.customBarrelName);
                 return true;
             } else if (args.length == 1 && args[0].equalsIgnoreCase("barrelname")) {
