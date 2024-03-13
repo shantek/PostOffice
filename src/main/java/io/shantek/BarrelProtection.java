@@ -33,12 +33,28 @@ public class BarrelProtection implements Listener {
         if (hasBarrelNearby(signBlock)) {
 
             if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.createError));
-                event.setCancelled(true);
+
+                if (!postOffice.postBoxProtection) {
+                    return;
+                } else {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.createError));
+                    event.setCancelled(true);
+                }
+            } else {
+                // Check if line 2 of the sign has text
+                String line2 = event.getLine(1);
+                if (!line2.isEmpty()) {
+                    // Get the player name
+                    String playerName = line2;
+
+                    // Send a message to the player indicating that the Post Box has been created for them
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "Post Box has been created for " + playerName));
+
+                    // Perform any other actions you need to do after creating the Post Box
+                }
+
             }
-
         }
-
     }
 
     @EventHandler

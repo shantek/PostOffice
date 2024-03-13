@@ -36,3 +36,8 @@ postbox-protection: true
 # Do you want to check for updates when restarting the server?
 # This will also message any server ops to notify them each time they log on.
 update-notification: true
+
+# Do you want to print messages to the server console? You'll always receive
+# start up/shut down messages as well as warnings/errors. Disabling this will
+# remove the less important console logs like the mail file being updated etc.
+console-logs: true

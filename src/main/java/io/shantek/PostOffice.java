@@ -63,6 +63,7 @@ public class PostOffice extends JavaPlugin implements Listener {
 
     public boolean updateNotificationEnabled = true;
     public boolean postBoxProtection = true;
+    public boolean consoleLogs = true;
 
     public void onEnable() {
 
@@ -404,7 +405,9 @@ public class PostOffice extends JavaPlugin implements Listener {
                                                     .replace("%receiver%", ownerName)));
 
                                     // Add owners to mail list if someone else is adding items
-                                    getLogger().info(player.getName() + " added mail for " + ownerName);
+                                    if (consoleLogs) {
+                                        getLogger().info(player.getName() + " added mail for " + ownerName);
+                                    }
                                     playersWithMail.add(ownerName);
                                     saveMailFile();
 
@@ -430,7 +433,9 @@ public class PostOffice extends JavaPlugin implements Listener {
 
     private void saveMailFile() {
         try {
-            getLogger().info("Mail list updated: " + playersWithMail);
+            if (consoleLogs) {
+                getLogger().info("Mail list updated: " + playersWithMail);
+            }
             Files.write(this.mailFile.toPath(), this.playersWithMail);
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, "Could not save mail file", e);

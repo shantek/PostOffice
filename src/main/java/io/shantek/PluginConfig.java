@@ -61,6 +61,7 @@ public class PluginConfig {
 
                 postOffice.postBoxProtection = getBoolean(config, "postbox-protection", true);
                 postOffice.updateNotificationEnabled = getBoolean(config, "update-notification", true);
+                postOffice.consoleLogs = getBoolean(config, "console-logs", true);
             }
 
         } catch (Exception e) {
@@ -75,7 +76,7 @@ public class PluginConfig {
         List<String> keysToCheck = Arrays.asList(
                 "custom-barrel-name", "cant-stack-items", "remove-item-error",
                 "offhand-error", "hotbar-error", "sent-message", "received-message",
-                "got-mail-message", "update-notification", "postbox-protection", "create-error", "break-error");
+                "got-mail-message", "update-notification", "postbox-protection", "create-error", "break-error", "console-logs");
 
         // Check for missing keys
         for (String key : keysToCheck) {
@@ -95,7 +96,7 @@ public class PluginConfig {
         List<String> keysToCheck = Arrays.asList(
                 "custom-barrel-name", "cant-stack-items", "remove-item-error",
                 "offhand-error", "hotbar-error", "sent-message", "received-message",
-                "got-mail-message", "update-notification", "postbox-protection", "create-error", "break-error");
+                "got-mail-message", "update-notification", "postbox-protection", "create-error", "break-error", "console-logs");
 
         // Save existing values of missing keys
         for (String key : keysToCheck) {
@@ -141,14 +142,18 @@ public class PluginConfig {
 
             // Log removal to the console if changes were made
             if (!originalValue.equals(updatedValue)) {
-                postOffice.getLogger().info("Extra spaces removed from key '" + key + "'");
+                if (postOffice.consoleLogs) {
+                    postOffice.getLogger().info("Extra spaces removed from key '" + key + "'");
+                }
             }
 
 
             // Check for a string split across two lines
             if (!originalValue.equals(updatedValue) && originalValue.contains("\n")) {
                 updatedValue = originalValue.replace("\n", "");  // Remove newline characters
-                postOffice.getLogger().info("Indentation removed from key '" + key + "'");
+                if (postOffice.consoleLogs) {
+                    postOffice.getLogger().info("Indentation removed from key '" + key + "'");
+                }
             }
 
 
