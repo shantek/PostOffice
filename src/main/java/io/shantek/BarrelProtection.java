@@ -47,10 +47,11 @@ public class BarrelProtection implements Listener {
                     // Get the player name
                     String playerName = line2;
 
-                    // Send a message to the player indicating that the Post Box has been created for them
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "Post Box has been created for " + playerName));
 
-                    // Perform any other actions you need to do after creating the Post Box
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                            postOffice.postboxCreated
+                                    .replace("%username%", playerName)));
+
                 }
 
             }

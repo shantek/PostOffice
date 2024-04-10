@@ -51,6 +51,7 @@ public class PostOffice extends JavaPlugin implements Listener {
     public String hotBarError = "&a[Post Office] &4No hot bar usage while in a Post Box!";
     public String breakError = "&a[Post Office] &4You can't break a Post Box.";
     public String createError = "&a[Post Office] &4You can't create a Post Box.";
+    public String postboxCreated = "&a[Post Office] &4 Box successfully created for %username%";
     public UpdateChecker updateChecker;
     public PluginConfig pluginConfig;
 
