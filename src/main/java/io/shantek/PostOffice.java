@@ -4,6 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.*;
 import java.util.stream.Collectors;
+
+import io.shantek.functions.BarrelProtection;
+import io.shantek.functions.Metrics;
+import io.shantek.functions.PluginConfig;
+import io.shantek.functions.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

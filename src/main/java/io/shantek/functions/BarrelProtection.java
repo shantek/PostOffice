@@ -1,6 +1,6 @@
-package io.shantek;
+package io.shantek.functions;
 
-import org.bukkit.Bukkit;
+import io.shantek.PostOffice;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.*;

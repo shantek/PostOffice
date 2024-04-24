@@ -1,4 +1,4 @@
-package io.shantek;
+package io.shantek.functions;
 
 import org.bukkit.plugin.Plugin;
 import java.io.BufferedReader;

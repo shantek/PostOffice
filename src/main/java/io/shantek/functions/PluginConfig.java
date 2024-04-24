@@ -1,10 +1,12 @@
-package io.shantek;
+package io.shantek.functions;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.logging.Level;
+
+import io.shantek.PostOffice;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.nio.file.*;
