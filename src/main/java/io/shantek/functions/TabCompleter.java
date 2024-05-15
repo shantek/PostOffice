@@ -21,7 +21,7 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
         if (cmd.getName().equalsIgnoreCase("postoffice")) {
             if (args.length == 1) {
                 // Check the first argument
-                if ("reload".startsWith(args[0].toLowerCase())) {
+                if ("reload".startsWith(args[0].toLowerCase()) && sender.hasPermission("shantek.postoffice.reload")) {
                     completions.add("reload");
                 }
                 if ("barrelname".startsWith(args[0].toLowerCase()) && sender.hasPermission("shantek.postoffice.setname")) {
