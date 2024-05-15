@@ -4,6 +4,7 @@ import io.shantek.PostOffice;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +14,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class InventoryClose implements Listener {
 
@@ -70,11 +72,15 @@ public class InventoryClose implements Listener {
                                                     .replace("%sender%", player.getName())
                                                     .replace("%receiver%", ownerName)));
 
+                                    // Get owner UUID
+                                    OfflinePlayer postBoxOwner = Bukkit.getOfflinePlayer(ownerName);
+                                    UUID ownerUUID = postBoxOwner.getUniqueId();
+
                                     // Add owners to mail list if someone else is adding items
                                     if (postOffice.consoleLogs) {
                                         plugin.getLogger().info(player.getName() + " added mail for " + ownerName);
                                     }
-                                    postOffice.playersWithMail.add(ownerName);
+                                    postOffice.playersWithMail.add(ownerUUID.toString());
                                     postOffice.helpers.saveMailFile();
 
                                     Player owner = Bukkit.getPlayer(ownerName);
@@ -87,7 +93,7 @@ public class InventoryClose implements Listener {
                                 }
                             } else {
                                 // If they were the owner, and it was their barrel, remove them from the mail list
-                                postOffice.playersWithMail.remove(event.getPlayer().getName());
+                                postOffice.playersWithMail.remove(event.getPlayer().getUniqueId());
                                 postOffice.helpers.saveMailFile();
                             }
                         }

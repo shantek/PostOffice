@@ -18,7 +18,7 @@ public class Helpers {
     public void saveMailFile() {
         try {
             if (postOffice.consoleLogs) {
-                postOffice.getLogger().info("Mail list updated: " + postOffice.playersWithMail);
+                postOffice.getLogger().info("Mail list updated.");
             }
             Files.write(postOffice.mailFile.toPath(), postOffice.playersWithMail);
         } catch (IOException e) {

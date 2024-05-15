@@ -21,7 +21,7 @@ public class PlayerJoin implements Listener {
         public void onPlayerLogin(PlayerJoinEvent event) {
             Player player = event.getPlayer();
 
-            if (postOffice.playersWithMail.contains(player.getName())) {
+            if (postOffice.playersWithMail.contains(player.getUniqueId())) {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.gotMailMessage));
             }
 
