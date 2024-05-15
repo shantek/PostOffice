@@ -3,7 +3,6 @@ package io.shantek.functions;
 import io.shantek.PostOffice;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.logging.Level;
@@ -18,11 +17,11 @@ public class Helpers {
     public void saveMailFile() {
         try {
             if (postOffice.consoleLogs) {
-                postOffice.getLogger().info("Mail list updated.");
+                postOffice.getLogger().info("The mail list has been updated.");
             }
             Files.write(postOffice.mailFile.toPath(), postOffice.playersWithMail);
         } catch (IOException e) {
-            postOffice.getLogger().log(Level.SEVERE, "Could not save mail file", e);
+            postOffice.getLogger().log(Level.SEVERE, "Error updating the mail file.", e);
         }
     }
 
@@ -43,7 +42,7 @@ public class Helpers {
             if (postOffice.getDataFolder().mkdir()) {
                 postOffice.getLogger().info("Data folder created successfully.");
             } else {
-                postOffice.getLogger().warning("Failed to create data folder.");
+                postOffice.getLogger().warning("Error creating the data folder.");
             }
         }
     }
