@@ -45,9 +45,6 @@ public final class PostOffice extends JavaPlugin {
 
     public void onEnable() {
 
-        // Enable plugin listeners
-        PlayerJoin playerJoinListener = new PlayerJoin(this);
-
         // Ensure the data folder exists
         if (!getDataFolder().exists()) {
             if (getDataFolder().mkdir()) {
