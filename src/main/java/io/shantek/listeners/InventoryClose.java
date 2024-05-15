@@ -21,15 +21,12 @@ public class InventoryClose implements Listener {
     public PostOffice postOffice;
     public InventoryClose(PostOffice postOffice) {
         this.postOffice = postOffice;
-
     }
-
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
 
         PostOffice plugin = PostOffice.getInstance();
-
         Inventory inventory = event.getInventory();
 
         Player player = (Player) event.getPlayer();
@@ -43,7 +40,6 @@ public class InventoryClose implements Listener {
                     Barrel barrel = (Barrel) blockState;
 
                     if (barrel.getCustomName() != null && barrel.getCustomName().equalsIgnoreCase(postOffice.customBarrelName)) {
-
                         boolean isOwner = false;
                         String ownerName = "";
 
