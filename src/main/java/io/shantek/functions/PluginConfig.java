@@ -77,9 +77,9 @@ public class PluginConfig {
 
         // List of keys to check
         List<String> keysToCheck = Arrays.asList(
-                "custom-barrel-name", "cant-stack-items", "remove-item-error",
-                "offhand-error", "hotbar-error", "sent-message", "received-message",
-                "got-mail-message", "update-notification", "postbox-protection", "create-error", "break-error", "console-logs", "postbox-created");
+                "custom-barrel-name", "cant-stack-items", "remove-item-error", "offhand-error", "hotbar-error",
+                "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
+                "create-error", "break-error", "console-logs", "postbox-created");
 
         // Check for missing keys
         for (String key : keysToCheck) {
@@ -88,7 +88,6 @@ public class PluginConfig {
                 keysMissing = true;
             }
         }
-
         return keysMissing;
     }
 
@@ -97,9 +96,9 @@ public class PluginConfig {
 
         // List of keys to check
         List<String> keysToCheck = Arrays.asList(
-                "custom-barrel-name", "cant-stack-items", "remove-item-error",
-                "offhand-error", "hotbar-error", "sent-message", "received-message",
-                "got-mail-message", "update-notification", "postbox-protection", "create-error", "break-error", "console-logs", "postbox-created");
+                "custom-barrel-name", "cant-stack-items", "remove-item-error", "offhand-error", "hotbar-error",
+                "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
+                "create-error", "break-error", "console-logs", "postbox-created");
 
         // Save existing values of missing keys
         for (String key : keysToCheck) {
@@ -108,7 +107,6 @@ public class PluginConfig {
                 missingKeyValues.put(key, value);
             }
         }
-
         return missingKeyValues;
     }
 
@@ -122,7 +120,6 @@ public class PluginConfig {
         saveConfigSilently(config);
     }
 
-    @SuppressWarnings("SameParameterValue")
     private void saveDefaultConfig(String resourceName, File destination) {
         try (InputStream resourceStream = getClass().getResourceAsStream("/config/" + resourceName)) {
             if (resourceStream != null) {
@@ -225,7 +222,6 @@ public class PluginConfig {
             // Update the custom barrel name in the PostOffice instance
             postOffice.customBarrelName = newCustomBarrelName;
 
-            //postOffice.getLogger().info("Custom barrel name updated to: " + newCustomBarrelName);
         } catch (Exception e) {
             postOffice.getLogger().log(Level.SEVERE, "An error occurred while updating the custom barrel name", e);
         }
