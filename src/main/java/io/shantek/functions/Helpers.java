@@ -37,4 +37,15 @@ public class Helpers {
         return count;
     }
 
+    public void checkForDataFolder() {
+        // Ensure the data folder exists
+        if (!postOffice.getDataFolder().exists()) {
+            if (postOffice.getDataFolder().mkdir()) {
+                postOffice.getLogger().info("Data folder created successfully.");
+            } else {
+                postOffice.getLogger().warning("Failed to create data folder.");
+            }
+        }
+    }
+
 }

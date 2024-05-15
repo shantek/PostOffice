@@ -45,14 +45,8 @@ public final class PostOffice extends JavaPlugin {
 
     public void onEnable() {
 
-        // Ensure the data folder exists
-        if (!getDataFolder().exists()) {
-            if (getDataFolder().mkdir()) {
-                getLogger().info("Data folder created successfully.");
-            } else {
-                getLogger().warning("Failed to create data folder.");
-            }
-        }
+        // Check for a data folder, create it if needed
+        helpers.checkForDataFolder();
 
         this.mailFile = new File(getDataFolder(), "mail.txt");
         this.getServer().getPluginManager().registerEvents(new BarrelProtection(this), this);
