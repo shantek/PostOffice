@@ -49,7 +49,6 @@ public final class PostOffice extends JavaPlugin {
         helpers.checkForDataFolder();
 
         this.mailFile = new File(getDataFolder(), "mail.txt");
-        this.getServer().getPluginManager().registerEvents(new BarrelProtection(this), this);
 
         PluginCommand barrelNameCommand = this.getCommand("postoffice");
         if (barrelNameCommand != null) {
@@ -107,7 +106,7 @@ public final class PostOffice extends JavaPlugin {
 
 
         int pluginId = 20173; // <-- Replace with the id of your plugin!
-        @SuppressWarnings("unused") Metrics metrics = new Metrics(this, pluginId);
+        Metrics metrics = new Metrics(this, pluginId);
 
         // CHECK FOR PLUGIN UPDATES IF ENABLED
         if (updateNotificationEnabled) {
@@ -124,7 +123,7 @@ public final class PostOffice extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new InventoryClose(this), this);
         Bukkit.getPluginManager().registerEvents(new InventoryOpen(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoin(this), this);
-
+        Bukkit.getPluginManager().registerEvents(new BarrelProtection(this), this);
     }
 
     public void onDisable() {

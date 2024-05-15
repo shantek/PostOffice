@@ -1,4 +1,4 @@
-package io.shantek.functions;
+package io.shantek.listeners;
 
 import io.shantek.PostOffice;
 import org.bukkit.ChatColor;
