@@ -11,7 +11,6 @@ import java.util.logging.Level;
 
 public class UpdateChecker {
 
-    @SuppressWarnings("unused")
     public String currentVersion = null;
     public static String remoteVersion = null;
     public static void checkForUpdatesAsync(String currentVersion, Plugin plugin) {
@@ -19,8 +18,8 @@ public class UpdateChecker {
     }
 
     private static void checkForUpdates(String currentVersion, Plugin plugin) {
-        String updateUrl = "https://api.shantek.io/postoffice.txt"; // Replace with your actual URL
 
+        String updateUrl = "https://api.shantek.dev/postoffice.txt"; // Replace with your actual URL
         try {
             URL url = new URL(updateUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
