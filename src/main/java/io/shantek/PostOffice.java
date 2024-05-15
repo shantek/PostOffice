@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.util.logging.*;
 import java.util.stream.Collectors;
 
-import io.shantek.functions.BarrelProtection;
-import io.shantek.functions.Metrics;
-import io.shantek.functions.PluginConfig;
-import io.shantek.functions.UpdateChecker;
+import io.shantek.functions.*;
+import io.shantek.listeners.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -28,24 +26,24 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.*;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class PostOffice extends JavaPlugin implements Listener {
+public final class PostOffice extends JavaPlugin {
 
     //region Configuration Variables
     public String customBarrelName = "pobox";
     private File mailFile;
     int previousItemCount = 0;
     int newItemCount = 0;
-    private Set<String> playersWithMail = new HashSet<>();
+    public Set<String> playersWithMail = new HashSet<>();
 
     public String sentMessage = "&a[Post Office] &aMail sent to %receiver%.";
     public String receivedMessage = "&a[Post Office] &eYou received mail from %sender%!";
@@ -60,11 +58,6 @@ public class PostOffice extends JavaPlugin implements Listener {
     public UpdateChecker updateChecker;
     public PluginConfig pluginConfig;
 
-    public PostOffice() {
-
-        // Other initialization code
-    }
-
     //endregion
 
     public boolean updateNotificationEnabled = true;
@@ -72,6 +65,9 @@ public class PostOffice extends JavaPlugin implements Listener {
     public boolean consoleLogs = true;
 
     public void onEnable() {
+
+        // Enable plugin listeners
+        PlayerJoinListener playerJoinListener = new PlayerJoinListener(this);
 
         // Ensure the data folder exists
         if (!getDataFolder().exists()) {
@@ -84,7 +80,6 @@ public class PostOffice extends JavaPlugin implements Listener {
 
 
         this.mailFile = new File(getDataFolder(), "mail.txt");
-        this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getPluginManager().registerEvents(new BarrelProtection(this), this);
 
         PluginCommand barrelNameCommand = this.getCommand("postoffice");
@@ -139,8 +134,8 @@ public class PostOffice extends JavaPlugin implements Listener {
                 getLogger().log(Level.SEVERE, "Could not create mail file", e);
             }
         }
+        Bukkit.getPluginManager().registerEvents(playerJoinListener, this);
 
-        this.getServer().getPluginManager().registerEvents(new PlayerLoginListener(), this);
 
         int pluginId = 20173; // <-- Replace with the id of your plugin!
         @SuppressWarnings("unused") Metrics metrics = new Metrics(this, pluginId);
@@ -151,23 +146,6 @@ public class PostOffice extends JavaPlugin implements Listener {
         }
     }
 
-    private class PlayerLoginListener implements Listener {
-        @EventHandler
-        public void onPlayerLogin(PlayerJoinEvent event) {
-            Player player = event.getPlayer();
-
-            if (playersWithMail.contains(player.getName())) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', gotMailMessage));
-            }
-
-            if (updateNotificationEnabled && (player.isOp() || player.hasPermission("shantek.postoffice.updatenotification"))) {
-                if (UpdateChecker.isNewVersionAvailable(getDescription().getVersion(), UpdateChecker.remoteVersion)) {
-                    player.sendMessage("[Post Office] An update is available! New version: " + UpdateChecker.remoteVersion);
-                }
-            }
-
-        }
-    }
 
     public void onDisable() {
         File configFile = new File(this.getDataFolder(), "config.yml");
