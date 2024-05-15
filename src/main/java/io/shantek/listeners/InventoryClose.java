@@ -19,6 +19,7 @@ import java.util.UUID;
 public class InventoryClose implements Listener {
 
     public PostOffice postOffice;
+
     public InventoryClose(PostOffice postOffice) {
         this.postOffice = postOffice;
     }
@@ -98,5 +99,4 @@ public class InventoryClose implements Listener {
             }
         }
     }
-
 }
