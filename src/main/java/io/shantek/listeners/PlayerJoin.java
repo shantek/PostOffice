@@ -9,10 +9,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 
-public class PlayerJoinListener implements Listener {
+public class PlayerJoin implements Listener {
 
-    PostOffice postOffice;
-    public PlayerJoinListener(PostOffice postOffice) { this.postOffice = postOffice; }
+    public PostOffice postOffice;
+    public PlayerJoin(PostOffice postOffice) {
+        this.postOffice = postOffice;
+    }
 
     private class PlayerLoginListener implements Listener {
         @EventHandler
@@ -20,7 +22,7 @@ public class PlayerJoinListener implements Listener {
             Player player = event.getPlayer();
 
             if (postOffice.playersWithMail.contains(player.getName())) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.gotMailMessage));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.gotMailMessage));
             }
 
             if (postOffice.updateNotificationEnabled && (player.isOp() || player.hasPermission("shantek.postoffice.updatenotification"))) {

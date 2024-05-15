@@ -37,7 +37,7 @@ public class BarrelProtection implements Listener {
                 if (!postOffice.postBoxProtection) {
                     return;
                 } else {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.createError));
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.createError));
                     event.setCancelled(true);
                 }
             } else {
@@ -49,7 +49,7 @@ public class BarrelProtection implements Listener {
 
 
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                            postOffice.postboxCreated
+                            postOffice.language.postboxCreated
                                     .replace("%username%", playerName)));
 
                 }
@@ -92,7 +92,7 @@ public class BarrelProtection implements Listener {
 
                 if (!player.isOp() && !player.hasPermission("shantek.postoffice.break")) {
 
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.breakError));
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.breakError));
                     event.setCancelled(true);
                 }
 
@@ -116,7 +116,7 @@ public class BarrelProtection implements Listener {
         if (hasBarrelNearby(placedBlock)) {
             if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
                 // Player doesn't have permission to place a sign on the barrel
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.createError));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.createError));
 
                 placedBlock.breakNaturally();
                 // event.setCancelled(true);
