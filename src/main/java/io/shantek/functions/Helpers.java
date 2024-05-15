@@ -1,5 +1,6 @@
 package io.shantek.functions;
 
+import io.shantek.PostOffice;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -9,18 +10,23 @@ import java.util.logging.Level;
 
 public class Helpers {
 
-    private void saveMailFile() {
+    public PostOffice postOffice;
+    public Helpers(PostOffice postOffice) {
+        this.postOffice = postOffice;
+    }
+
+    public void saveMailFile() {
         try {
-            if (consoleLogs) {
-                getLogger().info("Mail list updated: " + playersWithMail);
+            if (postOffice.consoleLogs) {
+                postOffice.getLogger().info("Mail list updated: " + postOffice.playersWithMail);
             }
-            Files.write(this.mailFile.toPath(), this.playersWithMail);
+            Files.write(postOffice.mailFile.toPath(), postOffice.playersWithMail);
         } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Could not save mail file", e);
+            postOffice.getLogger().log(Level.SEVERE, "Could not save mail file", e);
         }
     }
 
-    private int countNonNullItems(ItemStack[] items) {
+    public int countNonNullItems(ItemStack[] items) {
         int count = 0;
         for (ItemStack item : items) {
             if (item != null && item.getType() != Material.AIR) {

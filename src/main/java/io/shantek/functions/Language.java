@@ -1,6 +1,13 @@
 package io.shantek.functions;
 
+import io.shantek.PostOffice;
+
 public class Language {
+
+    public PostOffice postOffice;
+    public Language(PostOffice postOffice) {
+        this.postOffice = postOffice;
+    }
 
     public String sentMessage = "&a[Post Office] &aMail sent to %receiver%.";
     public String receivedMessage = "&a[Post Office] &eYou received mail from %sender%!";

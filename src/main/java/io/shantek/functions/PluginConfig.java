@@ -51,16 +51,16 @@ public class PluginConfig {
                 updateConfigWithMissingKeyValues(config, missingKeyValues);
 
                 postOffice.customBarrelName = getString(config, "custom-barrel-name", "pobox");
-                postOffice.cantStackItems = getString(config, "cant-stack-items", postOffice.cantStackItems);
-                postOffice.removeItemError = getString(config, "remove-item-error", postOffice.removeItemError);
-                postOffice.offHandError = getString(config, "offhand-error", postOffice.offHandError);
-                postOffice.hotBarError = getString(config, "hotbar-error", postOffice.hotBarError);
-                postOffice.sentMessage = getString(config, "sent-message", postOffice.sentMessage);
-                postOffice.receivedMessage = getString(config, "received-message", postOffice.receivedMessage);
-                postOffice.gotMailMessage = getString(config, "got-mail-message", postOffice.gotMailMessage);
-                postOffice.createError = getString(config, "create-error", postOffice.createError);
-                postOffice.breakError = getString(config, "break-error", postOffice.breakError);
-                postOffice.postboxCreated = getString(config, "postbox-created", postOffice.postboxCreated);
+                postOffice.language.cantStackItems = getString(config, "cant-stack-items", postOffice.language.cantStackItems);
+                postOffice.language.removeItemError = getString(config, "remove-item-error", postOffice.language.removeItemError);
+                postOffice.language.offHandError = getString(config, "offhand-error", postOffice.language.offHandError);
+                postOffice.language.hotBarError = getString(config, "hotbar-error", postOffice.language.hotBarError);
+                postOffice.language.sentMessage = getString(config, "sent-message", postOffice.language.sentMessage);
+                postOffice.language.receivedMessage = getString(config, "received-message", postOffice.language.receivedMessage);
+                postOffice.language.gotMailMessage = getString(config, "got-mail-message", postOffice.language.gotMailMessage);
+                postOffice.language.createError = getString(config, "create-error", postOffice.language.createError);
+                postOffice.language.breakError = getString(config, "break-error", postOffice.language.breakError);
+                postOffice.language.postboxCreated = getString(config, "postbox-created", postOffice.language.postboxCreated);
 
                 postOffice.postBoxProtection = getBoolean(config, "postbox-protection", true);
                 postOffice.updateNotificationEnabled = getBoolean(config, "update-notification", true);

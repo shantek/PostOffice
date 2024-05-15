@@ -62,11 +62,11 @@ public class InventoryClose implements Listener {
                         // Only process the logic if the ownerName is not empty
                         if (!ownerName.isEmpty()) {
                             if (!isOwner) {
-                                newItemCount = countNonNullItems(inventory.getContents());
-                                if (newItemCount > previousItemCount) {
+                                postOffice.newItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
+                                if (postOffice.newItemCount > postOffice.previousItemCount) {
 
                                     player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                            this.sentMessage
+                                            postOffice.language.sentMessage
                                                     .replace("%sender%", player.getName())
                                                     .replace("%receiver%", ownerName)));
 
@@ -80,15 +80,15 @@ public class InventoryClose implements Listener {
                                     Player owner = Bukkit.getPlayer(ownerName);
                                     if (owner != null) {
                                         owner.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                                this.receivedMessage
+                                                postOffice.language.receivedMessage
                                                         .replace("%sender%", player.getName())
                                                         .replace("%receiver%", owner.getName())));
                                     }
                                 }
                             } else {
                                 // If they were the owner, and it was their barrel, remove them from the mail list
-                                playersWithMail.remove(event.getPlayer().getName());
-                                saveMailFile();
+                                postOffice.playersWithMail.remove(event.getPlayer().getName());
+                                postOffice.helpers.saveMailFile();
                             }
                         }
                     }

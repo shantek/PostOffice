@@ -25,14 +25,17 @@ public final class PostOffice extends JavaPlugin {
     public Language language;
     public Metrics metrics;
     public PluginConfig pluginConfig;
+    public Helpers helpers;
+    public BarrelProtection barrelProtection;
+    public TabCompleter tabCompleter;
 
     public static PostOffice instance;
 
     //region Configuration Variables
     public String customBarrelName = "pobox";
-    private File mailFile;
+    public File mailFile;
     public int previousItemCount = 0;
-    int newItemCount = 0;
+    public int newItemCount = 0;
     public Set<String> playersWithMail = new HashSet<>();
     //endregion
 
@@ -109,7 +112,7 @@ public final class PostOffice extends JavaPlugin {
                 getLogger().log(Level.SEVERE, "Could not create mail file", e);
             }
         }
-        Bukkit.getPluginManager().registerEvents(playerJoinListener, this);
+
 
 
         int pluginId = 20173; // <-- Replace with the id of your plugin!
@@ -119,6 +122,18 @@ public final class PostOffice extends JavaPlugin {
         if (updateNotificationEnabled) {
             UpdateChecker.checkForUpdatesAsync(getDescription().getVersion(), this);
         }
+
+        // Register event listeners
+        registerEventListeners();
+    }
+
+    public void registerEventListeners() {
+
+        Bukkit.getPluginManager().registerEvents(new InventoryClick(this), this);
+        Bukkit.getPluginManager().registerEvents(new InventoryClose(this), this);
+        Bukkit.getPluginManager().registerEvents(new InventoryOpen(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerJoin(this), this);
+
     }
 
     public void onDisable() {
