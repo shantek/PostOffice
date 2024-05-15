@@ -29,13 +29,12 @@ public class InventoryClick implements Listener {
         Player player = (Player) event.getWhoClicked();
         Inventory inventory = event.getInventory();
 
-        // IF THEY DON'T HAVE A BARREL OPEN, IGNORE IT
+        // If they aren't opening a barrel, ignore it
         if (event.getClickedInventory() == null || inventory.getType() != InventoryType.BARREL) {
             return;
         }
 
         Block clickedBlock = Objects.requireNonNull(event.getClickedInventory().getLocation()).getBlock();
-
         if (clickedBlock.getType() == Material.BARREL) {
             BlockState blockState = clickedBlock.getState();
 
