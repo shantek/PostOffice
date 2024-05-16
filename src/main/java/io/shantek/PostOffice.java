@@ -31,19 +31,25 @@ public final class PostOffice extends JavaPlugin {
 
     public static PostOffice instance;
 
-    //region Configuration Variables
     public String customBarrelName = "pobox";
     public File mailFile;
     public int previousItemCount = 0;
     public int newItemCount = 0;
     public Set<String> playersWithMail = new HashSet<>();
-    //endregion
-
     public boolean updateNotificationEnabled = true;
     public boolean postBoxProtection = true;
     public boolean consoleLogs = true;
 
     public void onEnable() {
+
+        instance = this;
+        commands = new Commands(this);
+        language = new Language(this);
+        barrelProtection = new BarrelProtection(this);
+        helpers = new Helpers(this);
+        TabCompleter tabCompleter = new TabCompleter(this);
+
+        getCommand("postoffice").setTabCompleter(new TabCompleter(this));
 
         // Check for a data folder, create it if needed
         helpers.checkForDataFolder();
@@ -63,23 +69,7 @@ public final class PostOffice extends JavaPlugin {
         // Create an instance of PluginConfig
         this.pluginConfig = new PluginConfig(this);
 
-        // Register the permission node
-        Permission removeItemsPermission = new Permission("shantek.postoffice.removeitems");
-        PluginManager pm = getServer().getPluginManager();
-        pm.addPermission(removeItemsPermission);
-
-        // Permission for breaking Post Boxes
-        Permission breakPermission = new Permission("shantek.postoffice.break");
-        pm.addPermission(breakPermission);
-
-        // Permission for creating Post Boxes
-        Permission createBoxPermission = new Permission("shantek.postoffice.create");
-        pm.addPermission(createBoxPermission);
-
-        // Permission for breaking Post Boxes
-        Permission updateNotificationPermission = new Permission("shantek.postoffice.updatenotification");
-        pm.addPermission(updateNotificationPermission);
-
+        registerPluginPermissions();
         pluginConfig.reloadConfigFile();
 
         if (this.mailFile.exists()) {
@@ -103,16 +93,13 @@ public final class PostOffice extends JavaPlugin {
             }
         }
 
-
-
-        int pluginId = 20173; // <-- Replace with the id of your plugin!
+        int pluginId = 20173;
         Metrics metrics = new Metrics(this, pluginId);
 
         // CHECK FOR PLUGIN UPDATES IF ENABLED
         if (updateNotificationEnabled) {
             UpdateChecker.checkForUpdatesAsync(getDescription().getVersion(), this);
         }
-
         // Register event listeners
         registerEventListeners();
     }
@@ -127,29 +114,9 @@ public final class PostOffice extends JavaPlugin {
     }
 
     public void onDisable() {
-        File configFile = new File(this.getDataFolder(), "config.yml");
-        if (!configFile.exists()) {
-            try {
-                if (configFile.createNewFile()) {
-                    // File created successfully
-                    getLogger().info("Config file created successfully.");
-                } else {
-                    // File already exists
-                    getLogger().warning("Config file already exists.");
-                }
-            } catch (IOException e) {
-                getLogger().log(Level.SEVERE, "Could not create config file", e);
-            }
-        }
 
-        FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-        config.set("custom-barrel-name", this.customBarrelName);
-
-        try {
-            config.save(configFile);
-        } catch (IOException var4) {
-            getLogger().log(Level.SEVERE, "Could not save config file", var4);
-        }
+        // Save the config prior to shutting down
+        pluginConfig.reloadConfigFile();
 
     }
 
@@ -157,4 +124,22 @@ public final class PostOffice extends JavaPlugin {
         return instance;
     }
 
+    private void registerPluginPermissions() {
+        // Register the permission node
+        Permission removeItemsPermission = new Permission("shantek.postoffice.removeitems");
+        PluginManager pm = getServer().getPluginManager();
+        pm.addPermission(removeItemsPermission);
+
+        // Permission for breaking Post Boxes
+        Permission breakPermission = new Permission("shantek.postoffice.break");
+        pm.addPermission(breakPermission);
+
+        // Permission for creating Post Boxes
+        Permission createBoxPermission = new Permission("shantek.postoffice.create");
+        pm.addPermission(createBoxPermission);
+
+        // Permission for breaking Post Boxes
+        Permission updateNotificationPermission = new Permission("shantek.postoffice.updatenotification");
+        pm.addPermission(updateNotificationPermission);
+    }
 }
