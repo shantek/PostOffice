@@ -20,6 +20,7 @@ public class Language {
     public String createError = "&a[Post Office] &4You can't create a Post Box.";
     public String postboxCreated = "&a[Post Office] &4 Box successfully created for %username%";
     public String pluginUpToDate = "Your plugin is up-to-date.";
+    public String dropItemError = "&a[Post Office] &4 You can't drop items while in a postbox.";
     public UpdateChecker updateChecker;
     public PluginConfig pluginConfig;
 

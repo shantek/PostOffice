@@ -101,7 +101,6 @@ public final class PostOffice extends JavaPlugin {
     }
 
     public void registerEventListeners() {
-
         Bukkit.getPluginManager().registerEvents(new InventoryClick(this), this);
         Bukkit.getPluginManager().registerEvents(new InventoryClose(this), this);
         Bukkit.getPluginManager().registerEvents(new InventoryOpen(this), this);

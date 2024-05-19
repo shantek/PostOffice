@@ -80,7 +80,7 @@ public class PluginConfig {
 
         // List of keys to check
         List<String> keysToCheck = Arrays.asList(
-                "custom-barrel-name", "cant-stack-items", "remove-item-error", "offhand-error", "hotbar-error",
+                "custom-barrel-name", "cant-stack-items", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
                 "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
                 "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay");
 
@@ -99,7 +99,7 @@ public class PluginConfig {
 
         // List of keys to check
         List<String> keysToCheck = Arrays.asList(
-                "custom-barrel-name", "cant-stack-items", "remove-item-error", "offhand-error", "hotbar-error",
+                "custom-barrel-name", "cant-stack-items", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
                 "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
                 "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay");
 
