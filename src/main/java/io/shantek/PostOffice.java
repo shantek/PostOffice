@@ -39,6 +39,7 @@ public final class PostOffice extends JavaPlugin {
     public boolean updateNotificationEnabled = true;
     public boolean postBoxProtection = true;
     public boolean consoleLogs = true;
+    public boolean gotMailDelay = true;
 
     public void onEnable() {
 
@@ -106,13 +107,6 @@ public final class PostOffice extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new InventoryOpen(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoin(this), this);
         Bukkit.getPluginManager().registerEvents(new BarrelProtection(this), this);
-    }
-
-    public void onDisable() {
-
-        // Save the config prior to shutting down
-        //pluginConfig.reloadConfigFile();
-
     }
 
     public static PostOffice getInstance() {

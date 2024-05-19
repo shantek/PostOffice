@@ -2,6 +2,7 @@ package io.shantek.listeners;
 
 import io.shantek.PostOffice;
 import io.shantek.functions.UpdateChecker;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,10 +19,20 @@ public class PlayerJoin implements Listener {
 
     @EventHandler
     public void onPlayerLogin(PlayerJoinEvent event) {
+
         Player player = event.getPlayer();
 
         if (postOffice.playersWithMail.contains(player.getName())) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.gotMailMessage));
+
+            // If message delay is enabled, delay it by 5 seconds
+            long messageDelay = 10L;
+            if (postOffice.gotMailDelay) {
+                messageDelay = 100L;
+            }
+
+            Bukkit.getScheduler().runTaskLater(postOffice, () -> {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.gotMailMessage));
+            }, messageDelay); // Delay showing the title by 10 ticks
         }
 
         if (postOffice.updateNotificationEnabled && (player.isOp() || player.hasPermission("shantek.postoffice.updatenotification"))) {
@@ -32,4 +43,5 @@ public class PlayerJoin implements Listener {
 
     }
 }
+
 

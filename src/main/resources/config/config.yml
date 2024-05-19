@@ -11,6 +11,10 @@ received-message: "&a[Post Office] &eYou received mail from %sender%!"
 # Message sent to the receiver next time they log on to the server
 got-mail-message: "&a[Post Office] &fYou got mail!"
 
+# Do we want to delay the got-mail-message by 5 seconds? This ensures the message
+# isn't lost in any other messages they receive during connection
+got-mail-delay: true
+
 # Error shown when the player attempts to stack items in a post box
 cant-stack-items: "&a[Post Office] &4You don't have permission to do that."
 
@@ -32,6 +36,9 @@ break-error: "&a[Post Office] &4You can't break this Post Box."
 # Confirmation message shown when a post box has been created
 # You can use %username% to show the players name
 postbox-created: "&a[Post Office] &4 Box successfully created for %username%"
+
+# Message shown in the console to inform the server owner the plugin is up to date
+plugin-up-to-date: "Your plugin is up to date."
 
 # Do you want to use the built-in protection to prevent players breaking
 # Post Boxes? Disable if you prefer to use something like WorldGuard
