@@ -33,6 +33,9 @@ break-error: "&a[Post Office] &4You can't break this Post Box."
 # You can use %username% to show the players name
 postbox-created: "&a[Post Office] &4 Box successfully created for %username%"
 
+# Message shown in the console to inform the server owner the plugin is up to date
+plugin-up-to-date: "Your plugin is up to date."
+
 # Do you want to use the built-in protection to prevent players breaking
 # Post Boxes? Disable if you prefer to use something like WorldGuard
 postbox-protection: true
