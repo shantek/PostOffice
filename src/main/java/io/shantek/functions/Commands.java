@@ -16,6 +16,7 @@ public class Commands implements CommandExecutor {
         this.postOffice = postOffice;
     }
 
+    @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("postoffice")) {
             if (args.length > 1 && args[0].equalsIgnoreCase("barrelname")) {
