@@ -61,6 +61,7 @@ public class PluginConfig {
                 postOffice.language.createError = getString(config, "create-error", postOffice.language.createError);
                 postOffice.language.breakError = getString(config, "break-error", postOffice.language.breakError);
                 postOffice.language.postboxCreated = getString(config, "postbox-created", postOffice.language.postboxCreated);
+                postOffice.language.pluginUpToDate = getString(config, "plugin-up-to-date", postOffice.language.pluginUpToDate);
 
                 postOffice.postBoxProtection = getBoolean(config, "postbox-protection", true);
                 postOffice.updateNotificationEnabled = getBoolean(config, "update-notification", true);
@@ -79,7 +80,7 @@ public class PluginConfig {
         List<String> keysToCheck = Arrays.asList(
                 "custom-barrel-name", "cant-stack-items", "remove-item-error", "offhand-error", "hotbar-error",
                 "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
-                "create-error", "break-error", "console-logs", "postbox-created");
+                "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date");
 
         // Check for missing keys
         for (String key : keysToCheck) {
@@ -98,7 +99,7 @@ public class PluginConfig {
         List<String> keysToCheck = Arrays.asList(
                 "custom-barrel-name", "cant-stack-items", "remove-item-error", "offhand-error", "hotbar-error",
                 "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
-                "create-error", "break-error", "console-logs", "postbox-created");
+                "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date");
 
         // Save existing values of missing keys
         for (String key : keysToCheck) {
