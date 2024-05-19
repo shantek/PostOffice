@@ -56,12 +56,7 @@ public final class PostOffice extends JavaPlugin {
 
         this.mailFile = new File(getDataFolder(), "mail.txt");
 
-        PluginCommand barrelNameCommand = this.getCommand("postoffice");
-        if (barrelNameCommand != null) {
-            barrelNameCommand.setExecutor(this);
-        } else {
-            getLogger().warning("Command 'postoffice' not found!");
-        }
+        getCommand("postoffice").setExecutor(new Commands(this));
 
         // Create an instance of UpdateChecker
         this.updateChecker = new UpdateChecker();
@@ -116,12 +111,20 @@ public final class PostOffice extends JavaPlugin {
     public void onDisable() {
 
         // Save the config prior to shutting down
-        pluginConfig.reloadConfigFile();
+        //pluginConfig.reloadConfigFile();
 
     }
 
     public static PostOffice getInstance() {
+        if (instance == null) {
+            instance = new PostOffice();
+        }
+
         return instance;
+    }
+
+    public void printInfoMessage(String message) {
+        getLogger().info(message); // Print to the console
     }
 
     private void registerPluginPermissions() {
@@ -142,4 +145,6 @@ public final class PostOffice extends JavaPlugin {
         Permission updateNotificationPermission = new Permission("shantek.postoffice.updatenotification");
         pm.addPermission(updateNotificationPermission);
     }
+
+
 }
