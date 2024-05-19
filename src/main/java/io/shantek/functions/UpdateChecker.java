@@ -1,5 +1,6 @@
 package io.shantek.functions;
 
+import io.shantek.PostOffice;
 import org.bukkit.plugin.Plugin;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,7 +11,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class UpdateChecker {
-
     public String currentVersion = null;
     public static String remoteVersion = null;
     public static void checkForUpdatesAsync(String currentVersion, Plugin plugin) {
@@ -19,7 +19,9 @@ public class UpdateChecker {
 
     private static void checkForUpdates(String currentVersion, Plugin plugin) {
 
-        String updateUrl = "https://api.shantek.dev/postoffice.txt"; // Replace with your actual URL
+        PostOffice postOffice = PostOffice.getInstance();
+
+        String updateUrl = "https://api.shantek.dev/postoffice.txt";
         try {
             URL url = new URL(updateUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -36,7 +38,7 @@ public class UpdateChecker {
                         plugin.getLogger().log(Level.WARNING, "Plugin outdated. Installed version: " + currentVersion + ", Latest version: " + remoteVersion);
                         // Notify users about the update
                     } else {
-                        plugin.getLogger().info("Your plugin is up-to-date.");
+                        postOffice.printInfoMessage(postOffice.language.pluginUpToDate);
                     }
                 } else {
                     // Treat non-version responses as failed attempts
