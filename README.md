@@ -18,7 +18,7 @@ Available now on [Modrinth](https://modrinth.com/plugin/postoffice), [CurgeForge
 - Place a sign on the front of the barrel and type the barrel owners name on the second line, this then becomes the owner of the post box.
 - Enjoy your awesome post office on your SMP!
 
-![Alt Plugin Usage Stats]("https://bstats.org/signatures/bukkit/Post%20Office.svg")
+![Plugin Usage Stats](https://bstats.org/signatures/bukkit/Post%20Office.svg)
 
 ## Permissions
 The below permissions are intended for giving your mods extra access and abilities within your post office. By default, players will be able to access their own post box without any additional permission nodes being granted.
