@@ -49,7 +49,7 @@ public class InventoryClick implements Listener {
                             Barrel barrel = (Barrel) blockState;
                             if (barrel.getCustomName() != null && barrel.getCustomName().equalsIgnoreCase(postOffice.customBarrelName)) {
                                 event.setCancelled(true);
-                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
+                                //player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
                                 return;
                             }
                         }
@@ -109,6 +109,13 @@ public class InventoryClick implements Listener {
                                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.hotBarError));
                                 return;
                             }
+                        }
+
+                        // Prevent players from swapping items from a barrel while having another item in hand
+                        if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
+                            event.setCancelled(true);
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
+                            return;
                         }
 
                         if (event.getAction() == InventoryAction.HOTBAR_SWAP) {
