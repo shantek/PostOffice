@@ -77,7 +77,7 @@ public class InventoryClose implements Listener {
                                     if (postOffice.consoleLogs) {
                                         plugin.getLogger().info(player.getName() + " added mail for " + ownerName);
                                     }
-                                    postOffice.playersWithMail.add(ownerUUID.toString());
+                                    postOffice.playersWithMail.add(ownerName);
                                     postOffice.helpers.saveMailFile();
 
                                     Player owner = Bukkit.getPlayer(ownerName);
@@ -90,7 +90,7 @@ public class InventoryClose implements Listener {
                                 }
                             } else {
                                 // If they were the owner, and it was their barrel, remove them from the mail list
-                                postOffice.playersWithMail.remove(event.getPlayer().getUniqueId());
+                                postOffice.playersWithMail.remove(event.getPlayer().getName());
                                 postOffice.helpers.saveMailFile();
                             }
                         }
