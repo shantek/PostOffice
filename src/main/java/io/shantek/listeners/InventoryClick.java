@@ -29,10 +29,33 @@ public class InventoryClick implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         Inventory inventory = event.getInventory();
+        Inventory clickedInventory = event.getClickedInventory();
 
         // If they aren't opening a barrel, ignore it
         if (event.getClickedInventory() == null || inventory.getType() != InventoryType.BARREL) {
             return;
+        }
+
+        // Prevent the player from double-clicking items in their own inventory to remove items
+        if (event.getClick() == ClickType.DOUBLE_CLICK) {
+            if (clickedInventory == player.getInventory() || clickedInventory.getType() == InventoryType.PLAYER) {
+                Inventory topInventory = player.getOpenInventory().getTopInventory();
+                if (topInventory != null && topInventory.getType() == InventoryType.BARREL) {
+                    Block clickedBlock = Objects.requireNonNull(topInventory.getLocation()).getBlock();
+                    if (clickedBlock.getType() == Material.BARREL) {
+                        BlockState blockState = clickedBlock.getState();
+
+                        if (blockState instanceof Barrel) {
+                            Barrel barrel = (Barrel) blockState;
+                            if (barrel.getCustomName() != null && barrel.getCustomName().equalsIgnoreCase(postOffice.customBarrelName)) {
+                                event.setCancelled(true);
+                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         Block clickedBlock = Objects.requireNonNull(event.getClickedInventory().getLocation()).getBlock();
@@ -79,7 +102,7 @@ public class InventoryClick implements Listener {
                     if (isNotOwner && !player.hasPermission("shantek.postoffice.removeitems") && !player.isOp()) {
                         // CHECK IF THE PLAYER DOESN'T HAVE PERMISSION TO USE THIS BARREL, RESTRICT NUMBER KEY CLICKING TO MOVE TO HOTBAR
                         if (event.getWhoClicked() instanceof Player && event.getClickedInventory() != null) {
-                            ItemStack hotbarItem = event.getClick() == org.bukkit.event.inventory.ClickType.NUMBER_KEY ? event.getWhoClicked().getInventory().getItem(event.getHotbarButton()) : null;
+                            ItemStack hotbarItem = event.getClick() == ClickType.NUMBER_KEY ? event.getWhoClicked().getInventory().getItem(event.getHotbarButton()) : null;
 
                             if (hotbarItem != null) {
                                 event.setCancelled(true);
@@ -94,6 +117,7 @@ public class InventoryClick implements Listener {
                             return;
                         }
 
+                        // Prevent the player from dropping items out of the postbox
                         if (event.getClick() == ClickType.DROP || event.getClick() == ClickType.CONTROL_DROP) {
                             event.setCancelled(true);
                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.dropItemError));
@@ -118,5 +142,6 @@ public class InventoryClick implements Listener {
             }
         }
     }
+
 
 }
