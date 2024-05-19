@@ -24,17 +24,8 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
                 if ("reload".startsWith(args[0].toLowerCase()) && sender.hasPermission("shantek.postoffice.reload")) {
                     completions.add("reload");
                 }
-                if ("barrelname".startsWith(args[0].toLowerCase()) && sender.hasPermission("shantek.postoffice.setname")) {
-                    completions.add("barrelname");
-                }
-            } else if (args.length == 2 && args[0].equalsIgnoreCase("barrelname") && sender.hasPermission("shantek.postoffice.setname")) {
-                // Check the second argument for "barrelname" subcommand
-                if (args[1].isEmpty()) {
-                    completions.add("<name>");
-                }
             }
         }
-
         return completions;
     }
 

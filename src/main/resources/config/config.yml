@@ -11,7 +11,7 @@ received-message: "&a[Post Office] &eYou received mail from %sender%!"
 # Message sent to the receiver next time they log on to the server
 got-mail-message: "&a[Post Office] &fYou got mail!"
 
-# Do we want to delay the got-mail-message by 5 seconds? This ensures the message
+# Do we want to delay the got-mail-message by 10 seconds? This ensures the message
 # isn't lost in any other messages they receive during connection
 got-mail-delay: true
 

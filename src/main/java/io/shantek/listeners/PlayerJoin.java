@@ -24,15 +24,15 @@ public class PlayerJoin implements Listener {
 
         if (postOffice.playersWithMail.contains(player.getName())) {
 
-            // If message delay is enabled, delay it by 5 seconds
+            // Delay this message being sent if the delay is enabled
             long messageDelay = 10L;
             if (postOffice.gotMailDelay) {
-                messageDelay = 100L;
+                messageDelay = 200L;
             }
 
             Bukkit.getScheduler().runTaskLater(postOffice, () -> {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.gotMailMessage));
-            }, messageDelay); // Delay showing the title by 10 ticks
+            }, messageDelay);
         }
 
         if (postOffice.updateNotificationEnabled && (player.isOp() || player.hasPermission("shantek.postoffice.updatenotification"))) {
