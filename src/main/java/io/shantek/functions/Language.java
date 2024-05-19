@@ -19,6 +19,7 @@ public class Language {
     public String breakError = "&a[Post Office] &4You can't break a Post Box.";
     public String createError = "&a[Post Office] &4You can't create a Post Box.";
     public String postboxCreated = "&a[Post Office] &4 Box successfully created for %username%";
+    public String pluginUpToDate = "Your plugin is up-to-date.";
     public UpdateChecker updateChecker;
     public PluginConfig pluginConfig;
 
