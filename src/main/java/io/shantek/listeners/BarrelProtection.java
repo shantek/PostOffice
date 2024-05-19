@@ -76,7 +76,7 @@ public class BarrelProtection implements Listener {
             if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
 
                 if (!player.isOp() && !player.hasPermission("shantek.postoffice.break")) {
-
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.breakError));
                     event.setCancelled(true);
                 }
 
