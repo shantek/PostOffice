@@ -7,7 +7,7 @@
 
 Show your support for the Plugin via [PayPal](https://www.paypal.com/donate/?hosted_button_id=9N3RCSJF6PYPU) or [Patreon](https://shantek.co/patreon).
 
-With built in lost box protection, you can rest easy knowing your post boxes are safe on your SMP.
+With built-in post box protection, you can rest easy knowing your post boxes are safe on your Minecraft SMP.
 
 Players are unable to break a post box or sign unless they have the correct permission node allowing them to do so.
 
