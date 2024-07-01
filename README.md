@@ -1,7 +1,9 @@
 [![License: GPL](https://img.shields.io/badge/license-GPL-blue.svg)](LICENSE)
 [![Discord](https://img.shields.io/discord/628396916639793152.svg?color=%237289da&label=discord)](https://shantek.co/discord)
 
-### Post Office is a fully functional Minecraft Post Office plugim for your Bukkit based Minecraft servers.
+#### Looking for the latest dev builds? You can find them [here!](https://shantek.dev/job/PostOffice/)
+
+### Post Office is a fully functional Minecraft Post Office plugin for your Bukkit based Minecraft servers.
 
 Show your support for the Plugin via [PayPal](https://www.paypal.com/donate/?hosted_button_id=9N3RCSJF6PYPU) or [Patreon](https://shantek.co/patreon).
 
