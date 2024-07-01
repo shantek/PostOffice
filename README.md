@@ -15,7 +15,6 @@ Available now on [Modrinth](https://modrinth.com/plugin/postoffice), [CurgeForge
 
 - Upload the JAR to your server and reboot
 - Rename barrels in an anvil to "pobox" - if you want to use a different name, be sure to change this in the config and use /postoffice reload to update your config file.
-- Use the in-game command "/setcustombarrelname name" to identify your Post Box barrels
 - Place your barrels in your amazing Post Office build.
 - Place a sign on the front of the barrel and type the barrel owners name on the second line, this then becomes the owner of the post box.
 - Enjoy your awesome post office on your SMP!
