@@ -8,6 +8,7 @@ import org.bukkit.block.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -177,8 +178,8 @@ public class BarrelProtection implements Listener {
         InventoryHolder sourceHolder = event.getSource().getHolder();
         InventoryHolder destinationHolder = event.getDestination().getHolder();
 
-        // Check if the source is a barrel and the destination is a hopper
-        if (sourceHolder instanceof Barrel && destinationHolder instanceof Hopper) {
+        // Check if the source is a barrel and the destination is a hopper or hopper minecart
+        if (sourceHolder instanceof Barrel && (destinationHolder instanceof Hopper || destinationHolder instanceof HopperMinecart)) {
             Barrel barrel = (Barrel) sourceHolder;
 
             // Check if the barrel has the custom name
@@ -195,7 +196,6 @@ public class BarrelProtection implements Listener {
         if (!postOffice.postBoxProtection) {
             return;
         }
-
         event.blockList().removeIf(this::isProtectedPostBox);
     }
 
