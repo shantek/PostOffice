@@ -3,6 +3,7 @@ package io.shantek.listeners;
 import io.shantek.PostOffice;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
@@ -186,6 +187,55 @@ public class BarrelProtection implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+
+    @EventHandler
+    public void onEntityExplode(EntityExplodeEvent event) {
+        if (!postOffice.postBoxProtection) {
+            return;
+        }
+
+        event.blockList().removeIf(this::isProtectedPostBox);
+    }
+
+    @EventHandler
+    public void onBlockExplode(BlockExplodeEvent event) {
+        if (!postOffice.postBoxProtection) {
+            return;
+        }
+        event.blockList().removeIf(this::isProtectedPostBox);
+    }
+
+    private boolean isProtectedPostBox(Block block) {
+        if (block.getType() == Material.BARREL) {
+            Barrel barrel = (Barrel) block.getState();
+            String barrelCustomName = barrel.getCustomName();
+            return barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName);
+        }
+        else if (Tag.SIGNS.isTagged(block.getType())) {
+            // Check if the sign is attached to or adjacent to a custom barrel
+            return isSignNextToProtectedBarrel(block);
+        }
+        return false;
+    }
+
+    private boolean isSignNextToProtectedBarrel(Block signBlock) {
+        BlockFace[] adjacentFaces = {
+                BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN
+        };
+
+        for (BlockFace face : adjacentFaces) {
+            Block adjacentBlock = signBlock.getRelative(face);
+            if (adjacentBlock.getType() == Material.BARREL) {
+                Barrel barrel = (Barrel) adjacentBlock.getState();
+                String barrelCustomName = barrel.getCustomName();
+                if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }
