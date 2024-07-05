@@ -3,10 +3,7 @@ package io.shantek.listeners;
 import io.shantek.PostOffice;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.Tag;
 import org.bukkit.block.*;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.EventHandler;
@@ -40,23 +37,20 @@ public class BarrelProtection implements Listener {
 
             if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
 
-                if (!postOffice.postBoxProtection) {
-                    return;
-                } else {
+                if (postOffice.postBoxProtection) {
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.createError));
                     event.setCancelled(true);
                 }
+
             } else {
                 // Check if line 2 of the sign has text
                 String line2 = event.getLine(1);
-                if (!line2.isEmpty()) {
+                if (line2 != null && !line2.isEmpty()) {
                     // Get the player name
-                    String playerName = line2;
-
 
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&',
                             postOffice.language.postboxCreated
-                                    .replace("%username%", playerName)));
+                                    .replace("%username%", line2)));
 
                 }
 
