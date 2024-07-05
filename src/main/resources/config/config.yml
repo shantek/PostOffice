@@ -35,7 +35,7 @@ break-error: "&a[Post Office] &4You can't break this Post Box."
 
 # Confirmation message shown when a post box has been created
 # You can use %username% to show the players name
-postbox-created: "&a[Post Office] &4 Box successfully created for %username%"
+postbox-created: "&a[Post Office] &2 Box successfully created for %username%"
 
 # Error shown to the player if they try dropping an item while in a post box
 drop-item-error: "&a[Post Office] &4 You can't drop items while in a postbox."
