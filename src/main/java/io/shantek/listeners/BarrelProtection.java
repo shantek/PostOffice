@@ -10,8 +10,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.inventory.InventoryHolder;
 
 public class BarrelProtection implements Listener {
 
@@ -161,6 +165,27 @@ public class BarrelProtection implements Listener {
             return facing != null ? facing.getOppositeFace() : null;
         }
         return null;
+    }
+
+    @EventHandler
+    public void onInventoryMoveItem(InventoryMoveItemEvent event) {
+        if (!postOffice.postBoxProtection) {
+            return;
+        }
+
+        InventoryHolder sourceHolder = event.getSource().getHolder();
+        InventoryHolder destinationHolder = event.getDestination().getHolder();
+
+        // Check if the source is a barrel and the destination is a hopper
+        if (sourceHolder instanceof Barrel && destinationHolder instanceof Hopper) {
+            Barrel barrel = (Barrel) sourceHolder;
+
+            // Check if the barrel has the custom name
+            String barrelCustomName = barrel.getCustomName();
+            if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+                event.setCancelled(true);
+            }
+        }
     }
 
 }
