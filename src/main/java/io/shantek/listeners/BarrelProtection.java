@@ -159,16 +159,6 @@ public class BarrelProtection implements Listener {
         return false;
     }
 
-    private BlockFace getAttachedFace(Block block) {
-        BlockData blockData = block.getBlockData();
-        if (blockData instanceof Directional) {
-            Directional directional = (Directional) blockData;
-            BlockFace facing = directional.getFacing();
-            return facing != null ? facing.getOppositeFace() : null;
-        }
-        return null;
-    }
-
     @EventHandler
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
         if (!postOffice.postBoxProtection) {
