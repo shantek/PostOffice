@@ -2,14 +2,20 @@ package io.shantek.functions;
 
 import io.shantek.PostOffice;
 import org.bukkit.Material;
+import org.bukkit.Tag;
+import org.bukkit.block.Barrel;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.logging.Level;
 
 public class Helpers {
 
-    public PostOffice postOffice;
+    private final PostOffice postOffice;
+
     public Helpers(PostOffice postOffice) {
         this.postOffice = postOffice;
     }
@@ -29,7 +35,6 @@ public class Helpers {
         int count = 0;
         for (ItemStack item : items) {
             if (item != null && item.getType() != Material.AIR) {
-                //count++;
                 count += item.getAmount();
             }
         }
@@ -37,7 +42,6 @@ public class Helpers {
     }
 
     public void checkForDataFolder() {
-        // Ensure the data folder exists
         if (!postOffice.getDataFolder().exists()) {
             if (postOffice.getDataFolder().mkdir()) {
                 postOffice.getLogger().info("Data folder created successfully.");
@@ -47,4 +51,32 @@ public class Helpers {
         }
     }
 
+    public boolean isProtectedPostBox(Block block) {
+        if (block.getType() == Material.BARREL) {
+            Barrel barrel = (Barrel) block.getState();
+            String barrelCustomName = barrel.getCustomName();
+            return barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName);
+        } else if (Tag.SIGNS.isTagged(block.getType())) {
+            return isSignNextToProtectedBarrel(block);
+        }
+        return false;
+    }
+
+    public boolean isSignNextToProtectedBarrel(Block signBlock) {
+        BlockFace[] adjacentFaces = {
+                BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN
+        };
+
+        for (BlockFace face : adjacentFaces) {
+            Block adjacentBlock = signBlock.getRelative(face);
+            if (adjacentBlock.getType() == Material.BARREL) {
+                Barrel barrel = (Barrel) adjacentBlock.getState();
+                String barrelCustomName = barrel.getCustomName();
+                if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
