@@ -1,47 +1,47 @@
 # The name of your barrel. Any barrel renamed to this in an anvil
 # will be treated as a Post Box
-custom-barrel-name: "pobox"
+custom-barrel-name: pobox
 
 # Message sent to the sender when closing the Post Box
-sent-message: "&a[Post Office] &aMail sent to %receiver%."
+sent-message: '&a[Postacı] &aPosta başarıyla %receiver%. oyuncusuna gönderildi'
 
 # Message sent to the receiver if they are online
-received-message: "&a[Post Office] &eYou received mail from %sender%!"
+received-message: '&a[Postacı] &e%sender% sana bir posta gönderdi!'
 
 # Message sent to the receiver next time they log on to the server
-got-mail-message: "&a[Post Office] &fYou got mail!"
+got-mail-message: '&a[Postacı] &fPostan var!'
 
 # Do we want to delay the got-mail-message by 10 seconds? This ensures the message
 # isn't lost in any other messages they receive during connection
 got-mail-delay: true
 
 # Error shown when the player attempts to stack items in a post box
-cant-stack-items: "&a[Post Office] &4You don't have permission to do that."
+cant-stack-items: '&a[Postacı] &4Bunu yapmak için yeterli iznin yok'
 
 # Error shown when a player attempts to remove items without permission
-remove-item-error: "&a[Post Office] &4You don't have permission to remove items."
+remove-item-error: '&a[Postacı] &4Kutudan eşya kaldırma iznin yok.'
 
 # Error shown when trying to use their offhand while in a Post Box
-offhand-error: "&a[Post Office] &4No offhand usage while in a Post Box!"
+offhand-error: '&a[Postacı] &4Posta kutusundayken diğer elini kullanmazsın!'
 
 # Error shown when trying to swap items to their hotbar
-hotbar-error: "&a[Post Office] &4No hot bar usage while in a Post Box!"
+hotbar-error: '&a[Postacı] &4Posta kutusundayken sık kullanılanlar çubuğunu kullanamazsın'
 
 # Error shown when the player tries to create a Post Box
-create-error: "&a[Post Office] &4You can't create a Post Box."
+create-error: '&a[Postacı] &4Bir posta kutusu oluşturamazsın.'
 
 # Error shown when a player tries to break a Post Box
-break-error: "&a[Post Office] &4You can't break this Post Box."
+break-error: '&a[Postacı] &4Bu posta kutusunu kıramazsın'
 
 # Confirmation message shown when a post box has been created
 # You can use %username% to show the players name
-postbox-created: "&a[Post Office] &2 Box successfully created for %username%"
+postbox-created: '&a[Postacı] &4 %username% için posta kutusu oluşturuldu'
 
 # Error shown to the player if they try dropping an item while in a post box
-drop-item-error: "&a[Post Office] &4 You can't drop items while in a postbox."
+drop-item-error: '&a[Postacı] &4Posta kutusundayken eşya bırakamazsın.'
 
 # Message shown in the console to inform the server owner the plugin is up to date
-plugin-up-to-date: "Your plugin is up to date."
+plugin-up-to-date: Your plugin is up to date.
 
 # Do you want to use the built-in protection to prevent players breaking
 # Post Boxes? Disable if you prefer to use something like WorldGuard
