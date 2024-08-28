@@ -24,8 +24,10 @@ public class PlayerJoin implements Listener {
 
         if (postOffice.playersWithMail.contains(player.getName())) {
 
-            // Delay this message being sent if the delay is enabled
-            long messageDelay = 10L;
+            // Set initial delay of 1 second
+            long messageDelay = 20L;
+
+            // If the additional delay is active, change to 10 seconds
             if (postOffice.gotMailDelay) {
                 messageDelay = 200L;
             }
