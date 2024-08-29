@@ -22,11 +22,13 @@ public class Commands implements CommandExecutor {
         if (cmd.getName().equalsIgnoreCase("postoffice")) {
             if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
                 if (sender.hasPermission("shantek.postoffice.reload") || sender.isOp()) {
+
                     // Reload all the config and language file
                     postOffice.pluginConfig.reloadConfigFile();
                     sender.sendMessage(ChatColor.GREEN + "Post Office config file has been reloaded.");
                     return true;
                 } else {
+                    // Player doesn't have permission to use the command
                     sender.sendMessage(ChatColor.RED + "You don't have access to this command!");
                     return false;
                 }
@@ -38,5 +40,6 @@ public class Commands implements CommandExecutor {
         }
         return false;
     }
+
 }
 

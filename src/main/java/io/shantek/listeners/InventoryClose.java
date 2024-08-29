@@ -58,7 +58,6 @@ public class InventoryClose implements Listener {
                             }
                         }
 
-                        // Only process the logic if the ownerName is not empty
                         if (!ownerName.isEmpty()) {
                             if (!isOwner) {
                                 postOffice.newItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
