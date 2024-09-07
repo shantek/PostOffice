@@ -37,3 +37,14 @@ Allow a player to break any post box
 
 ### shantek.postoffice.updatenotification
 Any player with this permission will be notified if there is an update to the plugin
+
+## External Links
+
+[Support via Patreon](https://shantek.co/patreon)
+
+[Discord](https://shantek.co/discord)
+
+[Report bugs/make suggestions](https://github.com/shantek/PostOffice/issues)
+
+### License
+Distributed under the GNU General Public License v3.0.
