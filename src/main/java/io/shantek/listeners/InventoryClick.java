@@ -21,6 +21,7 @@ import java.util.Objects;
 public class InventoryClick implements Listener {
 
     public PostOffice postOffice;
+
     public InventoryClick(PostOffice postOffice) {
         this.postOffice = postOffice;
     }
@@ -149,4 +150,5 @@ public class InventoryClick implements Listener {
             }
         }
     }
+
 }

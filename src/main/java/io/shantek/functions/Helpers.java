@@ -21,15 +21,32 @@ public class Helpers {
         this.postOffice = postOffice;
     }
 
-    public void saveMailFile() {
-        try {
-            if (postOffice.consoleLogs) {
-                postOffice.getLogger().info("The mail list has been updated.");
+    public boolean hasBarrelNearby(Block block) {
+        // Check if the given block is a barrel with the custom name
+        if (block.getType() == Material.BARREL) {
+            Barrel barrel = (Barrel) block.getState();
+            String barrelCustomName = barrel.getCustomName();
+
+            if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+                return true;
             }
-            Files.write(postOffice.mailFile.toPath(), postOffice.playersWithMail);
-        } catch (IOException e) {
-            postOffice.getLogger().log(Level.SEVERE, "Error updating the mail file.", e);
         }
+
+        // Check if any nearby block is a barrel with the custom name
+        for (BlockFace blockFace : BlockFace.values()) {
+            Block relativeBlock = block.getRelative(blockFace);
+
+            if (relativeBlock.getType() == Material.BARREL) {
+                Barrel barrel = (Barrel) relativeBlock.getState();
+                String barrelCustomName = barrel.getCustomName();
+
+                if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public int countNonNullItems(ItemStack[] items) {
@@ -40,16 +57,6 @@ public class Helpers {
             }
         }
         return count;
-    }
-
-    public void checkForDataFolder() {
-        if (!postOffice.getDataFolder().exists()) {
-            if (postOffice.getDataFolder().mkdir()) {
-                postOffice.getLogger().info("Data folder created successfully.");
-            } else {
-                postOffice.getLogger().warning("Error creating the data folder.");
-            }
-        }
     }
 
     public boolean isProtectedPostBox(Block block) {
@@ -80,4 +87,29 @@ public class Helpers {
         }
         return false;
     }
+
+    //region Plugin Configuration
+
+    public void checkForDataFolder() {
+        if (!postOffice.getDataFolder().exists()) {
+            if (postOffice.getDataFolder().mkdir()) {
+                postOffice.getLogger().info("Data folder created successfully.");
+            } else {
+                postOffice.getLogger().warning("Error creating the data folder.");
+            }
+        }
+    }
+
+    public void saveMailFile() {
+        try {
+            if (postOffice.consoleLogs) {
+                postOffice.getLogger().info("The mail list has been updated.");
+            }
+            Files.write(postOffice.mailFile.toPath(), postOffice.playersWithMail);
+        } catch (IOException e) {
+            postOffice.getLogger().log(Level.SEVERE, "Error updating the mail file.", e);
+        }
+    }
+
+    //endregion
 }

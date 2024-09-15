@@ -25,9 +25,7 @@ public final class PostOffice extends JavaPlugin {
     public Helpers helpers;
     public BarrelProtection barrelProtection;
     public TabCompleter tabCompleter;
-
     public static PostOffice instance;
-
     public String customBarrelName = "pobox";
     public File mailFile;
     public int previousItemCount = 0;
@@ -135,6 +133,5 @@ public final class PostOffice extends JavaPlugin {
         Permission updateNotificationPermission = new Permission("shantek.postoffice.updatenotification");
         pm.addPermission(updateNotificationPermission);
     }
-
 
 }

@@ -2,7 +2,6 @@ package io.shantek.listeners;
 
 import io.shantek.PostOffice;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.block.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -37,7 +36,7 @@ public class BarrelProtection implements Listener {
         Player player = event.getPlayer();
         Block signBlock = event.getBlock();
 
-        if (hasBarrelNearby(signBlock)) {
+        if (postOffice.helpers.hasBarrelNearby(signBlock)) {
             if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.createError));
                 event.setCancelled(true);
@@ -76,7 +75,7 @@ public class BarrelProtection implements Listener {
 
         // Check if the broken block is a sign
         if (brokenBlock.getState() instanceof Sign) {
-            if (hasBarrelNearby(brokenBlock)) {
+            if (postOffice.helpers.hasBarrelNearby(brokenBlock)) {
                 if (!player.isOp() && !player.hasPermission("shantek.postoffice.break")) {
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.breakError));
                     event.setCancelled(true);
@@ -94,40 +93,12 @@ public class BarrelProtection implements Listener {
         Player player = event.getPlayer();
         Block placedBlock = event.getBlockPlaced();
 
-        if (placedBlock.getState() instanceof Sign && hasBarrelNearby(placedBlock)) {
+        if (placedBlock.getState() instanceof Sign && postOffice.helpers.hasBarrelNearby(placedBlock)) {
             if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.createError));
                 placedBlock.breakNaturally();
             }
         }
-    }
-
-    private boolean hasBarrelNearby(Block block) {
-        // Check if the given block is a barrel with the custom name
-        if (block.getType() == Material.BARREL) {
-            Barrel barrel = (Barrel) block.getState();
-            String barrelCustomName = barrel.getCustomName();
-
-            if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
-                return true;
-            }
-        }
-
-        // Check if any nearby block is a barrel with the custom name
-        for (BlockFace blockFace : BlockFace.values()) {
-            Block relativeBlock = block.getRelative(blockFace);
-
-            if (relativeBlock.getType() == Material.BARREL) {
-                Barrel barrel = (Barrel) relativeBlock.getState();
-                String barrelCustomName = barrel.getCustomName();
-
-                if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     @EventHandler

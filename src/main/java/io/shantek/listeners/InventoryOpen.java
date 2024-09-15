@@ -15,6 +15,7 @@ import java.util.Objects;
 public class InventoryOpen implements Listener {
 
     public PostOffice postOffice;
+
     public InventoryOpen(PostOffice postOffice) {
         this.postOffice = postOffice;
     }
