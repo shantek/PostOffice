@@ -1,10 +1,7 @@
 package io.shantek.listeners;
 
 import io.shantek.PostOffice;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -44,11 +41,15 @@ public class InventoryClose implements Listener {
                         boolean isOwner = false;
                         String ownerName = "";
 
+                        Sign sign = null;
+                        boolean foundSign = false;
+
                         for (BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST}) {
                             Block relativeBlock = clickedBlock.getRelative(face);
 
                             if (relativeBlock.getType().name().toUpperCase().contains("SIGN")) {
-                                Sign sign = (Sign) relativeBlock.getState();
+                                foundSign = true;
+                                sign = (Sign) relativeBlock.getState();
                                 ownerName = sign.getLine(1);
 
                                 if (sign.getLine(1).equalsIgnoreCase(event.getPlayer().getName())) {
@@ -58,10 +59,19 @@ public class InventoryClose implements Listener {
                             }
                         }
 
+
                         if (!ownerName.isEmpty()) {
                             if (!isOwner) {
                                 postOffice.newItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
                                 if (postOffice.newItemCount > postOffice.previousItemCount) {
+
+                                    // Set their sign to notify them they have mail
+                                    if (postOffice.signNotification && foundSign) {
+
+                                        sign.setLine(2, ChatColor.GREEN + "You have mail");
+                                        sign.update();
+
+                                    }
 
                                     player.sendMessage(ChatColor.translateAlternateColorCodes('&',
                                             postOffice.language.sentMessage
@@ -88,6 +98,15 @@ public class InventoryClose implements Listener {
                                     }
                                 }
                             } else {
+
+                                // Set their sign to notify them they have mail
+                                if (postOffice.signNotification && foundSign) {
+
+                                    sign.setLine(2, "");
+                                    sign.update();
+
+                                }
+
                                 // If they were the owner, and it was their barrel, remove them from the mail list
                                 postOffice.playersWithMail.remove(event.getPlayer().getName());
                                 postOffice.helpers.saveMailFile();

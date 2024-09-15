@@ -2,6 +2,10 @@
 # will be treated as a Post Box
 custom-barrel-name: "pobox"
 
+# Display mail state on post box signs. When enabled, a notification will be
+# added to the third line of the post box sign
+sign-notification: true
+
 # Message sent to the sender when closing the Post Box
 sent-message: "&a[Post Office] &aMail sent to %receiver%."
 
