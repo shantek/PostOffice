@@ -213,23 +213,4 @@ public class PluginConfig {
         }
     }
 
-    public void setCustomBarrelName(String newCustomBarrelName) {
-        try {
-            File configFile = new File(postOffice.getDataFolder(), "config.yml");
-            FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-
-            // Update the custom barrel name in the configuration
-            config.set("custom-barrel-name", newCustomBarrelName);
-
-            // Save the updated configuration
-            saveConfigSilently(config);
-
-            // Update the custom barrel name in the PostOffice instance
-            postOffice.customBarrelName = newCustomBarrelName;
-
-        } catch (Exception e) {
-            postOffice.getLogger().log(Level.SEVERE, "An error occurred while updating the custom barrel name", e);
-        }
-    }
-
 }

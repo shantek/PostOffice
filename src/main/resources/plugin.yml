@@ -1,6 +1,6 @@
 name: PostOffice
 api-version: 1.15
-version: 1.6.3
+version: '${project.version}'
 author: Shantek.io
 main: io.shantek.PostOffice
 

@@ -35,7 +35,6 @@ public class InventoryOpen implements Listener {
                     Barrel barrel = (Barrel) blockState;
 
                     if (barrel.getCustomName() != null && barrel.getCustomName().equalsIgnoreCase(postOffice.customBarrelName)) {
-
                         postOffice.previousItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
                     }
                 }
