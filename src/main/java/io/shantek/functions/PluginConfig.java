@@ -21,6 +21,9 @@ public class PluginConfig {
         this.postOffice = postOffice;
     }
 
+    private FileConfiguration barrelsConfig = null;
+    private File barrelsConfigFile = null;
+
     public void reloadConfigFile() {
         try {
             postOffice.getLogger().info("Reloading config file."); // Print to the console
@@ -212,5 +215,39 @@ public class PluginConfig {
             postOffice.getLogger().log(Level.SEVERE, "An error occurred while updating the config file", e);
         }
     }
+
+    public void reloadBarrelsConfig() {
+        if (barrelsConfigFile == null) {
+            barrelsConfigFile = new File(postOffice.getDataFolder(), "barrels.yml");
+        }
+        barrelsConfig = YamlConfiguration.loadConfiguration(barrelsConfigFile);
+
+        // Check if the file exists, and if not, create it
+        if (!barrelsConfigFile.exists()) {
+            postOffice.saveResource("barrels.yml", false);
+        }
+    }
+
+    // Get the barrels.yml configuration
+    public FileConfiguration getBarrelsConfig() {
+        if (barrelsConfig == null) {
+            reloadBarrelsConfig();
+        }
+        return barrelsConfig;
+    }
+
+    // Save changes to barrels.yml
+    public void saveBarrelsConfig() {
+        if (barrelsConfig == null || barrelsConfigFile == null) {
+            return;
+        }
+        try {
+            barrelsConfig.save(barrelsConfigFile);
+        } catch (IOException e) {
+            postOffice.getLogger().severe("Could not save barrels.yml: " + e.getMessage());
+        }
+    }
+
+
 
 }
