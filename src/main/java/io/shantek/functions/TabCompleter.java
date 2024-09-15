@@ -3,7 +3,6 @@ package io.shantek.functions;
 import io.shantek.PostOffice;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-
 import java.util.ArrayList;
 import java.util.List;
 

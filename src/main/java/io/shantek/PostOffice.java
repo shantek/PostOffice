@@ -1,16 +1,13 @@
 package io.shantek;
 
+import io.shantek.functions.*;
+import io.shantek.listeners.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.*;
 import java.util.stream.Collectors;
-
-import io.shantek.functions.*;
-import io.shantek.listeners.*;
 import org.bukkit.Bukkit;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;

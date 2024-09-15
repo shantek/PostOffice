@@ -1,17 +1,18 @@
 package io.shantek.functions;
 
+import io.shantek.PostOffice;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.logging.Level;
-
-import io.shantek.PostOffice;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import java.nio.file.*;
 import java.util.*;
-@SuppressWarnings("SameParameterValue")
+
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 public class PluginConfig {
 
     private final PostOffice postOffice;
