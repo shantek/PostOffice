@@ -209,6 +209,7 @@ public class PluginConfig {
             config.save(new File(postOffice.getDataFolder(), "config.yml"));
         } catch (IOException e) {
             // Log the exception or handle it as needed (e.g., printStackTrace())
+            postOffice.getLogger().log(Level.SEVERE, "An error occurred while updating the config file", e);
         }
     }
 
