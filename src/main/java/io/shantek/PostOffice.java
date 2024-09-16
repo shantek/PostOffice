@@ -112,6 +112,12 @@ public final class PostOffice extends JavaPlugin {
         return instance;
     }
 
+    @Override
+    public void onDisable() {
+        // Save the cache to file when the plugin is disabled
+        helpers.saveCacheToFile();
+    }
+
     public void printInfoMessage(String message) {
         getLogger().info(message); // Print to the console
     }
