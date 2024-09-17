@@ -1,10 +1,12 @@
 package io.shantek.listeners;
 
 import io.shantek.PostOffice;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Barrel;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -24,6 +26,7 @@ public class InventoryOpen implements Listener {
     public void onInventoryOpen(InventoryOpenEvent event) {
 
         Inventory inventory = event.getInventory();
+        Player player = (Player) event.getPlayer();
 
         if (inventory.getType() == InventoryType.BARREL) {
 
@@ -35,7 +38,16 @@ public class InventoryOpen implements Listener {
                     Barrel barrel = (Barrel) blockState;
 
                     if (barrel.getCustomName() != null && barrel.getCustomName().equalsIgnoreCase(postOffice.customBarrelName)) {
-                        postOffice.previousItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
+
+                        if (player.hasPermission("shantek.postoffice.use")) {
+
+                            // They have permission to use the post office system. Let them open the post box
+                            postOffice.previousItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
+                        }
+                        else {
+                            player.sendMessage(ChatColor.RED + "You don't have permission to interact with post boxes.");
+                        }
+
                     }
                 }
             }
