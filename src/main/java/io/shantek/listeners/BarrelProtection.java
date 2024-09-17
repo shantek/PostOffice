@@ -2,6 +2,7 @@ package io.shantek.listeners;
 
 import io.shantek.PostOffice;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.block.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -34,20 +35,14 @@ public class BarrelProtection implements Listener {
         }
 
         Player player = event.getPlayer();
-        Block signBlock = event.getBlock();
 
-        if (postOffice.helpers.hasBarrelNearby(signBlock)) {
-            if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.createError));
-                event.setCancelled(true);
-            } else {
-                String line2 = event.getLine(1);
-                if (line2 != null && !line2.isEmpty()) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                            postOffice.language.postboxCreated
-                                    .replace("%username%", line2)));
-                }
-            }
+        // Ensure the sign is attached to a barrel
+        // If this is a post box barrel, cancel the sign editing
+        Block signBlock = event.getBlock();
+        Block attachedBarrel = postOffice.helpers.getBarrelFromSign(signBlock);
+
+        if (postOffice.helpers.isBarrelInConfig(attachedBarrel)) {
+            event.setCancelled(true);
         }
     }
 
