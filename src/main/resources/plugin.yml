@@ -6,7 +6,40 @@ main: io.shantek.PostOffice
 
 commands:
   postoffice:
-    description: Reload the PostOffice plugin
-    usage: /postoffice reload
-    permission: shantek.postoffice.reload
+    description: Post office plugin commands
+    aliases: [po]
+    usage: /postoffice [subcommand]
+    permission: shantek.postoffice.use
+
+permissions:
+  shantek.postoffice.use:
+    description: Allows usage of the Post Office commands.
+    default: true
+
+  shantek.postoffice.register:
+    description: Allows the player to register a post box in the config.
+    default: op
+
+  shantek.postoffice.remove:
+    description: Allows the player to remove a post box from the config file.
+    default: op
+
+  shantek.postoffice.reload:
+    description: Allows the player to reload the post office plugin config.
+    default: op
+
+  shantek.postoffice.claim:
+    description: Allows players to claim their own post box.
+    default: op
+
+  shantek.postoffice.claim.others:
+    description: Allows admin/mods to claim a post box for others.
+    default: op
+
+  shantek.postoffice.removeitems:
+    description: Allows admin/mods to remove items from other post boxes.
+    default: op
+
+  shantek.postoffice.updatenotification:
+    description: Notifies OPs/admins/mods of a plugin update.
     default: op

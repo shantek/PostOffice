@@ -30,7 +30,7 @@ public class Commands implements CommandExecutor {
                     Player player = (Player) sender;
 
                     // Ensure they have the proper permission
-                    if (player.hasPermission("shantek.postoffice.remove") || player.isOp()) {
+                    if (player.hasPermission("shantek.postoffice.register") || player.isOp()) {
 
                         // Get the block the player is looking at (sign or barrel)
                         Block targetBlock = player.getTargetBlock(null, 10);
@@ -58,9 +58,6 @@ public class Commands implements CommandExecutor {
                             return true;
                         }
 
-                        // Call the helper to remove the barrel from the cache and config
-                        postOffice.helpers.removeBarrelFromCache(barrelBlock);
-
                         // Optionally clear the sign associated with the post box
                         Block signBlock = postOffice.helpers.getSignForBarrel(barrelBlock);
                         if (signBlock != null && signBlock.getState() instanceof Sign) {
@@ -69,6 +66,9 @@ public class Commands implements CommandExecutor {
                             sign.setLine(2, ""); // Clear the third line
                             sign.update(); // Update the sign
                         }
+
+                        // Call the helper to remove the barrel from the cache and config
+                        postOffice.helpers.removeBarrelFromCache(barrelBlock);
 
                         player.sendMessage(ChatColor.GREEN + "Post box removed successfully.");
 
@@ -147,7 +147,7 @@ public class Commands implements CommandExecutor {
 
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
-                    if (sender.hasPermission("shantek.postoffice.create") || sender.isOp()) {
+                    if (sender.hasPermission("shantek.postoffice.register") || sender.isOp()) {
 
                         // Ensure they are looking at a sign
                         Block targetBlock = player.getTargetBlock(null, 10); // Max distance 10 blocks
@@ -204,7 +204,7 @@ public class Commands implements CommandExecutor {
                     return true;
                 }
             } else if (args[0].equalsIgnoreCase("claim") && args.length == 2) {
-                if (sender.hasPermission("shantek.postoffice.admin") || sender.isOp()) {
+                if (sender.hasPermission("shantek.postoffice.claim.others") || sender.isOp()) {
 
                     // Ensure they are looking at a sign
                     if (!(sender instanceof Player)) {
@@ -282,7 +282,7 @@ public class Commands implements CommandExecutor {
                     Player player = (Player) sender;
                     UUID playerUUID = player.getUniqueId();
 
-                    if (sender.hasPermission("shantek.postoffice.create") || sender.isOp()) {
+                    if (sender.hasPermission("shantek.postoffice.claim") || sender.isOp()) {
 
                         // Ensure they are looking at a sign
                         Block targetBlock = player.getTargetBlock(null, 10); // Max distance 10 blocks
