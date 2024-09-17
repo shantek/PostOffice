@@ -28,7 +28,6 @@ public class Helpers {
 
     // In-memory cache to store barrel data (key: block location, value: owner UUID)
     private Map<String, BarrelData> barrelsCache;
-
     private FileConfiguration barrelsConfig = null;
     private File barrelsConfigFile = null;
 
@@ -63,27 +62,6 @@ public class Helpers {
         return false;
     }
 
-    // Method to check if the block the player is looking at is a custom barrel
-    public boolean isLookingAtCustomBarrel(Player player) {
-
-        // Get the block the player is looking at (with a max distance of 10)
-        Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
-
-        if (targetBlock.getType() == Material.BARREL) {
-            BlockState state = targetBlock.getState();
-
-            if (state instanceof Barrel) {
-                Barrel barrel = (Barrel) state;
-                String barrelCustomName = barrel.getCustomName();
-
-                // Check if the barrel has the custom name
-                return barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName);
-            }
-        }
-
-        return false; // Not looking at a valid custom barrel
-    }
-
     // Check if the block is a protected post box
     public boolean isProtectedPostBox(Block block) {
         if (block.getType() == Material.BARREL) {
@@ -113,17 +91,6 @@ public class Helpers {
             }
         }
         return false;
-    }
-
-    // Check for a sign attached to a barrel
-    public Block getAttachedSign(Block barrelBlock) {
-        for (BlockFace face : BlockFace.values()) {
-            Block relativeBlock = barrelBlock.getRelative(face);
-            if (Tag.SIGNS.isTagged(relativeBlock.getType())) {
-                return relativeBlock; // Return the block if it's a sign
-            }
-        }
-        return null; // No sign found
     }
 
     //region Barrel Caching and Config Operations
@@ -162,106 +129,6 @@ public class Helpers {
         } else {
             postOffice.getLogger().warning("No barrels found in barrels.yml during cache load.");
         }
-    }
-
-    public void addBarrelWithSign(Block barrelBlock, Block signBlock, UUID newOwnerUUID, String state) {
-        if (barrelBlock.getType() != Material.BARREL || !Tag.SIGNS.isTagged(signBlock.getType())) {
-            return; // Only proceed if the block is a barrel and the sign is valid
-        }
-
-        String barrelLocationString = getBlockLocationString(barrelBlock);
-        String signLocationString = getBlockLocationString(signBlock);
-
-        // Create or update the BarrelData
-        BarrelData barrelData = new BarrelData(newOwnerUUID, state, signLocationString);
-
-        // Add or update the barrel data in the cache
-        barrelsCache.put(barrelLocationString, barrelData);
-
-        // Log for debugging purposes
-        postOffice.getLogger().info("Adding/Updating barrel at: " + barrelLocationString);
-        postOffice.getLogger().info("Sign location for barrel: " + signLocationString);
-
-        // Save the updated cache to disk
-        saveBarrelsToDisk();
-    }
-
-    // Remove barrel from in-memory cache and save to disk if necessary
-    public void removeBarrel(Block block) {
-        String blockLocationString = getBlockLocationString(block);
-
-        // Check if the barrel exists in the cache
-        if (barrelsCache.containsKey(blockLocationString)) {
-            // Barrel exists, remove it from the cache
-            barrelsCache.remove(blockLocationString);
-
-            // Remove the barrel from the config as well
-            barrelsConfig.set("barrels." + blockLocationString, null);
-
-            // Save the updated cache to barrels.yml
-            saveBarrelsToDisk();
-        }
-    }
-
-    // Save the in-memory cache to barrels.yml
-    public void saveBarrelsToDisk() {
-        FileConfiguration barrelsConfig = getBarrelsConfig();
-
-        // Clear existing entries in the file
-        barrelsConfig.set("barrels", null);
-
-        // Iterate over the cache and save each barrel's data
-        for (Map.Entry<String, BarrelData> entry : barrelsCache.entrySet()) {
-            String barrelLocationString = entry.getKey();
-            BarrelData barrelData = entry.getValue();
-
-            String path = "barrels." + barrelLocationString;
-
-            // Set the owner UUID, or "none" if no owner is set
-            barrelsConfig.set(path + ".owner", barrelData.getOwnerUUID() != null ? barrelData.getOwnerUUID().toString() : "none");
-
-            // Set the state (e.g., "claimed", "registered")
-            barrelsConfig.set(path + ".state", barrelData.getState());
-
-            // Set the sign location if it exists
-            barrelsConfig.set(path + ".sign", barrelData.getSignLocation());
-
-            // Parse and store the world and coordinates from the barrel location string
-            String[] parts = barrelLocationString.split("_");
-            if (parts.length == 4) {
-                barrelsConfig.set(path + ".world", parts[0]);
-                barrelsConfig.set(path + ".x", Integer.parseInt(parts[1]));
-                barrelsConfig.set(path + ".y", Integer.parseInt(parts[2]));
-                barrelsConfig.set(path + ".z", Integer.parseInt(parts[3]));
-            }
-        }
-
-        // Save the updated configuration to barrels.yml
-        saveBarrelsConfig();
-    }
-
-
-    public void registerBarrelWithSign(Block barrelBlock, Block signBlock, UUID ownerUUID, String state) {
-        String barrelLocationString = getBlockLocationString(barrelBlock);
-        String signLocationString = getBlockLocationString(signBlock);
-
-        FileConfiguration barrelsConfig = getBarrelsConfig();
-
-        // Register barrel and sign in barrels.yml with proper world and coordinates
-        barrelsConfig.set("barrels." + barrelLocationString + ".state", state); // Set the state to registered/claimed
-        barrelsConfig.set("barrels." + barrelLocationString + ".owner", ownerUUID != null ? ownerUUID.toString() : "none");
-        barrelsConfig.set("barrels." + barrelLocationString + ".sign", signLocationString);
-        barrelsConfig.set("barrels." + barrelLocationString + ".world", barrelBlock.getWorld().getName());
-        barrelsConfig.set("barrels." + barrelLocationString + ".x", barrelBlock.getX());
-        barrelsConfig.set("barrels." + barrelLocationString + ".y", barrelBlock.getY());
-        barrelsConfig.set("barrels." + barrelLocationString + ".z", barrelBlock.getZ());
-
-        // Log the barrel and sign registration for debugging purposes
-        postOffice.getLogger().info("Registering barrel at: " + barrelLocationString);
-        postOffice.getLogger().info("Sign location for barrel: " + signLocationString);
-
-        saveBarrelsConfig(); // Save changes to barrels.yml
-        reloadBarrelsConfig();
     }
 
     public Block getSignFromConfig(Block barrelBlock) {
@@ -330,7 +197,6 @@ public class Helpers {
         }
         return false; // The player does not have a post box
     }
-
 
     public String getPlayerPostBoxLocation(UUID playerUUID) {
         FileConfiguration barrelsConfig = getBarrelsConfig();
@@ -543,8 +409,6 @@ public class Helpers {
 
     //endregion
 
-
-
     public void addOrUpdateBarrelInCache(Block barrelBlock, Block signBlock, UUID ownerUUID, String state) {
         String barrelLocationString = getBlockLocationString(barrelBlock);
         String signLocationString = getBlockLocationString(signBlock);
@@ -594,7 +458,6 @@ public class Helpers {
         // Save the cache to file immediately
         saveCacheToFile();
     }
-
 
     public void saveCacheToFile() {
         FileConfiguration barrelsConfig = getBarrelsConfig();
