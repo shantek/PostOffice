@@ -9,10 +9,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 import org.bukkit.*;
-import org.bukkit.block.Barrel;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
+import org.bukkit.block.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -515,10 +512,6 @@ public class Helpers {
         return Bukkit.getOfflinePlayer(uuid);
     }
 
-    public OfflinePlayer getPlayerReference(UUID ownerUuid) {
-        return Bukkit.getOfflinePlayer(ownerUuid);
-    }
-
     public boolean isPostBoxOwner(Block block, Player player) {
         UUID playerUUID = player.getUniqueId();
         return getOwnerUUID(block).equals(playerUUID);
@@ -548,16 +541,6 @@ public class Helpers {
         return offlinePlayer.getName(); // This may return null if the player's name is not available
     }
 
-    public UUID getPlayerUUID(Player player) {
-        return player.getUniqueId();
-    }
-
-    // Method to check if a player is online by UUID
-    public boolean isPlayerOnline(UUID uuid) {
-        Player player = Bukkit.getPlayer(uuid);
-        return player != null;
-    }
-
     //endregion
 
 
@@ -576,12 +559,42 @@ public class Helpers {
     public void removeBarrelFromCache(Block barrelBlock) {
         String barrelLocationString = getBlockLocationString(barrelBlock);
 
+        // Retrieve the associated sign before removing the barrel from the cache
+        BarrelData barrelData = barrelsCache.get(barrelLocationString);
+        if (barrelData != null) {
+            String signLocationString = barrelData.getSignLocation();
+            if (signLocationString != null) {
+                // Get the sign block from its location string
+                String[] parts = signLocationString.split("_");
+                if (parts.length == 4) {
+                    World world = Bukkit.getWorld(parts[0]);
+                    int x = Integer.parseInt(parts[1]);
+                    int y = Integer.parseInt(parts[2]);
+                    int z = Integer.parseInt(parts[3]);
+
+                    if (world != null) {
+                        Block signBlock = world.getBlockAt(x, y, z);
+                        if (signBlock.getState() instanceof Sign) {
+                            // Clear the sign text (e.g., remove the player's name and "Unclaimed" message)
+                            Sign sign = (Sign) signBlock.getState();
+                            sign.setLine(0, ""); // Clear the first line
+                            sign.setLine(1, ""); // Clear the second line
+                            sign.setLine(2, ""); // Clear the third line
+                            sign.setLine(3, ""); // Clear the fourth line
+                            sign.update(); // Update the sign
+                        }
+                    }
+                }
+            }
+        }
+
         // Remove the barrel from the cache
         barrelsCache.remove(barrelLocationString);
 
-        // Optionally, you could save the cache to file immediately here:
-        // saveCacheToFile();
+        // Save the cache to file immediately
+        saveCacheToFile();
     }
+
 
     public void saveCacheToFile() {
         FileConfiguration barrelsConfig = getBarrelsConfig();

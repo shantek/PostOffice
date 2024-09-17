@@ -23,7 +23,67 @@ public class Commands implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("postoffice")) {
-            if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+
+            // Postoffice remove command
+            if (args[0].equalsIgnoreCase("remove")) {
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+
+                    // Ensure they have the proper permission
+                    if (player.hasPermission("shantek.postoffice.remove") || player.isOp()) {
+
+                        // Get the block the player is looking at (sign or barrel)
+                        Block targetBlock = player.getTargetBlock(null, 10);
+
+                        Block barrelBlock = null;
+
+                        // Check if the player is looking at a sign
+                        if (Tag.SIGNS.isTagged(targetBlock.getType())) {
+                            // Retrieve the attached barrel
+                            barrelBlock = postOffice.helpers.getAttachedBarrel(targetBlock);
+                        } else if (targetBlock.getType() == Material.BARREL) {
+                            // Player is looking directly at a barrel
+                            barrelBlock = targetBlock;
+                        }
+
+                        // Ensure we have a valid barrel block
+                        if (barrelBlock == null || barrelBlock.getType() != Material.BARREL) {
+                            player.sendMessage(ChatColor.RED + "You must be looking at a barrel or a sign attached to a barrel.");
+                            return true;
+                        }
+
+                        // Check if the barrel exists in the config (registered post box)
+                        if (!postOffice.helpers.isBarrelInConfig(barrelBlock)) {
+                            player.sendMessage(ChatColor.RED + "This isn't a registered post box.");
+                            return true;
+                        }
+
+                        // Call the helper to remove the barrel from the cache and config
+                        postOffice.helpers.removeBarrelFromCache(barrelBlock);
+
+                        // Optionally clear the sign associated with the post box
+                        Block signBlock = postOffice.helpers.getSignForBarrel(barrelBlock);
+                        if (signBlock != null && signBlock.getState() instanceof Sign) {
+                            Sign sign = (Sign) signBlock.getState();
+                            sign.setLine(1, ""); // Clear the second line
+                            sign.setLine(2, ""); // Clear the third line
+                            sign.update(); // Update the sign
+                        }
+
+                        player.sendMessage(ChatColor.GREEN + "Post box removed successfully.");
+
+                        return true;
+                    } else {
+                        player.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
+                        return true;
+                    }
+                } else {
+                    sender.sendMessage(ChatColor.RED + "This command can only be used by players.");
+                    return true;
+                }
+            }
+
+            else if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
                 if (sender.hasPermission("shantek.postoffice.reload") || sender.isOp()) {
 
                     // Reload all the config and language file
