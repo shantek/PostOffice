@@ -1,6 +1,8 @@
 [![License: GPL](https://img.shields.io/badge/license-GPL-blue.svg)](LICENSE)
 [![Discord](https://img.shields.io/discord/628396916639793152.svg?color=%237289da&label=discord)](https://shantek.co/discord)
 
+## Version 2.0.0 is in active development. Do not use this build in its current state until further notice.
+
 #### Looking for the latest dev builds? You can find them [here!](https://shantek.dev/job/PostOffice/)
 
 ### Post Office is a fully functional Minecraft Post Office plugin for your Bukkit based Minecraft servers.
@@ -23,20 +25,45 @@ Available now on [Modrinth](https://modrinth.com/plugin/postoffice), [CurgeForge
 
 ![Plugin Usage Stats](https://bstats.org/signatures/bukkit/Post%20Office.svg)
 
+## Commands
+Below are the commands used to manage the post office barrels and plugin:
+
+### /postoffice register
+Place a barrel and a sign on the front. Run this command while looking at the sign to register the post box in the config.
+
+### /postoffice claim
+If players have the claim permission, this command will allow them to claim an already registered post box.
+
+### /postoffice claim playername
+Used for an admin/mod to claim a post box on behalf of another player.
+
+### /postoffice remove
+Run while looking at a registered or claimed post box to remove the owner and the post box from the config.
+
+### /postoffice info
+Run while looking at a post box barrel to get information about the registration state/owner.
+
+
 ## Permissions
 The below permissions are intended for giving your mods extra access and abilities within your post office. By default, players will be able to access their own post box without any additional permission nodes being granted.
 
+### shantek.postoffice.use
+This permission prevents a player from using/interacting with the post office. All players have this by default, so use this to deny access to any players you wish to ban from the post box system.
+
 ### shantek.postoffice.removeitems
-Allow these players to remove items from any post box
+Allow these players to remove items from any post box.
 
-### shantek.postoffice.create
-Allow a player to create a post box
+### shantek.postoffice.register
+Allow a player to register/remove a post box in the config.
 
-### shantek.postoffice.break
-Allow a player to break any post box
+### shantek.postoffice.claim
+Allow a player to claim their own post box.
+
+### shantek.postoffice.claim.others
+Allow a player to claim a post box for other players (generally used by admin/mods).
 
 ### shantek.postoffice.updatenotification
-Any player with this permission will be notified if there is an update to the plugin
+Any player with this permission will be notified if there is an update to the plugin.
 
 ## External Links
 
