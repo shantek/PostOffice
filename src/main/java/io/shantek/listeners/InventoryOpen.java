@@ -31,26 +31,26 @@ public class InventoryOpen implements Listener {
         if (inventory.getType() == InventoryType.BARREL) {
 
             Block clickedBlock = Objects.requireNonNull(inventory.getLocation()).getBlock();
-            if (clickedBlock.getType() == Material.BARREL) {
-                BlockState blockState = clickedBlock.getState();
 
-                if (blockState instanceof Barrel) {
-                    Barrel barrel = (Barrel) blockState;
+            BlockState blockState = clickedBlock.getState();
 
-                    if (barrel.getCustomName() != null && barrel.getCustomName().equalsIgnoreCase(postOffice.customBarrelName)) {
+            if (blockState instanceof Barrel) {
+                Barrel barrel = (Barrel) blockState;
 
-                        if (player.hasPermission("shantek.postoffice.use")) {
+                if (barrel.getCustomName() != null && barrel.getCustomName().equalsIgnoreCase(postOffice.customBarrelName)) {
 
-                            // They have permission to use the post office system. Let them open the post box
-                            postOffice.previousItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
-                        }
-                        else {
-                            player.sendMessage(ChatColor.RED + "You don't have permission to interact with post boxes.");
-                        }
+                    if (player.hasPermission("shantek.postoffice.use")) {
 
+                        // They have permission to use the post office system. Let them open the post box
+                        postOffice.previousItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
+                    } else {
+                        player.sendMessage(ChatColor.RED + "You don't have permission to interact with post boxes.");
+                        event.setCancelled(true);
                     }
+
                 }
             }
+
         }
     }
 
