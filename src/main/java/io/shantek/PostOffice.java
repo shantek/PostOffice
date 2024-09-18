@@ -51,7 +51,7 @@ public final class PostOffice extends JavaPlugin {
         // Check for a data folder, create it if needed
         helpers.checkForDataFolder();
 
-        this.mailFile = new File(getDataFolder(), "mail.txt");
+        this.mailFile = new File(getDataFolder(), "hasmail.txt");
 
         getCommand("postoffice").setExecutor(new Commands(this));
 

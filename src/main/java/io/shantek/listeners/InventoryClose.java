@@ -55,7 +55,7 @@ public class InventoryClose implements Listener {
                         }
 
                         // Remove any mail notifications (from the internal mail list)
-                        postOffice.playersWithMail.remove(player.getName());
+                        postOffice.playersWithMail.remove(player.getUniqueId().toString());
                         postOffice.helpers.saveMailFile();
 
                     } else if (boxOwnerUUID != null) {
@@ -80,7 +80,7 @@ public class InventoryClose implements Listener {
                             if (postOffice.consoleLogs) {
                                 plugin.getLogger().info(player.getName() + " added mail for " + Bukkit.getOfflinePlayer(boxOwnerUUID).getName());
                             }
-                            postOffice.playersWithMail.add(Bukkit.getOfflinePlayer(boxOwnerUUID).getName());
+                            postOffice.playersWithMail.add(boxOwnerUUID.toString());
                             postOffice.helpers.saveMailFile();
 
                             // Notify the owner if they are online

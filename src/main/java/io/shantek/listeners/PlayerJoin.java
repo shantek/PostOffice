@@ -22,7 +22,7 @@ public class PlayerJoin implements Listener {
 
         Player player = event.getPlayer();
 
-        if (postOffice.playersWithMail.contains(player.getName())) {
+        if (postOffice.playersWithMail.contains(player.getUniqueId().toString())) {
 
             // Set initial delay of 1 second
             long messageDelay = 20L;
