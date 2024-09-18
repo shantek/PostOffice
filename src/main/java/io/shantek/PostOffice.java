@@ -94,6 +94,17 @@ public final class PostOffice extends JavaPlugin {
         }
         // Register event listeners
         registerEventListeners();
+
+
+        // Delete old mail file - remove in a future update
+        // Now using a new file that stores UUIDs instead
+        File mailFile = new File("mail.txt");
+        if (mailFile.exists()) {
+            // Attempt to delete the file
+            if (mailFile.delete()) {
+                System.out.println("Deleted old mail file.");
+            }
+        }
     }
 
     public void registerEventListeners() {
