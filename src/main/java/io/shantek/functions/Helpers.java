@@ -229,7 +229,6 @@ public class Helpers {
 
     //region Retrieving Sign Information
 
-    // Retrieve the location of the sign attached to a barrel
     public Block getSignForBarrel(Block barrelBlock) {
         String barrelLocationString = getBlockLocationString(barrelBlock);
 
@@ -238,15 +237,33 @@ public class Helpers {
 
         if (signLocationString != null) {
             String[] parts = signLocationString.split("_");
-            String worldName = parts[0];
-            int x = Integer.parseInt(parts[1]);
-            int y = Integer.parseInt(parts[2]);
-            int z = Integer.parseInt(parts[3]);
 
-            return postOffice.getServer().getWorld(worldName).getBlockAt(x, y, z);
+            // Ensure the parts are valid (should be 4 parts: world, x, y, z)
+            if (parts.length == 4) {
+                String worldName = parts[0];
+                int x, y, z;
+
+                try {
+                    x = Integer.parseInt(parts[1]);
+                    y = Integer.parseInt(parts[2]);
+                    z = Integer.parseInt(parts[3]);
+                } catch (NumberFormatException e) {
+                    postOffice.getLogger().warning("Invalid sign coordinates in config for barrel: " + barrelLocationString);
+                    return null; // Invalid coordinates, return null
+                }
+
+                World world = Bukkit.getWorld(worldName);
+                if (world != null) {
+                    return world.getBlockAt(x, y, z); // Return the block at the saved sign location
+                } else {
+                    postOffice.getLogger().warning("World not found for barrel: " + barrelLocationString);
+                }
+            } else {
+                postOffice.getLogger().warning("Invalid sign location string format for barrel: " + barrelLocationString);
+            }
         }
 
-        return null; // No sign found for this barrel
+        return null; // Sign not found or invalid format
     }
 
     // Method to check if the sign is attached to a barrel
@@ -413,12 +430,21 @@ public class Helpers {
         String barrelLocationString = getBlockLocationString(barrelBlock);
         String signLocationString = getBlockLocationString(signBlock);
 
-        // Update the cache with the new data
-        barrelsCache.put(barrelLocationString, new BarrelData(ownerUUID, signLocationString, state));
+        // Create the BarrelData object with correct sign location and state
+        BarrelData barrelData = new BarrelData(ownerUUID, signLocationString, state);
 
-        // Optionally, you could save the cache to file immediately here:
+        // Add or update the barrel data in the cache
+        barrelsCache.put(barrelLocationString, barrelData);
+
+        // Log for debugging purposes
+        postOffice.getLogger().info("Adding/Updating barrel at: " + barrelLocationString);
+        postOffice.getLogger().info("Sign location for barrel: " + signLocationString);
+        postOffice.getLogger().info("Post box state: " + state);
+
+        // Optionally save the cache to disk immediately
         saveCacheToFile();
     }
+
 
     public void removeBarrelFromCache(Block barrelBlock) {
         String barrelLocationString = getBlockLocationString(barrelBlock);
@@ -488,8 +514,5 @@ public class Helpers {
         // Save the config to disk
         saveBarrelsConfig();
     }
-
-
-
 
 }

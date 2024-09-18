@@ -336,6 +336,8 @@ public class Commands implements CommandExecutor {
 
                         postOffice.helpers.saveCacheToFile(); // Save the cache to disk
                         return true;
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "You don't have permission to claim your own post box.");
                     }
                 } else {
                     sender.sendMessage(ChatColor.RED + "This command can only be used by players.");

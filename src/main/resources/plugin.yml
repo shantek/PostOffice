@@ -8,7 +8,6 @@ commands:
   postoffice:
     description: Post office plugin commands
     aliases: [po]
-    usage: /postoffice [subcommand]
     permission: shantek.postoffice.use
 
 permissions:
