@@ -35,16 +35,21 @@ public class BarrelProtection implements Listener {
         }
 
         Player player = event.getPlayer();
-
-        // Ensure the sign is attached to a barrel
-        // If this is a post box barrel, cancel the sign editing
         Block signBlock = event.getBlock();
-        Block attachedBarrel = postOffice.helpers.getBarrelFromSign(signBlock);
 
-        if (postOffice.helpers.isBarrelInConfig(attachedBarrel)) {
-            event.setCancelled(true);
+        // Get the attached barrel from the sign
+        Block attachedBarrel = postOffice.helpers.getAttachedBarrel(signBlock);
+
+        // Ensure the attached block is a barrel and that it is in the config
+        if (attachedBarrel != null && attachedBarrel.getType() == Material.BARREL) {
+            if (postOffice.helpers.isBarrelInConfig(attachedBarrel)) {
+                // Cancel the sign change event if the barrel is in the config (protected post box)
+                player.sendMessage(ChatColor.RED + "You cannot modify a post box sign.");
+                event.setCancelled(true);
+            }
         }
     }
+
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
@@ -55,29 +60,15 @@ public class BarrelProtection implements Listener {
         Player player = event.getPlayer();
         Block brokenBlock = event.getBlock();
 
-        // Check if the broken block is a barrel
-        if (brokenBlock.getState() instanceof Barrel) {
-            Barrel barrel = (Barrel) brokenBlock.getState();
-            String barrelCustomName = barrel.getCustomName();
-
-            if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
-                if (!player.isOp() && !player.hasPermission("shantek.postoffice.break")) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.breakError));
-                    event.setCancelled(true);
-                }
-            }
-        }
-
-        // Check if the broken block is a sign
-        if (brokenBlock.getState() instanceof Sign) {
-            if (postOffice.helpers.hasBarrelNearby(brokenBlock)) {
-                if (!player.isOp() && !player.hasPermission("shantek.postoffice.break")) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.breakError));
-                    event.setCancelled(true);
-                }
+        // Check if the broken block is a protected post box (either a barrel or a sign)
+        if (postOffice.helpers.isProtectedPostBox(brokenBlock)) {
+            if (!player.isOp() && !player.hasPermission("shantek.postoffice.break")) {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.breakError));
+                event.setCancelled(true);
             }
         }
     }
+
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
@@ -108,12 +99,12 @@ public class BarrelProtection implements Listener {
         // Check if the source is a barrel and the destination is a hopper or hopper minecart
         if (sourceHolder instanceof Barrel && (destinationHolder instanceof Hopper || destinationHolder instanceof HopperMinecart)) {
             Barrel barrel = (Barrel) sourceHolder;
-            String barrelCustomName = barrel.getCustomName();
-            if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+            if (postOffice.helpers.isProtectedPostBox(barrel.getBlock())) {
                 event.setCancelled(true);
             }
         }
     }
+
 
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
