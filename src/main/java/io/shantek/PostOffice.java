@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.util.logging.*;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
-import org.bukkit.permissions.Permission;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.nio.file.*;
 import java.util.*;
@@ -60,8 +58,6 @@ public final class PostOffice extends JavaPlugin {
 
         // Create an instance of PluginConfig
         this.pluginConfig = new PluginConfig(this);
-
-        registerPluginPermissions();
         pluginConfig.reloadConfigFile();
 
         if (this.mailFile.exists()) {
@@ -133,23 +129,5 @@ public final class PostOffice extends JavaPlugin {
         getLogger().info(message); // Print to the console
     }
 
-    private void registerPluginPermissions() {
-        // Register the permission node
-        Permission removeItemsPermission = new Permission("shantek.postoffice.removeitems");
-        PluginManager pm = getServer().getPluginManager();
-        pm.addPermission(removeItemsPermission);
-
-        // Permission for breaking Post Boxes
-        Permission breakPermission = new Permission("shantek.postoffice.break");
-        pm.addPermission(breakPermission);
-
-        // Permission for creating Post Boxes
-        Permission createBoxPermission = new Permission("shantek.postoffice.create");
-        pm.addPermission(createBoxPermission);
-
-        // Permission for breaking Post Boxes
-        Permission updateNotificationPermission = new Permission("shantek.postoffice.updatenotification");
-        pm.addPermission(updateNotificationPermission);
-    }
 
 }
