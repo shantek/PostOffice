@@ -157,8 +157,7 @@ public class Commands implements CommandExecutor {
                         }
 
                         // Ensure the sign is attached to a barrel
-                        Block signBlock = targetBlock;
-                        Block attachedBarrel = postOffice.helpers.getAttachedBarrel(signBlock);
+                        Block attachedBarrel = postOffice.helpers.getAttachedBarrel(targetBlock);
                         if (attachedBarrel == null || attachedBarrel.getType() != Material.BARREL) {
                             player.sendMessage(ChatColor.RED + "The sign must be attached to a barrel.");
                             return true;
@@ -186,10 +185,10 @@ public class Commands implements CommandExecutor {
 
                         // Register the barrel and sign in the plugin config
                         UUID barrelOwnerUUID = null; // No owner yet
-                        postOffice.helpers.addOrUpdateBarrelInCache(attachedBarrel, signBlock, barrelOwnerUUID, "registered");
+                        postOffice.helpers.addOrUpdateBarrelInCache(attachedBarrel, targetBlock, barrelOwnerUUID, "registered");
 
                         // Update the sign with "Unclaimed" on the second line in red text
-                        Sign sign = (Sign) signBlock.getState();
+                        Sign sign = (Sign) targetBlock.getState();
                         sign.setLine(1, ChatColor.RED + "Unclaimed");
                         sign.update(); // Make sure to update the sign to apply the changes
 
@@ -220,8 +219,7 @@ public class Commands implements CommandExecutor {
                     }
 
                     // Ensure the sign is attached to a barrel
-                    Block signBlock = targetBlock;
-                    Block attachedBarrel = postOffice.helpers.getAttachedBarrel(signBlock);
+                    Block attachedBarrel = postOffice.helpers.getAttachedBarrel(targetBlock);
                     if (attachedBarrel == null || attachedBarrel.getType() != Material.BARREL) {
                         player.sendMessage(ChatColor.RED + "The sign must be attached to a barrel.");
                         return true;
@@ -263,11 +261,11 @@ public class Commands implements CommandExecutor {
                     }
 
                     // Claim the post box for the target player and update the state to 'claimed'
-                    postOffice.helpers.addOrUpdateBarrelInCache(attachedBarrel, signBlock, targetPlayerUUID, "claimed");
+                    postOffice.helpers.addOrUpdateBarrelInCache(attachedBarrel, targetBlock, targetPlayerUUID, "claimed");
 
                     // Update the sign to display the player's name on the second line
-                    if (signBlock != null && signBlock.getState() instanceof Sign) {
-                        Sign sign = (Sign) signBlock.getState();
+                    if (targetBlock != null && targetBlock.getState() instanceof Sign) {
+                        Sign sign = (Sign) targetBlock.getState();
                         sign.setLine(1, targetPlayer.getName()); // Set the player's name on the 2nd line
                         sign.update();
                     }
@@ -292,8 +290,7 @@ public class Commands implements CommandExecutor {
                         }
 
                         // Ensure the sign is attached to a barrel
-                        Block signBlock = targetBlock;
-                        Block attachedBarrel = postOffice.helpers.getAttachedBarrel(signBlock);
+                        Block attachedBarrel = postOffice.helpers.getAttachedBarrel(targetBlock);
                         if (attachedBarrel == null || attachedBarrel.getType() != Material.BARREL) {
                             player.sendMessage(ChatColor.RED + "The sign must be attached to a barrel.");
                             return true;
@@ -324,12 +321,12 @@ public class Commands implements CommandExecutor {
                         }
 
                         // Claim the post box for the player and update the state to 'claimed'
-                        postOffice.helpers.addOrUpdateBarrelInCache(attachedBarrel, signBlock, playerUUID, "claimed");
+                        postOffice.helpers.addOrUpdateBarrelInCache(attachedBarrel, targetBlock, playerUUID, "claimed");
                         player.sendMessage(ChatColor.GREEN + "You have successfully claimed this post box.");
 
                         // Update the sign to display the player's name on the second line
-                        if (signBlock != null && signBlock.getState() instanceof Sign) {
-                            Sign sign = (Sign) signBlock.getState();
+                        if (targetBlock != null && targetBlock.getState() instanceof Sign) {
+                            Sign sign = (Sign) targetBlock.getState();
                             sign.setLine(1, player.getName()); // Set the player's name on the 2nd line
                             sign.update();
                         }

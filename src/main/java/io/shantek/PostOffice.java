@@ -44,14 +44,14 @@ public final class PostOffice extends JavaPlugin {
         helpers = new Helpers(this);
         TabCompleter tabCompleter = new TabCompleter(this);
 
-        getCommand("postoffice").setTabCompleter(new TabCompleter(this));
+        Objects.requireNonNull(getCommand("postoffice")).setTabCompleter(new TabCompleter(this));
 
         // Check for a data folder, create it if needed
         helpers.checkForDataFolder();
 
         this.mailFile = new File(getDataFolder(), "hasmail.txt");
 
-        getCommand("postoffice").setExecutor(new Commands(this));
+        Objects.requireNonNull(getCommand("postoffice")).setExecutor(new Commands(this));
 
         // Create an instance of UpdateChecker
         this.updateChecker = new UpdateChecker();
@@ -90,17 +90,6 @@ public final class PostOffice extends JavaPlugin {
         }
         // Register event listeners
         registerEventListeners();
-
-
-        // Delete old mail file - remove in a future update
-        // Now using a new file that stores UUIDs instead
-        File mailFile = new File("mail.txt");
-        if (mailFile.exists()) {
-            // Attempt to delete the file
-            if (mailFile.delete()) {
-                System.out.println("Deleted old mail file.");
-            }
-        }
     }
 
     public void registerEventListeners() {
@@ -115,7 +104,6 @@ public final class PostOffice extends JavaPlugin {
         if (instance == null) {
             instance = new PostOffice();
         }
-
         return instance;
     }
 

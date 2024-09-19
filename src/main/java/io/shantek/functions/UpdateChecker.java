@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class UpdateChecker {
-    public String currentVersion = null;
+
     public static String remoteVersion = null;
     public static void checkForUpdatesAsync(String currentVersion, Plugin plugin) {
         CompletableFuture.runAsync(() -> checkForUpdates(currentVersion, plugin));
