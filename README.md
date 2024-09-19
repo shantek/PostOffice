@@ -1,8 +1,6 @@
 [![License: GPL](https://img.shields.io/badge/license-GPL-blue.svg)](LICENSE)
 [![Discord](https://img.shields.io/discord/628396916639793152.svg?color=%237289da&label=discord)](https://shantek.co/discord)
 
-## Version 2.0.0 is in active development. Do not use this build in its current state until further notice.
-
 #### Looking for the latest dev builds? You can find them [here!](https://shantek.dev/job/PostOffice/)
 
 ### Post Office is a fully functional Minecraft Post Office plugin for your Bukkit based Minecraft servers.
@@ -18,9 +16,12 @@ Available now on [Modrinth](https://modrinth.com/plugin/postoffice), [CurgeForge
 ## How does the plugin work?
 
 - Upload the JAR to your server and reboot
-- Rename barrels in an anvil to "pobox" - if you want to use a different name, be sure to change this in the config and use /postoffice reload to update your config file.
+- Make any desired changes to the config file (not essential), and then type /postoffice reload' as an op.
 - Place your barrels in your amazing Post Office build.
-- Place a sign on the front of the barrel and type the barrel owners name on the second line, this then becomes the owner of the post box.
+- Place a blank sign on the front of the barrel.
+- While looking at the sign, type '/postoffice register' to register the barrel in the config file.
+- Again while looking at the sign, if permitted your players can type '/postoffice claim' on a registered post box to claim it.
+- Admin/mods can look at a sign and use '/postoffice claim playername' to claim a post box on behalf of another player.
 - Enjoy your awesome post office on your SMP!
 
 ![Plugin Usage Stats](https://bstats.org/signatures/bukkit/Post%20Office.svg)
