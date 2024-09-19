@@ -3,6 +3,7 @@ package io.shantek.listeners;
 import io.shantek.PostOffice;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -62,12 +63,39 @@ public class BarrelProtection implements Listener {
 
         // Check if the broken block is a protected post box (either a barrel or a sign)
         if (postOffice.helpers.isProtectedPostBox(brokenBlock)) {
-            if (!player.isOp() && !player.hasPermission("shantek.postoffice.break")) {
+            if (player.isOp() || player.hasPermission("shantek.postoffice.break")) {
+                Block barrelBlock = null;
+
+                // Check if the player is breaking a sign
+                if (Tag.SIGNS.isTagged(brokenBlock.getType())) {
+                    // Retrieve the attached barrel if the broken block is a sign
+                    barrelBlock = postOffice.helpers.getAttachedBarrel(brokenBlock);
+                } else if (brokenBlock.getType() == Material.BARREL) {
+                    // If breaking a barrel directly, set it as the barrelBlock
+                    barrelBlock = brokenBlock;
+                }
+
+                // Ensure barrelBlock is valid before proceeding
+                if (barrelBlock == null) {
+                    player.sendMessage(ChatColor.RED + "This isn't a registered post box.");
+                    return;
+                }
+
+                // Check if the barrel exists in the config (registered post box)
+                if (postOffice.helpers.isBarrelInConfig(barrelBlock)) {
+                    // Call the helper to remove the barrel from the cache and config
+                    postOffice.helpers.removeBarrelFromCache(barrelBlock);
+                    player.sendMessage(ChatColor.GREEN + "Post box removed from the config.");
+                }
+
+            } else {
+                // Prevent the player from breaking the post box if they don't have permission
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.breakError));
                 event.setCancelled(true);
             }
         }
     }
+
 
 
     @EventHandler
