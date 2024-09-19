@@ -19,8 +19,9 @@ got-mail-message: "&a[Post Office] &fYou got mail!"
 # isn't lost in any other messages they receive during connection
 got-mail-delay: true
 
-# Error shown when the player attempts to stack items in a post box
-cant-stack-items: "&a[Post Office] &4You don't have permission to do that."
+# Generic no permission error message when a player is attempting to do an action
+# that they shouldn't have permission to do
+no-permission: "&a[Post Office] &4You don't have permission to do that."
 
 # Error shown when a player attempts to remove items without permission
 remove-item-error: "&a[Post Office] &4You don't have permission to remove items."

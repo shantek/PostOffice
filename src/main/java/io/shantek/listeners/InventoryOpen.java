@@ -44,7 +44,7 @@ public class InventoryOpen implements Listener {
                         // They have permission to use the post office system. Let them open the post box
                         postOffice.previousItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
                     } else {
-                        player.sendMessage(ChatColor.RED + "You don't have permission to interact with post boxes.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.userBanned));
                         event.setCancelled(true);
                     }
 

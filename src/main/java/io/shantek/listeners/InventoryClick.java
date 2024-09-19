@@ -56,7 +56,7 @@ public class InventoryClick implements Listener {
 
         // Check if barrel data is null (not registered)
         if (barrelData == null) {
-            player.sendMessage(ChatColor.RED + "This is not a registered postbox.");
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.notRegistered));
             return;
         }
 
@@ -85,7 +85,7 @@ public class InventoryClick implements Listener {
         // Prevent double-clicking items in player's own inventory to remove items
         if (event.getClick() == ClickType.DOUBLE_CLICK) {
             if (clickedInventory == player.getInventory() || clickedInventory.getType() == InventoryType.PLAYER) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.cantStackItems));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.noPermission));
                 event.setCancelled(true);
                 return;
             }
@@ -121,7 +121,7 @@ public class InventoryClick implements Listener {
             if (item != null && event.getCurrentItem() != null && item.isSimilar(event.getCurrentItem())) {
                 // If the player is not the owner and trying to add to an existing stack, cancel the event
                 if (!isOwner && event.getAction() == InventoryAction.PLACE_ALL && item.getAmount() < item.getMaxStackSize()) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.cantStackItems));
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.noPermission));
                     event.setCancelled(true);
                     return;
                 }

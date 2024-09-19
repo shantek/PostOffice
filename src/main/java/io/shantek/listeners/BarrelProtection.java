@@ -45,7 +45,7 @@ public class BarrelProtection implements Listener {
         if (attachedBarrel != null && attachedBarrel.getType() == Material.BARREL) {
             if (postOffice.helpers.isBarrelInConfig(attachedBarrel)) {
                 // Cancel the sign change event if the barrel is in the config (protected post box)
-                player.sendMessage(ChatColor.RED + "You cannot modify a post box sign.");
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.modifySign));
                 event.setCancelled(true);
             }
         }
@@ -77,7 +77,7 @@ public class BarrelProtection implements Listener {
 
                 // Ensure barrelBlock is valid before proceeding
                 if (barrelBlock == null) {
-                    player.sendMessage(ChatColor.RED + "This isn't a registered post box.");
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.notRegistered));
                     return;
                 }
 
@@ -85,7 +85,7 @@ public class BarrelProtection implements Listener {
                 if (postOffice.helpers.isBarrelInConfig(barrelBlock)) {
                     // Call the helper to remove the barrel from the cache and config
                     postOffice.helpers.removeBarrelFromCache(barrelBlock);
-                    player.sendMessage(ChatColor.GREEN + "Post box removed from the config.");
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeFromConfig));
                 }
 
             } else {

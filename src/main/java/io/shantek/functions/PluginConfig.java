@@ -55,9 +55,8 @@ public class PluginConfig {
                 updateConfigWithMissingKeyValues(config, missingKeyValues);
 
                 postOffice.customBarrelName = getString(config, "custom-barrel-name", "pobox");
-                postOffice.language.cantStackItems = getString(config, "cant-stack-items", postOffice.language.cantStackItems);
+                postOffice.language.noPermission = getString(config, "no-permission", postOffice.language.noPermission);
                 postOffice.language.removeItemError = getString(config, "remove-item-error", postOffice.language.removeItemError);
-                postOffice.language.offHandError = getString(config, "offhand-error", postOffice.language.offHandError);
                 postOffice.language.hotBarError = getString(config, "hotbar-error", postOffice.language.hotBarError);
                 postOffice.language.sentMessage = getString(config, "sent-message", postOffice.language.sentMessage);
                 postOffice.language.receivedMessage = getString(config, "received-message", postOffice.language.receivedMessage);
@@ -66,12 +65,25 @@ public class PluginConfig {
                 postOffice.language.breakError = getString(config, "break-error", postOffice.language.breakError);
                 postOffice.language.postboxCreated = getString(config, "postbox-created", postOffice.language.postboxCreated);
                 postOffice.language.pluginUpToDate = getString(config, "plugin-up-to-date", postOffice.language.pluginUpToDate);
+                postOffice.language.dropItemError = getString(config, "drop-item-error", postOffice.language.pluginUpToDate);
 
                 postOffice.postBoxProtection = getBoolean(config, "postbox-protection", true);
                 postOffice.updateNotificationEnabled = getBoolean(config, "update-notification", true);
                 postOffice.consoleLogs = getBoolean(config, "console-logs", true);
                 postOffice.gotMailDelay = getBoolean(config, "got-mail-delay", true);
                 postOffice.signNotification = getBoolean(config, "sign-notification", true);
+
+                postOffice.language.lookAtPostBox = getString(config, "look-at-post-box", postOffice.language.lookAtPostBox);
+                postOffice.language.notRegistered = getString(config, "not-registered", postOffice.language.notRegistered);
+                postOffice.language.postBoxRemoved = getString(config, "post-box-removed", postOffice.language.postBoxRemoved);
+                postOffice.language.signOnBarrel = getString(config, "sign-on-barrel", postOffice.language.signOnBarrel);
+                postOffice.language.successfulRegistration = getString(config, "successful-registration", postOffice.language.successfulRegistration);
+                postOffice.language.alreadyClaimed = getString(config, "already-claimed", postOffice.language.alreadyClaimed);
+                postOffice.language.successfullyClaimed = getString(config, "successfully-claimed", postOffice.language.successfullyClaimed);
+                postOffice.language.modifySign = getString(config, "modify-sign", postOffice.language.modifySign);
+                postOffice.language.removeFromConfig = getString(config, "remove-from-config", postOffice.language.removeFromConfig);
+                postOffice.language.unclaimedPostbox = getString(config, "unclaimed-postbox", postOffice.language.unclaimedPostbox);
+                postOffice.language.userBanned = getString(config, "user-banned", postOffice.language.userBanned);
             }
 
         } catch (Exception e) {
@@ -84,9 +96,11 @@ public class PluginConfig {
 
         // List of keys to check
         List<String> keysToCheck = Arrays.asList(
-                "custom-barrel-name", "cant-stack-items", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
+                "custom-barrel-name", "no-permission", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
                 "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
-                "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay", "sign-notification");
+                "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay", "sign-notification",
+                "look-at-post-box", "not-registered", "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
+                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned");
 
         // Check for missing keys
         for (String key : keysToCheck) {
@@ -103,9 +117,12 @@ public class PluginConfig {
 
         // List of keys to check
         List<String> keysToCheck = Arrays.asList(
-                "custom-barrel-name", "cant-stack-items", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
+                "custom-barrel-name", "no-permission", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
                 "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
-                "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay", "sign-notification");
+                "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay", "sign-notification",
+                "look-at-post-box", "not-registered", "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
+                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned");
+
 
         // Save existing values of missing keys
         for (String key : keysToCheck) {
@@ -247,7 +264,4 @@ public class PluginConfig {
             postOffice.getLogger().severe("Could not save barrels.yml: " + e.getMessage());
         }
     }
-
-
-
 }

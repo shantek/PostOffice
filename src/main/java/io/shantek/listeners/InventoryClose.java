@@ -38,7 +38,7 @@ public class InventoryClose implements Listener {
                     UUID boxOwnerUUID = postOffice.helpers.getOwnerUUID(clickedBlock);
 
                     if (boxOwnerUUID == null) {
-                        player.sendMessage(ChatColor.RED + "This post box is unclaimed.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.unclaimedPostbox));
                     } else {
 
                         if (postOffice.consoleLogs) {

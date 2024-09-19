@@ -48,13 +48,13 @@ public class Commands implements CommandExecutor {
 
                         // Ensure we have a valid barrel block
                         if (barrelBlock == null || barrelBlock.getType() != Material.BARREL) {
-                            player.sendMessage(ChatColor.RED + "You must be looking at a barrel or a sign attached to a barrel.");
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
                             return true;
                         }
 
                         // Check if the barrel exists in the config (registered post box)
                         if (!postOffice.helpers.isBarrelInConfig(barrelBlock)) {
-                            player.sendMessage(ChatColor.RED + "This isn't a registered post box.");
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.notRegistered));
                             return true;
                         }
 
@@ -70,11 +70,11 @@ public class Commands implements CommandExecutor {
                         // Call the helper to remove the barrel from the cache and config
                         postOffice.helpers.removeBarrelFromCache(barrelBlock);
 
-                        player.sendMessage(ChatColor.GREEN + "Post box removed successfully.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.postBoxRemoved));
 
                         return true;
                     } else {
-                        player.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.noPermission));
                         return true;
                     }
                 } else {
@@ -112,7 +112,7 @@ public class Commands implements CommandExecutor {
 
                         // If there's no attached barrel or it's not a valid post box, show unregistered
                         if (barrelBlock == null || barrelBlock.getType() != Material.BARREL) {
-                            player.sendMessage(ChatColor.RED + "This isn't a valid post box.");
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.notRegistered));
                             return true;
                         }
 
@@ -123,7 +123,7 @@ public class Commands implements CommandExecutor {
 
                     // Ensure we have a valid barrel block
                     if (barrelBlock == null || barrelBlock.getType() != Material.BARREL) {
-                        player.sendMessage(ChatColor.RED + "This isn't a valid post box.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.notRegistered));
                         return true;
                     }
 
@@ -152,14 +152,14 @@ public class Commands implements CommandExecutor {
                         // Ensure they are looking at a sign
                         Block targetBlock = player.getTargetBlock(null, 10); // Max distance 10 blocks
                         if (targetBlock == null || !(targetBlock.getState() instanceof Sign)) {
-                            player.sendMessage(ChatColor.RED + "You must be looking at a sign attached to a barrel.");
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
                             return true;
                         }
 
                         // Ensure the sign is attached to a barrel
                         Block attachedBarrel = postOffice.helpers.getAttachedBarrel(targetBlock);
                         if (attachedBarrel == null || attachedBarrel.getType() != Material.BARREL) {
-                            player.sendMessage(ChatColor.RED + "The sign must be attached to a barrel.");
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.signOnBarrel));
                             return true;
                         }
 
@@ -194,7 +194,7 @@ public class Commands implements CommandExecutor {
 
                         postOffice.helpers.saveCacheToFile(); // Save the cache to disk
 
-                        player.sendMessage(ChatColor.GREEN + "Post box registered successfully.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.successfulRegistration));
                         return true;
 
                     }
@@ -214,21 +214,21 @@ public class Commands implements CommandExecutor {
                     Player player = (Player) sender;
                     Block targetBlock = player.getTargetBlock(null, 10); // Max distance 10 blocks
                     if (targetBlock == null || !(targetBlock.getState() instanceof Sign)) {
-                        player.sendMessage(ChatColor.RED + "You must be looking at a sign attached to a barrel.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
                         return true;
                     }
 
                     // Ensure the sign is attached to a barrel
                     Block attachedBarrel = postOffice.helpers.getAttachedBarrel(targetBlock);
                     if (attachedBarrel == null || attachedBarrel.getType() != Material.BARREL) {
-                        player.sendMessage(ChatColor.RED + "The sign must be attached to a barrel.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.signOnBarrel));
                         return true;
                     }
 
                     // Check if the sign exists in the config (if the post box has been registered)
                     Block savedSign = postOffice.helpers.getSignForBarrel(attachedBarrel); // Retrieve saved sign
                     if (savedSign == null) {
-                        player.sendMessage(ChatColor.RED + "This post box has not been registered yet.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.signOnBarrel));
                         return true;
                     }
 
@@ -256,7 +256,7 @@ public class Commands implements CommandExecutor {
                     // Check if the post box is already claimed
                     String currentOwner = postOffice.helpers.getOwnerNameFromConfig(barrelLocation);
                     if (currentOwner != null && !currentOwner.equals("none")) {
-                        player.sendMessage(ChatColor.RED + "This post box is already claimed.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.alreadyClaimed));
                         return true;
                     }
 
@@ -285,21 +285,21 @@ public class Commands implements CommandExecutor {
                         // Ensure they are looking at a sign
                         Block targetBlock = player.getTargetBlock(null, 10); // Max distance 10 blocks
                         if (targetBlock == null || !(targetBlock.getState() instanceof Sign)) {
-                            player.sendMessage(ChatColor.RED + "You must be looking at a sign attached to a barrel.");
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
                             return true;
                         }
 
                         // Ensure the sign is attached to a barrel
                         Block attachedBarrel = postOffice.helpers.getAttachedBarrel(targetBlock);
                         if (attachedBarrel == null || attachedBarrel.getType() != Material.BARREL) {
-                            player.sendMessage(ChatColor.RED + "The sign must be attached to a barrel.");
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.signOnBarrel));
                             return true;
                         }
 
                         // Check if the sign exists in the config (if the post box has been registered)
                         Block savedSign = postOffice.helpers.getSignForBarrel(attachedBarrel); // Retrieve saved sign
                         if (savedSign == null) {
-                            player.sendMessage(ChatColor.RED + "This post box has not been registered yet.");
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.notRegistered));
                             return true;
                         }
 
@@ -309,7 +309,7 @@ public class Commands implements CommandExecutor {
                         // Check if the post box is already claimed
                         String currentOwner = postOffice.helpers.getOwnerNameFromConfig(barrelLocation);
                         if (currentOwner != null && !currentOwner.equals("none")) {
-                            player.sendMessage(ChatColor.RED + "This post box is already claimed.");
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.alreadyClaimed));
                             return true;
                         }
 
@@ -322,7 +322,7 @@ public class Commands implements CommandExecutor {
 
                         // Claim the post box for the player and update the state to 'claimed'
                         postOffice.helpers.addOrUpdateBarrelInCache(attachedBarrel, targetBlock, playerUUID, "claimed");
-                        player.sendMessage(ChatColor.GREEN + "You have successfully claimed this post box.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.successfullyClaimed));
 
                         // Update the sign to display the player's name on the second line
                         if (targetBlock != null && targetBlock.getState() instanceof Sign) {
