@@ -40,8 +40,12 @@ public class InventoryClose implements Listener {
                     if (boxOwnerUUID == null) {
                         player.sendMessage(ChatColor.RED + "This post box is unclaimed.");
                     } else {
-                        OfflinePlayer boxOwner = postOffice.helpers.getPlayer(boxOwnerUUID);
-                        player.sendMessage("Closing valid post box. Owner: " + boxOwner.getName());
+
+                        if (postOffice.consoleLogs) {
+                            OfflinePlayer boxOwner = postOffice.helpers.getPlayer(boxOwnerUUID);
+                            plugin.getLogger().info("Closing valid post box. Owner: " + boxOwner.getName());
+                        }
+
                     }
 
                     // Check if the player owns the post box
