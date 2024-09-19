@@ -62,10 +62,6 @@ public class InventoryClick implements Listener {
 
         // Log the owner and the player interacting
         UUID ownerUUID = barrelData.getOwnerUUID();
-        if (postOffice.consoleLogs) {
-            postOffice.getLogger().info("Owner of the barrel: " + (ownerUUID != null ? ownerUUID.toString() : "None"));
-            postOffice.getLogger().info("Player interacting: " + player.getUniqueId());
-        }
 
         // Determine if the player is the owner or has permission
         boolean isOwner = ownerUUID != null && ownerUUID.equals(player.getUniqueId());
@@ -73,8 +69,7 @@ public class InventoryClick implements Listener {
 
         // Log the result of the ownership and permission checks
         if (postOffice.consoleLogs) {
-            postOffice.getLogger().info("Is owner: " + isOwner);
-            postOffice.getLogger().info("Has permission to remove items: " + hasPermissionToRemove);
+            postOffice.getLogger().info("Barrel owner: " + isOwner + ". Remove permission: " + hasPermissionToRemove);
         }
 
         // Prevent non-owners without permission from interacting with the post box
@@ -82,7 +77,7 @@ public class InventoryClick implements Listener {
             if (postOffice.consoleLogs) {
                 postOffice.getLogger().info("Player " + player.getName() + " tried to interact without permission.");
             }
-            player.sendMessage(ChatColor.RED + postOffice.language.removeItemError);
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
             event.setCancelled(true);
             return;
         }
@@ -90,7 +85,7 @@ public class InventoryClick implements Listener {
         // Prevent double-clicking items in player's own inventory to remove items
         if (event.getClick() == ClickType.DOUBLE_CLICK) {
             if (clickedInventory == player.getInventory() || clickedInventory.getType() == InventoryType.PLAYER) {
-                player.sendMessage(ChatColor.RED + "You cannot double-click items into this postbox.");
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.cantStackItems));
                 event.setCancelled(true);
                 return;
             }
@@ -100,7 +95,7 @@ public class InventoryClick implements Listener {
         if (event.getClick() == ClickType.NUMBER_KEY) {
             ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
             if (hotbarItem != null) {
-                player.sendMessage(ChatColor.RED + "You cannot use number keys to swap items in this postbox.");
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.hotBarError));
                 event.setCancelled(true);
                 return;
             }
@@ -108,14 +103,14 @@ public class InventoryClick implements Listener {
 
         // Prevent swapping items from a barrel while having another item in hand
         if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR || event.getAction() == InventoryAction.HOTBAR_SWAP) {
-            player.sendMessage(ChatColor.RED + "You cannot swap items with the cursor in this postbox.");
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.hotBarError));
             event.setCancelled(true);
             return;
         }
 
         // Prevent the player from dropping items out of the postbox
         if (event.getClick() == ClickType.DROP || event.getClick() == ClickType.CONTROL_DROP) {
-            player.sendMessage(ChatColor.RED + "You cannot drop items out of this postbox.");
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.dropItemError));
             event.setCancelled(true);
             return;
         }
@@ -126,7 +121,7 @@ public class InventoryClick implements Listener {
             if (item != null && event.getCurrentItem() != null && item.isSimilar(event.getCurrentItem())) {
                 // If the player is not the owner and trying to add to an existing stack, cancel the event
                 if (!isOwner && event.getAction() == InventoryAction.PLACE_ALL && item.getAmount() < item.getMaxStackSize()) {
-                    player.sendMessage(ChatColor.RED + "You cannot stack items in this postbox.");
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.cantStackItems));
                     event.setCancelled(true);
                     return;
                 }
