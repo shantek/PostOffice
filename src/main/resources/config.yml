@@ -38,16 +38,19 @@ create-error: "&a[Post Office] &4You can't create a Post Box."
 # Error shown when a player tries to break a Post Box
 break-error: "&a[Post Office] &4You can't break this Post Box."
 
-# Error when running a command and not looking at a configured post box
+# Error when running a command and not looking at a configured post box.
+# This is a generic error, shown in a lot of different scenarios.
 look-at-post-box: "&a[Post Office] &4You must be looking at a barrel or a sign attached to a barrel."
 
-# Error when the post box isn't registered in the config
+# Error when the post box isn't registered in the config. Used in instanced like when trying to remove
+# a post box, looking up postbox info etc.
 not-registered: "&a[Post Office] &4This isn't a registered post office box."
 
 # Message shown when a post box is successfully removed with the remove command
 post-box-removed: "&a[Post Office] &aPost box removed successfully."
 
-# Error when interacting with a sign that isn't attached to the barrel correctly
+# Warning shown in cases where we haven't found a barrel/sign combo
+# resulting in an invalid setup
 sign-on-barrel: "&a[Post Office] &4The sign must be attached to a barrel."
 
 # Message when a post box has been successfully registered in the config
@@ -57,18 +60,22 @@ successful-registration: "&a[Post Office] &aPost box registered successfully."
 already-claimed: "&a[Post Office] &4This post box has already been claimed."
 
 # Message shown when a post box is successfully claimed with the claim command
-successfully-claimed: "&a[Post Office] &aYou have successfully registered this post box."
+successfully-claimed: "&a[Post Office] &aYou have successfully claimed this post box."
 
 # Error when a player is trying to modify a post box sign without the correct permission
 modify-sign: "&a[Post Office] &4You cannot modify a post box sign."
 
-# Message when a post box
+# Message when a post box has been broken but was still in the config. The plugin will
+# automatically remove it from the config.
 remove-from-config: "&a[Post Office] &aPost box successfully removed from the config."
+
+# Warning shown when closing an unclaimed post box. Good as a reminder for an admin/mod
+# that they may be leaving items in the wrong post box
 unclaimed-postbox: "&a[Post Office] &4This post box is unclaimed."
+
+# Error shown to a user when they have been banned from using the post office plugin.
+# They aren't able to open a post box and will see this error.
 user-banned: "&a[Post Office] &4You aren't able to interact with this post box."
-
-
-
 
 # Confirmation message shown when a post box has been created
 # You can use %username% to show the players name
