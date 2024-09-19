@@ -27,7 +27,7 @@ public class Helpers {
     }
 
     // In-memory cache to store barrel data (key: block location, value: owner UUID)
-    private Map<String, BarrelData> barrelsCache;
+    public Map<String, BarrelData> barrelsCache;
     private FileConfiguration barrelsConfig = null;
     private File barrelsConfigFile = null;
 

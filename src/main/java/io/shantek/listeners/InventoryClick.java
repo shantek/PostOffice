@@ -1,7 +1,8 @@
 package io.shantek.listeners;
 
+import io.shantek.PostOffice;
+import io.shantek.functions.BarrelData;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.*;
 import org.bukkit.entity.Player;
@@ -14,13 +15,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import io.shantek.PostOffice;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class InventoryClick implements Listener {
 
-    public PostOffice postOffice;
+    private final PostOffice postOffice;
 
     public InventoryClick(PostOffice postOffice) {
         this.postOffice = postOffice;
@@ -32,123 +33,105 @@ public class InventoryClick implements Listener {
         Inventory inventory = event.getInventory();
         Inventory clickedInventory = event.getClickedInventory();
 
-        // If they aren't opening a barrel, ignore it
-        if (event.getClickedInventory() == null || inventory.getType() != InventoryType.BARREL) {
+        // If the clicked inventory isn't a barrel, ignore it
+        if (clickedInventory == null || inventory.getType() != InventoryType.BARREL) {
             return;
         }
 
-        // Prevent the player from double-clicking items in their own inventory to remove items
+        Block clickedBlock = Objects.requireNonNull(inventory.getLocation()).getBlock();
+        if (clickedBlock.getType() != Material.BARREL) {
+            return;
+        }
+
+        // Get the location string for the barrel
+        String barrelLocationString = postOffice.helpers.getBlockLocationString(clickedBlock);
+
+        // Log barrel location
+        if (postOffice.consoleLogs) {
+            postOffice.getLogger().info("Player is interacting with a barrel at location: " + barrelLocationString);
+        }
+
+        // Fetch the barrel data from the cache
+        BarrelData barrelData = postOffice.helpers.barrelsCache.get(barrelLocationString);  // Use barrelsCache directly
+
+        // Check if barrel data is null (not registered)
+        if (barrelData == null) {
+            player.sendMessage(ChatColor.RED + "This is not a registered postbox.");
+            return;
+        }
+
+        // Log the owner and the player interacting
+        UUID ownerUUID = barrelData.getOwnerUUID();
+        if (postOffice.consoleLogs) {
+            postOffice.getLogger().info("Owner of the barrel: " + (ownerUUID != null ? ownerUUID.toString() : "None"));
+            postOffice.getLogger().info("Player interacting: " + player.getUniqueId());
+        }
+
+        // Determine if the player is the owner or has permission
+        boolean isOwner = ownerUUID != null && ownerUUID.equals(player.getUniqueId());
+        boolean hasPermissionToRemove = player.hasPermission("shantek.postoffice.removeitems");
+
+        // Log the result of the ownership and permission checks
+        if (postOffice.consoleLogs) {
+            postOffice.getLogger().info("Is owner: " + isOwner);
+            postOffice.getLogger().info("Has permission to remove items: " + hasPermissionToRemove);
+        }
+
+        // Prevent non-owners without permission from interacting with the post box
+        if (!isOwner && !hasPermissionToRemove) {
+            if (postOffice.consoleLogs) {
+                postOffice.getLogger().info("Player " + player.getName() + " tried to interact without permission.");
+            }
+            player.sendMessage(ChatColor.RED + postOffice.language.removeItemError);
+            event.setCancelled(true);
+            return;
+        }
+
+        // Prevent double-clicking items in player's own inventory to remove items
         if (event.getClick() == ClickType.DOUBLE_CLICK) {
             if (clickedInventory == player.getInventory() || clickedInventory.getType() == InventoryType.PLAYER) {
-                Inventory topInventory = player.getOpenInventory().getTopInventory();
-                if (topInventory != null && topInventory.getType() == InventoryType.BARREL) {
-                    Block clickedBlock = Objects.requireNonNull(topInventory.getLocation()).getBlock();
-                    if (clickedBlock.getType() == Material.BARREL) {
-                        BlockState blockState = clickedBlock.getState();
-
-                        if (blockState instanceof Barrel) {
-                            Barrel barrel = (Barrel) blockState;
-                            if (barrel.getCustomName() != null && barrel.getCustomName().equalsIgnoreCase(postOffice.customBarrelName)) {
-                                event.setCancelled(true);
-                                //player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
-                                return;
-                            }
-                        }
-                    }
-                }
+                player.sendMessage(ChatColor.RED + "You cannot double-click items into this postbox.");
+                event.setCancelled(true);
+                return;
             }
         }
 
-        Block clickedBlock = Objects.requireNonNull(event.getClickedInventory().getLocation()).getBlock();
-        if (clickedBlock.getType() == Material.BARREL) {
-            BlockState blockState = clickedBlock.getState();
+        // Prevent item swapping using hotbar
+        if (event.getClick() == ClickType.NUMBER_KEY) {
+            ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
+            if (hotbarItem != null) {
+                player.sendMessage(ChatColor.RED + "You cannot use number keys to swap items in this postbox.");
+                event.setCancelled(true);
+                return;
+            }
+        }
 
-            if (blockState instanceof Barrel) {
-                Barrel barrel = (Barrel) blockState;
+        // Prevent swapping items from a barrel while having another item in hand
+        if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR || event.getAction() == InventoryAction.HOTBAR_SWAP) {
+            player.sendMessage(ChatColor.RED + "You cannot swap items with the cursor in this postbox.");
+            event.setCancelled(true);
+            return;
+        }
 
-                if (barrel.getCustomName() != null && barrel.getCustomName().equalsIgnoreCase(postOffice.customBarrelName)) {
+        // Prevent the player from dropping items out of the postbox
+        if (event.getClick() == ClickType.DROP || event.getClick() == ClickType.CONTROL_DROP) {
+            player.sendMessage(ChatColor.RED + "You cannot drop items out of this postbox.");
+            event.setCancelled(true);
+            return;
+        }
 
-                    String ownerName = "";
-
-                    for (BlockFace blockFace : BlockFace.values()) {
-                        Block relativeBlock = clickedBlock.getRelative(blockFace);
-
-                        if (relativeBlock.getType().name().toUpperCase().contains("SIGN")) {
-                            Sign sign = (Sign) relativeBlock.getState();
-                            Location signLoc = relativeBlock.getLocation().subtract(blockFace.getDirection());
-
-                            if (sign.getLine(1).equalsIgnoreCase(player.getName()) && signLoc.equals(clickedBlock.getLocation())) {
-                                ownerName = sign.getLine(1);
-                                break;
-                            }
-                        }
-                    }
-
-                    boolean isNotOwner = !ownerName.equalsIgnoreCase(player.getName());
-
-                    // Prevent non-owners who do not have OP from taking items or shift-clicking
-                    if (!player.isOp() && isNotOwner && !player.hasPermission("shantek.postoffice.removeitems") && (event.getAction().name().contains("PICKUP") || event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
-                        event.setCancelled(true);
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
-                        return;
-                    }
-
-                    // If player is not the owner and trying to take an item, cancel the event
-                    if (isNotOwner && !player.hasPermission("shantek.postoffice.removeitems") && event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-                        event.setCancelled(true);
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
-                        return;
-                    }
-
-                    if (isNotOwner && !player.hasPermission("shantek.postoffice.removeitems") && !player.isOp()) {
-                        // CHECK IF THE PLAYER DOESN'T HAVE PERMISSION TO USE THIS BARREL, RESTRICT NUMBER KEY CLICKING TO MOVE TO HOTBAR
-                        if (event.getWhoClicked() instanceof Player && event.getClickedInventory() != null) {
-                            ItemStack hotbarItem = event.getClick() == ClickType.NUMBER_KEY ? event.getWhoClicked().getInventory().getItem(event.getHotbarButton()) : null;
-
-                            if (hotbarItem != null) {
-                                event.setCancelled(true);
-                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.hotBarError));
-                                return;
-                            }
-                        }
-
-                        // Prevent players from swapping items from a barrel while having another item in hand
-                        if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
-                            event.setCancelled(true);
-                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
-                            return;
-                        }
-
-                        if (event.getAction() == InventoryAction.HOTBAR_SWAP) {
-                            event.setCancelled(true);
-                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.hotBarError));
-                            return;
-                        }
-
-                        // Prevent the player from dropping items out of the postbox
-                        if (event.getClick() == ClickType.DROP || event.getClick() == ClickType.CONTROL_DROP) {
-                            event.setCancelled(true);
-                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.dropItemError));
-                            return;
-                        }
-                    }
-
-                    // Check if item is already in the barrel
-                    ItemStack[] contents = inventory.getContents();
-                    for (ItemStack item : contents) {
-                        if (item != null && event.getCurrentItem() != null && item.isSimilar(event.getCurrentItem())) {
-                            // If the player is not the owner and trying to add to an existing stack, cancel the event
-                            if (isNotOwner && !player.hasPermission("shantek.postoffice.removeitems") && event.getAction() == InventoryAction.PLACE_ALL && item.getAmount() < item.getMaxStackSize()) {
-                                event.setCancelled(true);
-                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.cantStackItems));
-                                return;
-                            }
-                            break;
-                        }
-                    }
+        // Check if the player is adding items to an existing stack in the barrel
+        ItemStack[] contents = inventory.getContents();
+        for (ItemStack item : contents) {
+            if (item != null && event.getCurrentItem() != null && item.isSimilar(event.getCurrentItem())) {
+                // If the player is not the owner and trying to add to an existing stack, cancel the event
+                if (!isOwner && event.getAction() == InventoryAction.PLACE_ALL && item.getAmount() < item.getMaxStackSize()) {
+                    player.sendMessage(ChatColor.RED + "You cannot stack items in this postbox.");
+                    event.setCancelled(true);
+                    return;
                 }
+                break;
             }
         }
     }
-
 }
