@@ -54,7 +54,46 @@ public class UpdateChecker {
     }
 
     public static boolean isNewVersionAvailable(String currentVersion, String remoteVersion) {
-        // Directly compare the version strings
-        return !currentVersion.equals(remoteVersion);
+        // Check if the remote version is null, return false in that case
+        if (remoteVersion == null || remoteVersion.isEmpty()) {
+            return false;
+        }
+
+        // Split the version strings by '.' to compare major, minor, and patch
+        String[] currentVersionParts = currentVersion.split("\\.");
+        String[] remoteVersionParts = remoteVersion.split("\\.");
+
+        // Check if current version is a dev build (contains "-SNAPSHOT" or other pre-release indicators)
+        boolean isDevBuild = currentVersion.toLowerCase().contains("snapshot") || currentVersion.toLowerCase().contains("dev");
+
+        // Compare major, minor, and patch versions
+        for (int i = 0; i < Math.min(currentVersionParts.length, remoteVersionParts.length); i++) {
+            try {
+                int currentPart = Integer.parseInt(currentVersionParts[i]);
+                int remotePart = Integer.parseInt(remoteVersionParts[i]);
+
+                // If the current version part is less than the remote, a new version is available
+                if (currentPart < remotePart) {
+                    return true;
+                }
+                // If the current version part is greater, the current version is newer (possibly a dev build)
+                if (currentPart > remotePart) {
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                // In case of non-numeric version parts (like "1.6.2-SNAPSHOT"), treat dev build as newer
+                if (isDevBuild) {
+                    return false; // Consider dev builds to be newer than any stable release
+                }
+            }
+        }
+
+        // If all version parts are equal, but one version has more parts (e.g., "1.6" vs "1.6.1"), compare lengths
+        if (currentVersionParts.length < remoteVersionParts.length) {
+            return true; // Remote version has more parts (e.g., 1.6 -> 1.6.1), so a new version is available
+        }
+
+        return false; // No new version available
     }
+
 }

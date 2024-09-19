@@ -38,8 +38,12 @@ public class PlayerJoin implements Listener {
         }
 
         if (postOffice.updateNotificationEnabled && (player.isOp() || player.hasPermission("shantek.postoffice.updatenotification"))) {
-            if (UpdateChecker.isNewVersionAvailable(postOffice.getDescription().getVersion(), UpdateChecker.remoteVersion)) {
-                player.sendMessage("[Post Office] An update is available! New version: " + UpdateChecker.remoteVersion);
+            String currentVersion = postOffice.getDescription().getVersion();
+            String remoteVersion = UpdateChecker.remoteVersion; // Assuming UpdateChecker retrieves the remote version
+
+            // Only notify if a newer version is available
+            if (UpdateChecker.isNewVersionAvailable(currentVersion, remoteVersion)) {
+                player.sendMessage("[Post Office] An update is available! New version: " + remoteVersion);
             }
         }
 
