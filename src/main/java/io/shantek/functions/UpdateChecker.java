@@ -89,11 +89,9 @@ public class UpdateChecker {
         }
 
         // If all version parts are equal, but one version has more parts (e.g., "1.6" vs "1.6.1"), compare lengths
-        if (currentVersionParts.length < remoteVersionParts.length) {
-            return true; // Remote version has more parts (e.g., 1.6 -> 1.6.1), so a new version is available
-        }
-
-        return false; // No new version available
+        return currentVersionParts.length < remoteVersionParts.length;
+        // Remote version has more parts (e.g., 1.6 -> 1.6.1), so a new version is available
+        // No new version available
     }
 
 }
