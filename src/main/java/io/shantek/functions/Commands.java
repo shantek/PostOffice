@@ -136,7 +136,7 @@ public class Commands implements CommandExecutor {
                     if (owner != null && !owner.equals("none")) {
                         player.sendMessage(ChatColor.GREEN + "This post box is owned by: " + ChatColor.YELLOW + owner);
                     } else if (state != null && state.equals("registered")) {
-                        player.sendMessage(ChatColor.GREEN + "This post box is currently registered but not claimed.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.registeredNotClaimed));
                     } else {
                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.invalidPostbox));
                     }

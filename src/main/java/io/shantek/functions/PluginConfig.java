@@ -73,6 +73,7 @@ public class PluginConfig {
                 postOffice.gotMailDelay = getBoolean(config, "got-mail-delay", true);
                 postOffice.signNotification = getBoolean(config, "sign-notification", true);
 
+                postOffice.language.registeredNotClaimed = getString(config, "registered-not-claimed", postOffice.language.registeredNotClaimed);
                 postOffice.language.invalidPostbox = getString(config, "invalid-postbox", postOffice.language.invalidPostbox);
                 postOffice.language.lookAtPostBox = getString(config, "look-at-post-box", postOffice.language.lookAtPostBox);
                 postOffice.language.notRegistered = getString(config, "not-registered", postOffice.language.notRegistered);
@@ -102,7 +103,8 @@ public class PluginConfig {
                 "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
                 "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay", "sign-notification",
                 "look-at-post-box", "not-registered", "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
-                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned", "already-registered", "invalid-postbox");
+                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned", "already-registered", "invalid-postbox",
+                "registered-not-claimed");
 
         // Check for missing keys
         for (String key : keysToCheck) {
@@ -123,7 +125,9 @@ public class PluginConfig {
                 "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
                 "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay", "sign-notification",
                 "look-at-post-box", "not-registered", "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
-                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned", "already-registered", "invalid-postbox");
+                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned", "already-registered", "invalid-postbox",
+                "registered-not-claimed"
+        );
 
 
         // Save existing values of missing keys

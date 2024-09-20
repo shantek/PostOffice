@@ -22,8 +22,7 @@ public class Language {
     public String unclaimedPostbox = "&a[Post Office] &4This post box is unclaimed.";
     public String userBanned = "&a[Post Office] &4You aren't able to interact with this post box.";
     public String invalidPostbox = "&a[Post Office] &4This isn't a valid post box.";
-
-
+    public String registeredNotClaimed = "&a[Post Office] &eThis post box is currently registered, but not claimed.";
     public String sentMessage = "&a[Post Office] &aMail sent to %receiver%.";
     public String receivedMessage = "&a[Post Office] &eYou received mail from %sender%!";
     public String gotMailMessage = "&a[Post Office] &fYou got mail!";

@@ -12,6 +12,9 @@ sent-message: "&a[Post Office] &aMail sent to %receiver%."
 # Message sent to the receiver if they are online
 received-message: "&a[Post Office] &eYou received mail from %sender%!"
 
+# Message shown when a post box is registered, but not claimed - when running the info command
+registered-not-claimed: "&a[Post Office] &eThis post box is currently registered, but not claimed."
+
 # Message sent to the receiver next time they log on to the server
 got-mail-message: "&a[Post Office] &fYou got mail!"
 
