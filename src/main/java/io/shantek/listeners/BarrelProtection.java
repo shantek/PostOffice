@@ -51,7 +51,6 @@ public class BarrelProtection implements Listener {
         }
     }
 
-
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         if (!postOffice.postBoxProtection) {
@@ -96,8 +95,6 @@ public class BarrelProtection implements Listener {
         }
     }
 
-
-
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         if (!postOffice.postBoxProtection) {
@@ -132,7 +129,6 @@ public class BarrelProtection implements Listener {
             }
         }
     }
-
 
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {

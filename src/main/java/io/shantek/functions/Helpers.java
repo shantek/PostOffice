@@ -135,8 +135,6 @@ public class Helpers {
         return offlinePlayer.getName(); // This may return null if the player's name is not available
     }
 
-
-
     public Block getSignForBarrel(Block barrelBlock) {
         String barrelLocationString = getBlockLocationString(barrelBlock);
 

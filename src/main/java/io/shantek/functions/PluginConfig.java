@@ -180,31 +180,4 @@ public class PluginConfig {
         }
     }
 
-    // Reload and manage barrels.yml
-    public void reloadBarrelsConfig() {
-        if (barrelsConfigFile == null) {
-            barrelsConfigFile = new File(postOffice.getDataFolder(), "barrels.yml");
-        }
-        barrelsConfig = YamlConfiguration.loadConfiguration(barrelsConfigFile);
-        if (!barrelsConfigFile.exists()) {
-            postOffice.saveResource("barrels.yml", false);
-        }
-    }
-
-    public FileConfiguration getBarrelsConfig() {
-        if (barrelsConfig == null) {
-            reloadBarrelsConfig();
-        }
-        return barrelsConfig;
-    }
-
-    public void saveBarrelsConfig() {
-        if (barrelsConfig != null && barrelsConfigFile != null) {
-            try {
-                barrelsConfig.save(barrelsConfigFile);
-            } catch (IOException e) {
-                postOffice.getLogger().severe("Could not save barrels.yml: " + e.getMessage());
-            }
-        }
-    }
 }

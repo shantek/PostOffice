@@ -117,5 +117,4 @@ public final class PostOffice extends JavaPlugin {
         getLogger().info(message); // Print to the console
     }
 
-
 }

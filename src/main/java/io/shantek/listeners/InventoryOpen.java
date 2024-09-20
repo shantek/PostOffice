@@ -2,7 +2,6 @@ package io.shantek.listeners;
 
 import io.shantek.PostOffice;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.block.Barrel;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
