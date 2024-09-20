@@ -11,6 +11,7 @@ public class Language {
 
     public String lookAtPostBox = "&a[Post Office] &4You must be looking at a barrel or a sign attached to a barrel.";
     public String notRegistered = "&a[Post Office] &4This isn't a registered post office box.";
+    public String alreadyRegistered = "&a[Post Office] &4This post box is already registered.";
     public String postBoxRemoved = "&a[Post Office] &aPost box removed successfully.";
     public String signOnBarrel = "&a[Post Office] &4The sign must be attached to a barrel.";
     public String successfulRegistration = "&a[Post Office] &aPost box registered successfully.";
@@ -20,6 +21,7 @@ public class Language {
     public String removeFromConfig = "&a[Post Office] &aPost box successfully removed from the config.";
     public String unclaimedPostbox = "&a[Post Office] &4This post box is unclaimed.";
     public String userBanned = "&a[Post Office] &4You aren't able to interact with this post box.";
+    public String invalidPostbox = "&a[Post Office] &4This isn't a valid post box.";
 
 
     public String sentMessage = "&a[Post Office] &aMail sent to %receiver%.";

@@ -73,6 +73,7 @@ public class PluginConfig {
                 postOffice.gotMailDelay = getBoolean(config, "got-mail-delay", true);
                 postOffice.signNotification = getBoolean(config, "sign-notification", true);
 
+                postOffice.language.invalidPostbox = getString(config, "invalid-postbox", postOffice.language.invalidPostbox);
                 postOffice.language.lookAtPostBox = getString(config, "look-at-post-box", postOffice.language.lookAtPostBox);
                 postOffice.language.notRegistered = getString(config, "not-registered", postOffice.language.notRegistered);
                 postOffice.language.postBoxRemoved = getString(config, "post-box-removed", postOffice.language.postBoxRemoved);
@@ -84,6 +85,7 @@ public class PluginConfig {
                 postOffice.language.removeFromConfig = getString(config, "remove-from-config", postOffice.language.removeFromConfig);
                 postOffice.language.unclaimedPostbox = getString(config, "unclaimed-postbox", postOffice.language.unclaimedPostbox);
                 postOffice.language.userBanned = getString(config, "user-banned", postOffice.language.userBanned);
+                postOffice.language.alreadyRegistered = getString(config, "already-registered", postOffice.language.alreadyRegistered);
             }
 
         } catch (Exception e) {
@@ -100,7 +102,7 @@ public class PluginConfig {
                 "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
                 "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay", "sign-notification",
                 "look-at-post-box", "not-registered", "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
-                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned");
+                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned", "already-registered", "invalid-postbox");
 
         // Check for missing keys
         for (String key : keysToCheck) {
@@ -121,7 +123,7 @@ public class PluginConfig {
                 "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
                 "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay", "sign-notification",
                 "look-at-post-box", "not-registered", "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
-                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned");
+                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned", "already-registered", "invalid-postbox");
 
 
         // Save existing values of missing keys

@@ -59,6 +59,12 @@ successful-registration: "&a[Post Office] &aPost box registered successfully."
 # Message shown when a post box has already been claimed to another player
 already-claimed: "&a[Post Office] &4This post box has already been claimed."
 
+# Error shown when running the info command and not looking at a valid postbox
+invalid-postbox: "&a[Post Office] &4This isn't a valid post box."
+
+# Warning shown to the admin/mod when trying to register a new post box if it's already registered
+already-registered: "&a[Post Office] &4This post box is already registered."
+
 # Message shown when a post box is successfully claimed with the claim command
 successfully-claimed: "&a[Post Office] &aYou have successfully claimed this post box."
 

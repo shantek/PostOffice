@@ -138,7 +138,7 @@ public class Commands implements CommandExecutor {
                     } else if (state != null && state.equals("registered")) {
                         player.sendMessage(ChatColor.GREEN + "This post box is currently registered but not claimed.");
                     } else {
-                        player.sendMessage(ChatColor.RED + "This isn't a valid postbox.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.invalidPostbox));
                     }
 
                     return true;
@@ -174,7 +174,7 @@ public class Commands implements CommandExecutor {
                             return true;
                         }
                         if (currentState != null && currentState.equals("registered")) {
-                            player.sendMessage(ChatColor.RED + "This post box is already registered.");
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.alreadyRegistered));
                             return true;
                         }
 
