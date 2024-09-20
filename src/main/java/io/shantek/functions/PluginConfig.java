@@ -32,7 +32,7 @@ public class PluginConfig {
 
             // Check if the config file exists
             if (!configFile.exists()) {
-                postOffice.getLogger().info("Config file not found. Creating a new one...");
+                postOffice.getLogger().info("No config file found. Generating a new one.");
 
                 // Create a new config file based on a template from resources
                 saveDefaultConfig("config.yml", configFile);
@@ -70,7 +70,7 @@ public class PluginConfig {
 
             // Check if the config file exists
             if (!langFile.exists()) {
-                postOffice.getLogger().info("Lang file not found. Creating a new one.");
+                postOffice.getLogger().info("No lang file not found. Generating a new one.");
 
                 // Create a new config file based on a template from resources
                 saveDefaultConfig("lang.yml", langFile);
@@ -93,7 +93,6 @@ public class PluginConfig {
                 // Language strings
                 postOffice.customBarrelName = getString(config, "custom-barrel-name", "pobox");
                 postOffice.language.noPermission = getString(config, "no-permission", postOffice.language.noPermission);
-                postOffice.language.removeItemError = getString(config, "remove-item-error", postOffice.language.removeItemError);
                 postOffice.language.hotBarError = getString(config, "hotbar-error", postOffice.language.hotBarError);
                 postOffice.language.sentMessage = getString(config, "sent-message", postOffice.language.sentMessage);
                 postOffice.language.receivedMessage = getString(config, "received-message", postOffice.language.receivedMessage);
@@ -147,7 +146,7 @@ public class PluginConfig {
 
         // List of keys to check
         List<String> keysToCheck = Arrays.asList(
-                "no-permission", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
+                "no-permission", "offhand-error", "hotbar-error", "drop-item-error",
                 "plugin-up-to-date", "sent-message", "received-message", "got-mail-message", "create-error",
                 "break-error", "postbox-created", "registered-not-claimed", "look-at-post-box", "not-registered",
                 "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
@@ -171,7 +170,7 @@ public class PluginConfig {
 
         // List of keys to check
         List<String> keysToCheck = Arrays.asList(
-                "no-permission", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
+                "no-permission", "offhand-error", "hotbar-error", "drop-item-error",
                 "plugin-up-to-date", "sent-message", "received-message", "got-mail-message", "create-error",
                 "break-error", "postbox-created", "registered-not-claimed", "look-at-post-box", "not-registered",
                 "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",

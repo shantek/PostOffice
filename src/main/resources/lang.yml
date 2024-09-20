@@ -1,19 +1,19 @@
 
-# Message sent to the sender when closing the Post Box
+# Confirmation message shown to the sender when leaving mail in another post box.
+# %receiver% will be replaced with the person sending the mail
 sent-message: "&a[Post Office] &aMail sent to %receiver%."
 
 # Message sent to the receiver if they are online
+# %receiver% will be replaced with the name of the person receiving the mail
+# %sender% will be replaced with the name of the person sending the mail
 received-message: "&a[Post Office] &eYou received mail from %sender%!"
 
-# Message sent to the receiver next time they log on to the server
+# Message sent to the player next time they log on to the server, if they have mail
 got-mail-message: "&a[Post Office] &fYou got mail!"
 
 # Generic no permission error message when a player is attempting to do an action
 # that they shouldn't have permission to do
 no-permission: "&a[Post Office] &4You don't have permission to do that."
-
-# Error shown when a player attempts to remove items without permission
-remove-item-error: "&a[Post Office] &4You don't have permission to remove items."
 
 # Error shown when trying to use their offhand while in a Post Box
 offhand-error: "&a[Post Office] &4No offhand usage while in a Post Box!"

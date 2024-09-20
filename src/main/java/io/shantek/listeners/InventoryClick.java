@@ -77,7 +77,7 @@ public class InventoryClick implements Listener {
             if (postOffice.consoleLogs) {
                 postOffice.getLogger().info("Player " + player.getName() + " tried to interact without permission.");
             }
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.noPermission));
             event.setCancelled(true);
             return;
         }

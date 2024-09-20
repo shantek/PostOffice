@@ -27,7 +27,6 @@ public class Language {
     public String receivedMessage = "&a[Post Office] &eYou received mail from %sender%!";
     public String gotMailMessage = "&a[Post Office] &fYou got mail!";
     public String noPermission = "&a[Post Office] &4You don't have permission to do that.";
-    public String removeItemError = "&a[Post Office] &4You don't have permission to remove items.";
     public String hotBarError = "&a[Post Office] &4No hot bar usage while in a Post Box!";
     public String breakError = "&a[Post Office] &4You can't break a Post Box.";
     public String createError = "&a[Post Office] &4You can't create a Post Box.";
