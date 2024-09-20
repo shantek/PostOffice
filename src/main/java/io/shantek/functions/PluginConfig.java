@@ -40,7 +40,7 @@ public class PluginConfig {
                 FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
                 // Check for missing keys
-                @SuppressWarnings("unused") boolean keysMissing = checkForMissingKeys(config);
+                boolean keysMissing = checkForMissingKeys(config);
 
                 // Save existing values of missing keys
                 Map<String, Object> missingKeyValues = saveMissingKeyValues(config);
@@ -48,12 +48,49 @@ public class PluginConfig {
                 // Create a fresh config file
                 saveDefaultConfig("config.yml", configFile);
 
-                // Load the new config
+                // Load and update the config
                 config = YamlConfiguration.loadConfiguration(configFile);
-
-                // Update the new config with missing key values
                 updateConfigWithMissingKeyValues(config, missingKeyValues);
 
+                // Boolean settings/config
+                postOffice.postBoxProtection = getBoolean(config, "postbox-protection", true);
+                postOffice.updateNotificationEnabled = getBoolean(config, "update-notification", true);
+                postOffice.consoleLogs = getBoolean(config, "console-logs", true);
+                postOffice.gotMailDelay = getBoolean(config, "got-mail-delay", true);
+                postOffice.signNotification = getBoolean(config, "sign-notification", true);
+            }
+        } catch (Exception e) {
+            postOffice.getLogger().log(Level.SEVERE, "An error occurred while reloading the config file", e);
+        }
+
+        try {
+            postOffice.getLogger().info("Reloading lang file."); // Print to the console
+
+            File langFile = new File(postOffice.getDataFolder(), "lang.yml");
+
+            // Check if the config file exists
+            if (!langFile.exists()) {
+                postOffice.getLogger().info("Lang file not found. Creating a new one.");
+
+                // Create a new config file based on a template from resources
+                saveDefaultConfig("lang.yml", langFile);
+            } else {
+                FileConfiguration config = YamlConfiguration.loadConfiguration(langFile);
+
+                // Check for missing keys
+                boolean keysMissing = checkForMissingKeys(config);
+
+                // Save existing values of missing keys
+                Map<String, Object> missingKeyValues = saveMissingKeyValues(config);
+
+                // Create a fresh config file
+                saveDefaultConfig("config.yml", langFile);
+
+                // Load and update the config
+                config = YamlConfiguration.loadConfiguration(langFile);
+                updateConfigWithMissingKeyValues(config, missingKeyValues);
+
+                // Language strings
                 postOffice.customBarrelName = getString(config, "custom-barrel-name", "pobox");
                 postOffice.language.noPermission = getString(config, "no-permission", postOffice.language.noPermission);
                 postOffice.language.removeItemError = getString(config, "remove-item-error", postOffice.language.removeItemError);
@@ -66,13 +103,6 @@ public class PluginConfig {
                 postOffice.language.postboxCreated = getString(config, "postbox-created", postOffice.language.postboxCreated);
                 postOffice.language.pluginUpToDate = getString(config, "plugin-up-to-date", postOffice.language.pluginUpToDate);
                 postOffice.language.dropItemError = getString(config, "drop-item-error", postOffice.language.pluginUpToDate);
-
-                postOffice.postBoxProtection = getBoolean(config, "postbox-protection", true);
-                postOffice.updateNotificationEnabled = getBoolean(config, "update-notification", true);
-                postOffice.consoleLogs = getBoolean(config, "console-logs", true);
-                postOffice.gotMailDelay = getBoolean(config, "got-mail-delay", true);
-                postOffice.signNotification = getBoolean(config, "sign-notification", true);
-
                 postOffice.language.registeredNotClaimed = getString(config, "registered-not-claimed", postOffice.language.registeredNotClaimed);
                 postOffice.language.invalidPostbox = getString(config, "invalid-postbox", postOffice.language.invalidPostbox);
                 postOffice.language.lookAtPostBox = getString(config, "look-at-post-box", postOffice.language.lookAtPostBox);
@@ -87,10 +117,10 @@ public class PluginConfig {
                 postOffice.language.unclaimedPostbox = getString(config, "unclaimed-postbox", postOffice.language.unclaimedPostbox);
                 postOffice.language.userBanned = getString(config, "user-banned", postOffice.language.userBanned);
                 postOffice.language.alreadyRegistered = getString(config, "already-registered", postOffice.language.alreadyRegistered);
-            }
 
+            }
         } catch (Exception e) {
-            postOffice.getLogger().log(Level.SEVERE, "An error occurred while reloading the config file", e);
+            postOffice.getLogger().log(Level.SEVERE, "An error occurred while reloading the lang file", e);
         }
     }
 
@@ -151,7 +181,7 @@ public class PluginConfig {
     }
 
     private void saveDefaultConfig(String resourceName, File destination) {
-        try (InputStream resourceStream = getClass().getResourceAsStream("/config/" + resourceName)) {
+        try (InputStream resourceStream = getClass().getResourceAsStream("/" + resourceName)) {
             if (resourceStream != null) {
                 Files.copy(resourceStream, destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 //getLogger().info("Default config file created successfully.");

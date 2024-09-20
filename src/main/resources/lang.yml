@@ -1,10 +1,3 @@
-# The name of your barrel. Any barrel renamed to this in an anvil
-# will be treated as a Post Box
-custom-barrel-name: "pobox"
-
-# Display mail state on post box signs. When enabled, a notification will be
-# added to the third line of the post box sign
-sign-notification: true
 
 # Message sent to the sender when closing the Post Box
 sent-message: "&a[Post Office] &aMail sent to %receiver%."
@@ -14,10 +7,6 @@ received-message: "&a[Post Office] &eYou received mail from %sender%!"
 
 # Message sent to the receiver next time they log on to the server
 got-mail-message: "&a[Post Office] &fYou got mail!"
-
-# Do we want to delay the got-mail-message by 10 seconds? This ensures the message
-# isn't lost in any other messages they receive during connection
-got-mail-delay: true
 
 # Generic no permission error message when a player is attempting to do an action
 # that they shouldn't have permission to do
@@ -92,16 +81,3 @@ drop-item-error: "&a[Post Office] &4 You can't drop items while in a postbox."
 
 # Message shown in the console to inform the server owner the plugin is up to date
 plugin-up-to-date: "Your plugin is up to date."
-
-# Do you want to use the built-in protection to prevent players breaking
-# Post Boxes? Disable if you prefer to use something like WorldGuard
-postbox-protection: true
-
-# Do you want to check for updates when restarting the server?
-# This will also message any server ops to notify them each time they log on.
-update-notification: true
-
-# Do you want to print messages to the server console? You'll always receive
-# start up/shut down messages as well as warnings/errors. Disabling this will
-# remove the less important console logs like the mail file being updated etc.
-console-logs: true

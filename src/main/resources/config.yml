@@ -6,95 +6,9 @@ custom-barrel-name: "pobox"
 # added to the third line of the post box sign
 sign-notification: true
 
-# Message sent to the sender when closing the Post Box
-sent-message: "&a[Post Office] &aMail sent to %receiver%."
-
-# Message sent to the receiver if they are online
-received-message: "&a[Post Office] &eYou received mail from %sender%!"
-
-# Message shown when a post box is registered, but not claimed - when running the info command
-registered-not-claimed: "&a[Post Office] &eThis post box is currently registered, but not claimed."
-
-# Message sent to the receiver next time they log on to the server
-got-mail-message: "&a[Post Office] &fYou got mail!"
-
 # Do we want to delay the got-mail-message by 10 seconds? This ensures the message
 # isn't lost in any other messages they receive during connection
 got-mail-delay: true
-
-# Generic no permission error message when a player is attempting to do an action
-# that they shouldn't have permission to do
-no-permission: "&a[Post Office] &4You don't have permission to do that."
-
-# Error shown when a player attempts to remove items without permission
-remove-item-error: "&a[Post Office] &4You don't have permission to remove items."
-
-# Error shown when trying to use their offhand while in a Post Box
-offhand-error: "&a[Post Office] &4No offhand usage while in a Post Box!"
-
-# Error shown when trying to swap items to their hotbar
-hotbar-error: "&a[Post Office] &4No hot bar usage while in a Post Box!"
-
-# Error shown when the player tries to create a Post Box
-create-error: "&a[Post Office] &4You can't create a Post Box."
-
-# Error shown when a player tries to break a Post Box
-break-error: "&a[Post Office] &4You can't break this Post Box."
-
-# Error when running a command and not looking at a configured post box.
-# This is a generic error, shown in a lot of different scenarios.
-look-at-post-box: "&a[Post Office] &4You must be looking at a barrel or a sign attached to a barrel."
-
-# Error when the post box isn't registered in the config. Used in instanced like when trying to remove
-# a post box, looking up postbox info etc.
-not-registered: "&a[Post Office] &4This isn't a registered post office box."
-
-# Message shown when a post box is successfully removed with the remove command
-post-box-removed: "&a[Post Office] &aPost box removed successfully."
-
-# Warning shown in cases where we haven't found a barrel/sign combo
-# resulting in an invalid setup
-sign-on-barrel: "&a[Post Office] &4The sign must be attached to a barrel."
-
-# Message when a post box has been successfully registered in the config
-successful-registration: "&a[Post Office] &aPost box registered successfully."
-
-# Message shown when a post box has already been claimed to another player
-already-claimed: "&a[Post Office] &4This post box has already been claimed."
-
-# Error shown when running the info command and not looking at a valid postbox
-invalid-postbox: "&a[Post Office] &4This isn't a valid post box."
-
-# Warning shown to the admin/mod when trying to register a new post box if it's already registered
-already-registered: "&a[Post Office] &4This post box is already registered."
-
-# Message shown when a post box is successfully claimed with the claim command
-successfully-claimed: "&a[Post Office] &aYou have successfully claimed this post box."
-
-# Error when a player is trying to modify a post box sign without the correct permission
-modify-sign: "&a[Post Office] &4You cannot modify a post box sign."
-
-# Message when a post box has been broken but was still in the config. The plugin will
-# automatically remove it from the config.
-remove-from-config: "&a[Post Office] &aPost box successfully removed from the config."
-
-# Warning shown when closing an unclaimed post box. Good as a reminder for an admin/mod
-# that they may be leaving items in the wrong post box
-unclaimed-postbox: "&a[Post Office] &4This post box is unclaimed."
-
-# Error shown to a user when they have been banned from using the post office plugin.
-# They aren't able to open a post box and will see this error.
-user-banned: "&a[Post Office] &4You aren't able to interact with this post box."
-
-# Confirmation message shown when a post box has been created
-# You can use %username% to show the players name
-postbox-created: "&a[Post Office] &2 Box successfully created for %username%"
-
-# Error shown to the player if they try dropping an item while in a post box
-drop-item-error: "&a[Post Office] &4 You can't drop items while in a postbox."
-
-# Message shown in the console to inform the server owner the plugin is up to date
-plugin-up-to-date: "Your plugin is up to date."
 
 # Do you want to use the built-in protection to prevent players breaking
 # Post Boxes? Disable if you prefer to use something like WorldGuard
@@ -107,4 +21,4 @@ update-notification: true
 # Do you want to print messages to the server console? You'll always receive
 # start up/shut down messages as well as warnings/errors. Disabling this will
 # remove the less important console logs like the mail file being updated etc.
-console-logs: true
+console-logs: false
