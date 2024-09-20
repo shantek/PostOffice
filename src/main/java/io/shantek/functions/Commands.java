@@ -134,9 +134,12 @@ public class Commands implements CommandExecutor {
 
                     // If there's an owner, print it. Otherwise, print the state.
                     if (owner != null && !owner.equals("none")) {
-                        player.sendMessage(ChatColor.GREEN + "This post box is owned by: " + ChatColor.YELLOW + owner);
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                                postOffice.language.postBoxOwner
+                                        .replace("%owner%", owner)
+                                        ));
                     } else if (state != null && state.equals("registered")) {
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.registeredNotClaimed));
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.unclaimedPostbox));
                     } else {
                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.invalidPostbox));
                     }
@@ -170,7 +173,10 @@ public class Commands implements CommandExecutor {
 
                         // Check if the post box is already registered or claimed
                         if (currentOwner != null && !currentOwner.equals("none")) {
-                            player.sendMessage(ChatColor.RED + "This post box is already claimed by: " + ChatColor.YELLOW + currentOwner);
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                                    postOffice.language.postBoxOwner
+                                            .replace("%owner%", currentOwner)
+                                            ));
                             return true;
                         }
                         if (currentState != null && currentState.equals("registered")) {
@@ -240,7 +246,10 @@ public class Commands implements CommandExecutor {
                     OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(targetPlayerName);
 
                     if (!targetPlayer.hasPlayedBefore()) {
-                        player.sendMessage(ChatColor.RED + "The player " + targetPlayerName + " has not played on this server.");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                                postOffice.language.notPlayedBefore
+                                        .replace("%player%", targetPlayer.toString())
+                                        ));
                         return true;
                     }
 
@@ -249,7 +258,10 @@ public class Commands implements CommandExecutor {
                     // Check if the player already has a post box
                     if (postOffice.helpers.doesPlayerHavePostBox(targetPlayerUUID)) {
                         String existingPostBoxLocation = postOffice.helpers.getPlayerPostBoxLocation(targetPlayerUUID); // Get world and coordinates
-                        player.sendMessage(ChatColor.RED + targetPlayerName + " already has a post box at: " + ChatColor.YELLOW + existingPostBoxLocation);
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                                postOffice.language.alreadyHasPostBox
+                                        .replace("%player%", targetPlayerName)
+                                        .replace("%location%", existingPostBoxLocation)));
                         return true;
                     }
 
@@ -270,7 +282,9 @@ public class Commands implements CommandExecutor {
                         sign.update();
                     }
 
-                    player.sendMessage(ChatColor.GREEN + "The post box has been claimed for " + targetPlayerName + ".");
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                            postOffice.language.claimedFor
+                                    .replace("%owner%", targetPlayerName)));
 
                     postOffice.helpers.saveCacheToFile(); // Save the cache to disk
                     return true;
@@ -316,7 +330,12 @@ public class Commands implements CommandExecutor {
                         // Check if the player already has a post box
                         if (postOffice.helpers.doesPlayerHavePostBox(playerUUID)) {
                             String existingPostBoxLocation = postOffice.helpers.getPlayerPostBoxLocation(playerUUID); // Get world and coordinates
-                            player.sendMessage(ChatColor.RED + "You already have a post box at: " + ChatColor.YELLOW + existingPostBoxLocation);
+
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                                    postOffice.language.alreadyHasPostBox
+                                            .replace("%player%", player.getName())
+                                            .replace("%location%", existingPostBoxLocation)));
+
                             return true;
                         }
 

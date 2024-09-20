@@ -16,20 +16,7 @@ got-mail-message: "&a[Post Office] &fYou got mail!"
 no-permission: "&a[Post Office] &4You don't have permission to do that."
 
 # Error shown when trying to use their offhand while in a Post Box
-offhand-error: "&a[Post Office] &4No offhand usage while in a Post Box!"
-
-# Error shown when trying to swap items to their hotbar
-hotbar-error: "&a[Post Office] &4No hot bar usage while in a Post Box!"
-
-# Error shown when the player tries to create a Post Box
-create-error: "&a[Post Office] &4You can't create a Post Box."
-
-# Error shown when a player tries to break a Post Box
-break-error: "&a[Post Office] &4You can't break this Post Box."
-
-# Error when running a command and not looking at a configured post box.
-# This is a generic error, shown in a lot of different scenarios.
-look-at-post-box: "&a[Post Office] &4You must be looking at a barrel or a sign attached to a barrel."
+deny-action: "&a[Post Office] &4You can't do that here!"
 
 # Error when the post box isn't registered in the config. Used in instanced like when trying to remove
 # a post box, looking up postbox info etc.
@@ -38,12 +25,27 @@ not-registered: "&a[Post Office] &4This isn't a registered post office box."
 # Message shown when a post box is successfully removed with the remove command
 post-box-removed: "&a[Post Office] &aPost box removed successfully."
 
+# Message when a post box has been successfully registered in the config
+successful-registration: "&a[Post Office] &aPost box registered successfully."
+
+# Warning shown to the admin/mod when trying to register a new post box if it's already registered
+already-registered: "&a[Post Office] &4This post box is already registered."
+
+# Confirmation message shown when a post box has been created
+# You can use %username% to show the players name
+postbox-created: "&a[Post Office] &2 Box successfully created for %username%"
+
+# Message when a post box has been broken but was still in the config. The plugin will
+# automatically remove it from the config.
+remove-from-config: "&a[Post Office] &aPost box successfully removed from the config."
+
+# Error when running a command and not looking at a configured post box.
+# This is a generic error, shown in a lot of different scenarios.
+look-at-post-box: "&a[Post Office] &4You must be looking at a barrel or a sign attached to a barrel."
+
 # Warning shown in cases where we haven't found a barrel/sign combo
 # resulting in an invalid setup
 sign-on-barrel: "&a[Post Office] &4The sign must be attached to a barrel."
-
-# Message when a post box has been successfully registered in the config
-successful-registration: "&a[Post Office] &aPost box registered successfully."
 
 # Message shown when a post box has already been claimed to another player
 already-claimed: "&a[Post Office] &4This post box has already been claimed."
@@ -51,18 +53,11 @@ already-claimed: "&a[Post Office] &4This post box has already been claimed."
 # Error shown when running the info command and not looking at a valid postbox
 invalid-postbox: "&a[Post Office] &4This isn't a valid post box."
 
-# Warning shown to the admin/mod when trying to register a new post box if it's already registered
-already-registered: "&a[Post Office] &4This post box is already registered."
-
 # Message shown when a post box is successfully claimed with the claim command
 successfully-claimed: "&a[Post Office] &aYou have successfully claimed this post box."
 
 # Error when a player is trying to modify a post box sign without the correct permission
 modify-sign: "&a[Post Office] &4You cannot modify a post box sign."
-
-# Message when a post box has been broken but was still in the config. The plugin will
-# automatically remove it from the config.
-remove-from-config: "&a[Post Office] &aPost box successfully removed from the config."
 
 # Warning shown when closing an unclaimed post box. Good as a reminder for an admin/mod
 # that they may be leaving items in the wrong post box
@@ -72,12 +67,21 @@ unclaimed-postbox: "&a[Post Office] &4This post box is unclaimed."
 # They aren't able to open a post box and will see this error.
 user-banned: "&a[Post Office] &4You aren't able to interact with this post box."
 
-# Confirmation message shown when a post box has been created
-# You can use %username% to show the players name
-postbox-created: "&a[Post Office] &2 Box successfully created for %username%"
+# Message shown when looking running the info command and looking at a post box
+# %owner% is replaced with the name of the player who owns the post box
+post-box-owner: "&a[Post Office] &aThis post box is owned by %owner%"
 
-# Error shown to the player if they try dropping an item while in a post box
-drop-item-error: "&a[Post Office] &4 You can't drop items while in a postbox."
+# %owner% is replaced with the name of the owner of the post box
+claimed-for: "&a[Post Office] &aThis post box has been claimed for %owner%"
+
+# Warning shown when the player tries to register a box and already has one registered
+# %player% is replaced with the name of the player who is trying to claim a box
+# %location% is replaced with the location of the box they already own
+already-has-postbox: "&a[Post Office] &4%player% already has a post box at: %location%"
+
+# A warning shown when the name being registered doesn't exist on the server
+# %player% is replaced with the name that is being used to register a box
+not-played-before: "&a[Post Office] &4The player %player% has not played on this server."
 
 # Message shown in the console to inform the server owner the plugin is up to date
 plugin-up-to-date: "Your plugin is up to date."

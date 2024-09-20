@@ -53,6 +53,7 @@ public class PluginConfig {
                 updateConfigWithMissingKeyValues(config, missingKeyValues);
 
                 // Boolean settings/config
+                postOffice.customBarrelName = getString(config, "custom-barrel-name", "pobox");
                 postOffice.postBoxProtection = getBoolean(config, "postbox-protection", true);
                 postOffice.updateNotificationEnabled = getBoolean(config, "update-notification", true);
                 postOffice.consoleLogs = getBoolean(config, "console-logs", true);
@@ -84,38 +85,38 @@ public class PluginConfig {
                 Map<String, Object> missingKeyValues = saveMissingLangKey(config);
 
                 // Create a fresh config file
-                saveDefaultConfig("config.yml", langFile);
+                saveDefaultConfig("lang.yml", langFile);
 
                 // Load and update the config
                 config = YamlConfiguration.loadConfiguration(langFile);
                 updateConfigWithMissingKeyValues(config, missingKeyValues);
 
                 // Language strings
-                postOffice.customBarrelName = getString(config, "custom-barrel-name", "pobox");
-                postOffice.language.noPermission = getString(config, "no-permission", postOffice.language.noPermission);
-                postOffice.language.hotBarError = getString(config, "hotbar-error", postOffice.language.hotBarError);
                 postOffice.language.sentMessage = getString(config, "sent-message", postOffice.language.sentMessage);
                 postOffice.language.receivedMessage = getString(config, "received-message", postOffice.language.receivedMessage);
                 postOffice.language.gotMailMessage = getString(config, "got-mail-message", postOffice.language.gotMailMessage);
-                postOffice.language.createError = getString(config, "create-error", postOffice.language.createError);
-                postOffice.language.breakError = getString(config, "break-error", postOffice.language.breakError);
-                postOffice.language.postboxCreated = getString(config, "postbox-created", postOffice.language.postboxCreated);
-                postOffice.language.pluginUpToDate = getString(config, "plugin-up-to-date", postOffice.language.pluginUpToDate);
-                postOffice.language.dropItemError = getString(config, "drop-item-error", postOffice.language.pluginUpToDate);
-                postOffice.language.registeredNotClaimed = getString(config, "registered-not-claimed", postOffice.language.registeredNotClaimed);
-                postOffice.language.invalidPostbox = getString(config, "invalid-postbox", postOffice.language.invalidPostbox);
-                postOffice.language.lookAtPostBox = getString(config, "look-at-post-box", postOffice.language.lookAtPostBox);
+                postOffice.language.noPermission = getString(config, "no-permission", postOffice.language.noPermission);
+                postOffice.language.denyAction = getString(config, "deny-action", postOffice.language.denyAction);
                 postOffice.language.notRegistered = getString(config, "not-registered", postOffice.language.notRegistered);
                 postOffice.language.postBoxRemoved = getString(config, "post-box-removed", postOffice.language.postBoxRemoved);
-                postOffice.language.signOnBarrel = getString(config, "sign-on-barrel", postOffice.language.signOnBarrel);
                 postOffice.language.successfulRegistration = getString(config, "successful-registration", postOffice.language.successfulRegistration);
+                postOffice.language.alreadyRegistered = getString(config, "already-registered", postOffice.language.alreadyRegistered);
+                postOffice.language.postboxCreated = getString(config, "postbox-created", postOffice.language.postboxCreated);
+                postOffice.language.removeFromConfig = getString(config, "remove-from-config", postOffice.language.removeFromConfig);
+                postOffice.language.lookAtPostBox = getString(config, "look-at-post-box", postOffice.language.lookAtPostBox);
+                postOffice.language.signOnBarrel = getString(config, "sign-on-barrel", postOffice.language.signOnBarrel);
                 postOffice.language.alreadyClaimed = getString(config, "already-claimed", postOffice.language.alreadyClaimed);
+                postOffice.language.invalidPostbox = getString(config, "invalid-postbox", postOffice.language.invalidPostbox);
                 postOffice.language.successfullyClaimed = getString(config, "successfully-claimed", postOffice.language.successfullyClaimed);
                 postOffice.language.modifySign = getString(config, "modify-sign", postOffice.language.modifySign);
-                postOffice.language.removeFromConfig = getString(config, "remove-from-config", postOffice.language.removeFromConfig);
                 postOffice.language.unclaimedPostbox = getString(config, "unclaimed-postbox", postOffice.language.unclaimedPostbox);
                 postOffice.language.userBanned = getString(config, "user-banned", postOffice.language.userBanned);
-                postOffice.language.alreadyRegistered = getString(config, "already-registered", postOffice.language.alreadyRegistered);
+                postOffice.language.postBoxOwner = getString(config, "post-box-owner", postOffice.language.postBoxOwner);
+                postOffice.language.claimedFor = getString(config, "claimed-for", postOffice.language.claimedFor);
+                postOffice.language.alreadyHasPostBox = getString(config, "already-has-postbox", postOffice.language.alreadyHasPostBox);
+                postOffice.language.notPlayedBefore = getString(config, "not-played-before", postOffice.language.notPlayedBefore);
+
+                postOffice.language.pluginUpToDate = getString(config, "plugin-up-to-date", postOffice.language.pluginUpToDate);
 
             }
         } catch (Exception e) {
@@ -146,12 +147,29 @@ public class PluginConfig {
 
         // List of keys to check
         List<String> keysToCheck = Arrays.asList(
-                "no-permission", "offhand-error", "hotbar-error", "drop-item-error",
-                "plugin-up-to-date", "sent-message", "received-message", "got-mail-message", "create-error",
-                "break-error", "postbox-created", "registered-not-claimed", "look-at-post-box", "not-registered",
-                "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
-                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned",
-                "already-registered", "invalid-postbox"
+                "sent-message",
+                "received-message",
+                "got-mail-message",
+                "no-permission", "deny-action",
+                "not-registered",
+                "post-box-removed",
+                "successful-registration",
+                "already-registered",
+                "postbox-created",
+                "remove-from-config",
+                "look-at-post-box",
+                "sign-on-barrel",
+                "already-claimed",
+                "invalid-postbox",
+                "successfully-claimed",
+                "modify-sign",
+                "unclaimed-postbox",
+                "user-banned",
+                "post-box-owner",
+                "claimed-for",
+                "already-has-postbox",
+                "not-played-before",
+                "plugin-up-to-date"
         );
 
 
@@ -170,12 +188,29 @@ public class PluginConfig {
 
         // List of keys to check
         List<String> keysToCheck = Arrays.asList(
-                "no-permission", "offhand-error", "hotbar-error", "drop-item-error",
-                "plugin-up-to-date", "sent-message", "received-message", "got-mail-message", "create-error",
-                "break-error", "postbox-created", "registered-not-claimed", "look-at-post-box", "not-registered",
-                "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
-                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned",
-                "already-registered", "invalid-postbox"
+                "sent-message",
+                "received-message",
+                "got-mail-message",
+                "no-permission", "deny-action",
+                "not-registered",
+                "post-box-removed",
+                "successful-registration",
+                "already-registered",
+                "postbox-created",
+                "remove-from-config",
+                "look-at-post-box",
+                "sign-on-barrel",
+                "already-claimed",
+                "invalid-postbox",
+                "successfully-claimed",
+                "modify-sign",
+                "unclaimed-postbox",
+                "user-banned",
+                "post-box-owner",
+                "claimed-for",
+                "already-has-postbox",
+                "not-played-before",
+                "plugin-up-to-date"
         );
 
         // Save existing values of missing keys

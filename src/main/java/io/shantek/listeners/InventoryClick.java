@@ -95,7 +95,7 @@ public class InventoryClick implements Listener {
         if (event.getClick() == ClickType.NUMBER_KEY) {
             ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
             if (hotbarItem != null) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.hotBarError));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.denyAction));
                 event.setCancelled(true);
                 return;
             }
@@ -103,14 +103,14 @@ public class InventoryClick implements Listener {
 
         // Prevent swapping items from a barrel while having another item in hand
         if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR || event.getAction() == InventoryAction.HOTBAR_SWAP) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.hotBarError));
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.denyAction));
             event.setCancelled(true);
             return;
         }
 
         // Prevent the player from dropping items out of the postbox
         if (event.getClick() == ClickType.DROP || event.getClick() == ClickType.CONTROL_DROP) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.dropItemError));
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.denyAction));
             event.setCancelled(true);
             return;
         }

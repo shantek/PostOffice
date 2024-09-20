@@ -90,7 +90,7 @@ public class BarrelProtection implements Listener {
 
             } else {
                 // Prevent the player from breaking the post box if they don't have permission
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.breakError));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.noPermission));
                 event.setCancelled(true);
             }
         }
@@ -109,7 +109,7 @@ public class BarrelProtection implements Listener {
 
         if (placedBlock.getState() instanceof Sign && postOffice.helpers.hasBarrelNearby(placedBlock)) {
             if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.createError));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.noPermission));
                 placedBlock.breakNaturally();
             }
         }
