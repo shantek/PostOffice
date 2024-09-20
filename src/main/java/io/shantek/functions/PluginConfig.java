@@ -40,10 +40,10 @@ public class PluginConfig {
                 FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
                 // Check for missing keys
-                boolean keysMissing = checkForMissingKeys(config);
+                boolean keysMissing = checkForMissingConfigKeys(config);
 
                 // Save existing values of missing keys
-                Map<String, Object> missingKeyValues = saveMissingKeyValues(config);
+                Map<String, Object> missingKeyValues = saveMissingConfigKey(config);
 
                 // Create a fresh config file
                 saveDefaultConfig("config.yml", configFile);
@@ -78,10 +78,10 @@ public class PluginConfig {
                 FileConfiguration config = YamlConfiguration.loadConfiguration(langFile);
 
                 // Check for missing keys
-                boolean keysMissing = checkForMissingKeys(config);
+                boolean keysMissing = checkForMissingLangKeys(config);
 
                 // Save existing values of missing keys
-                Map<String, Object> missingKeyValues = saveMissingKeyValues(config);
+                Map<String, Object> missingKeyValues = saveMissingLangKey(config);
 
                 // Create a fresh config file
                 saveDefaultConfig("config.yml", langFile);
@@ -124,17 +124,13 @@ public class PluginConfig {
         }
     }
 
-    private boolean checkForMissingKeys(FileConfiguration config) {
+    private boolean checkForMissingConfigKeys(FileConfiguration config) {
         boolean keysMissing = false;
 
         // List of keys to check
         List<String> keysToCheck = Arrays.asList(
-                "custom-barrel-name", "no-permission", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
-                "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
-                "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay", "sign-notification",
-                "look-at-post-box", "not-registered", "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
-                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned", "already-registered", "invalid-postbox",
-                "registered-not-claimed");
+                "custom-barrel-name", "sign-notification", "got-mail-delay", "update-notification", "postbox-protection", "console-logs"
+        );
 
         // Check for missing keys
         for (String key : keysToCheck) {
@@ -146,19 +142,60 @@ public class PluginConfig {
         return keysMissing;
     }
 
-    private Map<String, Object> saveMissingKeyValues(FileConfiguration config) {
+    private boolean checkForMissingLangKeys(FileConfiguration config) {
+        boolean keysMissing = false;
+
+        // List of keys to check
+        List<String> keysToCheck = Arrays.asList(
+                "no-permission", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
+                "plugin-up-to-date", "sent-message", "received-message", "got-mail-message", "create-error",
+                "break-error", "postbox-created", "registered-not-claimed", "look-at-post-box", "not-registered",
+                "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
+                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned",
+                "already-registered", "invalid-postbox"
+        );
+
+
+        // Check for missing keys
+        for (String key : keysToCheck) {
+            if (!config.contains(key)) {
+                postOffice.getLogger().warning("Key '" + key + "' not found in the configuration file, reverting to the default.");
+                keysMissing = true;
+            }
+        }
+        return keysMissing;
+    }
+
+    private Map<String, Object> saveMissingLangKey(FileConfiguration config) {
         Map<String, Object> missingKeyValues = new HashMap<>();
 
         // List of keys to check
         List<String> keysToCheck = Arrays.asList(
-                "custom-barrel-name", "no-permission", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
-                "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
-                "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay", "sign-notification",
-                "look-at-post-box", "not-registered", "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
-                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned", "already-registered", "invalid-postbox",
-                "registered-not-claimed"
+                "no-permission", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
+                "plugin-up-to-date", "sent-message", "received-message", "got-mail-message", "create-error",
+                "break-error", "postbox-created", "registered-not-claimed", "look-at-post-box", "not-registered",
+                "post-box-removed", "sign-on-barrel", "successful-registration", "already-claimed",
+                "successfully-claimed", "modify-sign", "remove-from-config", "unclaimed-postbox", "user-banned",
+                "already-registered", "invalid-postbox"
         );
 
+        // Save existing values of missing keys
+        for (String key : keysToCheck) {
+            if (config.contains(key)) {
+                Object value = config.get(key);
+                missingKeyValues.put(key, value);
+            }
+        }
+        return missingKeyValues;
+    }
+
+    private Map<String, Object> saveMissingConfigKey(FileConfiguration config) {
+        Map<String, Object> missingKeyValues = new HashMap<>();
+
+        // List of keys to check
+        List<String> keysToCheck = Arrays.asList(
+                "custom-barrel-name", "sign-notification", "got-mail-delay", "update-notification", "postbox-protection", "console-logs"
+        );
 
         // Save existing values of missing keys
         for (String key : keysToCheck) {
