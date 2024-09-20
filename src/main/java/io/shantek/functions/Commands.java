@@ -203,6 +203,11 @@ public class Commands implements CommandExecutor {
                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.successfulRegistration));
                         return true;
 
+                    } else {
+                        // Player doesn't have permission to use the command
+                        sender.sendMessage(ChatColor.RED + "You don't have access to this command!");
+                        return false;
+
                     }
                 } else {
                     sender.sendMessage(ChatColor.RED + "This command can only be used by players.");
