@@ -19,7 +19,11 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.InventoryHolder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BarrelProtection implements Listener {
 
@@ -174,4 +178,30 @@ public class BarrelProtection implements Listener {
             }
         }
     }
+
+    @EventHandler
+    public void onStructureGrow(StructureGrowEvent event) {
+
+        if (!postOffice.postBoxProtection) {
+            return;
+        }
+
+        // Create a list to store blocks to be removed
+        List<BlockState> blocksToRemove = new ArrayList<>();
+
+        // Iterate through the blocks the structure is going to replace
+        for (BlockState blockState : event.getBlocks()) {
+            Block block = blockState.getBlock();
+
+            // Check if the block is a protected post box (e.g., a sign attached to a barrel)
+            if (postOffice.helpers.isProtectedPostBox(block)) {
+                // Add the block to the list for removal
+                blocksToRemove.add(blockState);
+            }
+        }
+
+        // Remove the protected blocks from the event after iteration
+        event.getBlocks().removeAll(blocksToRemove);
+    }
+
 }
