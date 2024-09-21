@@ -32,6 +32,7 @@ public class Language {
     public String claimedFor = "&a[Post Office] &aThis post box has been claimed for %owner%";
     public String alreadyHasPostBox = "&a[Post Office] &4%player% already has a post box at: %location%";
     public String notPlayedBefore = "&a[Post Office] &4The player %player% has not played on this server.";
+    public String claimedForOtherPlayer = "&a[Post Office] &aA post box has been created for you.";
     public String pluginUpToDate = "Your plugin is up-to-date.";
 
     public UpdateChecker updateChecker;

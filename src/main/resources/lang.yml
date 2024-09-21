@@ -83,5 +83,9 @@ already-has-postbox: "&a[Post Office] &4%player% already has a post box at: %loc
 # %player% is replaced with the name that is being used to register a box
 not-played-before: "&a[Post Office] &4The player %player% has not played on this server."
 
+# Message shown to a player when a post box has been set up for them. Displayed when using the
+# claim of other players command. Sent to the player if they are online at the time.
+claimed-for-other-player: "&a[Post Office] &aA post box has been created for you."
+
 # Message shown in the console to inform the server owner the plugin is up to date
 plugin-up-to-date: "Your plugin is up to date."

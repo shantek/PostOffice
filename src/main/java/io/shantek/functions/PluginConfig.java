@@ -87,6 +87,7 @@ public class PluginConfig {
         postOffice.language.claimedFor = getString(langConfig, "claimed-for", postOffice.language.claimedFor);
         postOffice.language.alreadyHasPostBox = getString(langConfig, "already-has-postbox", postOffice.language.alreadyHasPostBox);
         postOffice.language.notPlayedBefore = getString(langConfig, "not-played-before", postOffice.language.notPlayedBefore);
+        postOffice.language.claimedForOtherPlayer = getString(langConfig, "claimed-for-other-player", postOffice.language.claimedForOtherPlayer);
         postOffice.language.pluginUpToDate = getString(langConfig, "plugin-up-to-date", postOffice.language.pluginUpToDate);
     }
 
@@ -103,7 +104,7 @@ public class PluginConfig {
                 "postbox-created", "remove-from-config", "look-at-post-box", "sign-on-barrel",
                 "already-claimed", "invalid-postbox", "successfully-claimed", "modify-sign",
                 "unclaimed-postbox", "user-banned", "post-box-owner", "claimed-for",
-                "already-has-postbox", "not-played-before", "plugin-up-to-date"
+                "already-has-postbox", "not-played-before", "claimed-for-other-player", "plugin-up-to-date"
         ));
     }
 
@@ -131,7 +132,7 @@ public class PluginConfig {
                 "postbox-created", "remove-from-config", "look-at-post-box", "sign-on-barrel",
                 "already-claimed", "invalid-postbox", "successfully-claimed", "modify-sign",
                 "unclaimed-postbox", "user-banned", "post-box-owner", "claimed-for",
-                "already-has-postbox", "not-played-before", "plugin-up-to-date"
+                "already-has-postbox", "not-played-before", "claimed-for-other-player", "plugin-up-to-date"
         ));
     }
 

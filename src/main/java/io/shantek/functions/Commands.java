@@ -10,6 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Commands implements CommandExecutor {
@@ -287,10 +288,16 @@ public class Commands implements CommandExecutor {
                         sign.update();
                     }
 
+                    // Confirm to the person running the command that it worked
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&',
                             postOffice.language.claimedFor
                                     .replace("%owner%", targetPlayerName)));
 
+                    // Let the owner know they now have a post box, if they're online
+                    if (targetPlayer.isOnline()) {
+                        Objects.requireNonNull(targetPlayer.getPlayer()).sendMessage(ChatColor.translateAlternateColorCodes('&',
+                                postOffice.language.claimedForOtherPlayer));
+                    }
                     postOffice.helpers.saveCacheToFile(); // Save the cache to disk
                     return true;
                 }
