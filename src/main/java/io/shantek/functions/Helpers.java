@@ -15,6 +15,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.RayTraceResult;
 
 public class Helpers {
 
@@ -274,6 +275,20 @@ public class Helpers {
             }
         }
         return false;
+    }
+
+    public Block getBlockLookingAt(Player player, double maxDistance) {
+
+        // Perform a ray trace to get the block the player is directly looking at
+        Block targetBlock = null;
+        RayTraceResult result = player.rayTraceBlocks(maxDistance);
+
+        // Check if the ray trace hit a block
+        if (result != null && result.getHitBlock() != null) {
+            targetBlock = result.getHitBlock();
+        }
+
+        return targetBlock;
     }
 
     //endregion
