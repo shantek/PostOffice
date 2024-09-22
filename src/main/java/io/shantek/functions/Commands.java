@@ -25,7 +25,6 @@ public class Commands implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("postoffice")) {
 
-            // Postoffice remove command
             if (args[0].equalsIgnoreCase("remove")) {
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
@@ -360,7 +359,7 @@ public class Commands implements CommandExecutor {
                             return true;
                         }
 
-                        if (targetBlock == null || !(targetBlock.getState() instanceof Sign)) {
+                        if (targetBlock.getState() instanceof Sign) {
                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
                             return true;
                         }
