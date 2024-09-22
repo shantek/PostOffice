@@ -34,7 +34,13 @@ public class Commands implements CommandExecutor {
                     if (player.hasPermission("shantek.postoffice.register") || player.isOp()) {
 
                         // Get the block the player is looking at (sign or barrel)
-                        Block targetBlock = player.getTargetBlock(null, 10);
+                        Block targetBlock = postOffice.helpers.getBlockLookingAt(player, 6);
+
+                        // Exit out if they aren't looking at a block or are too far away
+                        if (targetBlock == null) {
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
+                            return true;
+                        }
 
                         Block barrelBlock = null;
 
@@ -63,9 +69,19 @@ public class Commands implements CommandExecutor {
                         Block signBlock = postOffice.helpers.getSignForBarrel(barrelBlock);
                         if (signBlock != null && signBlock.getState() instanceof Sign) {
                             Sign sign = (Sign) signBlock.getState();
-                            sign.setLine(1, ""); // Clear the second line
-                            sign.setLine(2, ""); // Clear the third line
-                            sign.update(); // Update the sign
+
+                            // Clear all lines of the sign (if you want to fully reset it)
+                            for (int i = 0; i < 4; i++) {
+                                sign.setLine(i, "");
+                            }
+
+                            // Finally, update the sign
+                            boolean signUpdated = sign.update();
+
+                            // Log if the sign was successfully updated
+                            if (!signUpdated) {
+                                player.sendMessage(ChatColor.RED + "There was an issue updating the sign.");
+                            }
                         }
 
                         // Call the helper to remove the barrel from the cache and config
@@ -102,7 +118,14 @@ public class Commands implements CommandExecutor {
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
 
-                    Block targetBlock = player.getTargetBlock(null, 10); // Get the block the player is looking at
+                    // Get the block the player is looking at (sign or barrel)
+                    Block targetBlock = postOffice.helpers.getBlockLookingAt(player, 6);
+
+                    // Exit out if they aren't looking at a block or are too far away
+                    if (targetBlock == null) {
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
+                        return true;
+                    }
 
                     Block barrelBlock = null;
 
@@ -153,8 +176,15 @@ public class Commands implements CommandExecutor {
                     Player player = (Player) sender;
                     if (sender.hasPermission("shantek.postoffice.register") || sender.isOp()) {
 
-                        // Ensure they are looking at a sign
-                        Block targetBlock = player.getTargetBlock(null, 10); // Max distance 10 blocks
+                        // Get the block the player is looking at (sign or barrel)
+                        Block targetBlock = postOffice.helpers.getBlockLookingAt(player, 6);
+
+                        // Exit out if they aren't looking at a block or are too far away
+                        if (targetBlock == null) {
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
+                            return true;
+                        }
+
                         if (targetBlock == null || !(targetBlock.getState() instanceof Sign)) {
                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
                             return true;
@@ -224,7 +254,15 @@ public class Commands implements CommandExecutor {
                     }
 
                     Player player = (Player) sender;
-                    Block targetBlock = player.getTargetBlock(null, 10); // Max distance 10 blocks
+                    // Get the block the player is looking at (sign or barrel)
+                    Block targetBlock = postOffice.helpers.getBlockLookingAt(player, 6);
+
+                    // Exit out if they aren't looking at a block or are too far away
+                    if (targetBlock == null) {
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
+                        return true;
+                    }
+
                     if (targetBlock == null || !(targetBlock.getState() instanceof Sign)) {
                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
                         return true;
@@ -313,8 +351,15 @@ public class Commands implements CommandExecutor {
 
                     if (sender.hasPermission("shantek.postoffice.claim") || sender.isOp()) {
 
-                        // Ensure they are looking at a sign
-                        Block targetBlock = player.getTargetBlock(null, 10); // Max distance 10 blocks
+                        // Get the block the player is looking at (sign or barrel)
+                        Block targetBlock = postOffice.helpers.getBlockLookingAt(player, 6);
+
+                        // Exit out if they aren't looking at a block or are too far away
+                        if (targetBlock == null) {
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
+                            return true;
+                        }
+
                         if (targetBlock == null || !(targetBlock.getState() instanceof Sign)) {
                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
                             return true;
