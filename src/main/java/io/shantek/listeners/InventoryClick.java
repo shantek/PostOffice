@@ -1,5 +1,6 @@
 package io.shantek.listeners;
 
+import io.shantek.PostOffice;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,13 +15,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import io.shantek.PostOffice;
 
 import java.util.Objects;
 
 public class InventoryClick implements Listener {
 
     public PostOffice postOffice;
+
     public InventoryClick(PostOffice postOffice) {
         this.postOffice = postOffice;
     }
@@ -32,7 +33,7 @@ public class InventoryClick implements Listener {
         Inventory clickedInventory = event.getClickedInventory();
 
         // If they aren't opening a barrel, ignore it
-        if (event.getClickedInventory() == null || inventory.getType() != InventoryType.BARREL) {
+        if (clickedInventory == null || inventory.getType() != InventoryType.BARREL) {
             return;
         }
 
@@ -49,7 +50,6 @@ public class InventoryClick implements Listener {
                             Barrel barrel = (Barrel) blockState;
                             if (barrel.getCustomName() != null && barrel.getCustomName().equalsIgnoreCase(postOffice.customBarrelName)) {
                                 event.setCancelled(true);
-                                //player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
                                 return;
                             }
                         }
@@ -58,7 +58,7 @@ public class InventoryClick implements Listener {
             }
         }
 
-        Block clickedBlock = Objects.requireNonNull(event.getClickedInventory().getLocation()).getBlock();
+        Block clickedBlock = Objects.requireNonNull(clickedInventory.getLocation()).getBlock();
         if (clickedBlock.getType() == Material.BARREL) {
             BlockState blockState = clickedBlock.getState();
 
@@ -85,28 +85,28 @@ public class InventoryClick implements Listener {
 
                     boolean isNotOwner = !ownerName.equalsIgnoreCase(player.getName());
 
-                    // Prevent non-owners who do not have OP from taking items or shift-clicking
-                    if (!player.isOp() && isNotOwner && !player.hasPermission("shantek.postoffice.removeitems") && (event.getAction().name().contains("PICKUP") || event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
-                        event.setCancelled(true);
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
+                    // Prevent non-owners from taking items out of the postbox
+                    if (!player.isOp() && isNotOwner && !player.hasPermission("shantek.postoffice.removeitems")) {
+                        if (event.getAction().name().contains("PICKUP") || event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+                            event.setCancelled(true);
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.denyAction));
+                            return;
+                        }
+                    }
+
+                    // Allow placing items into the postbox
+                    if (event.getAction() == InventoryAction.PLACE_ALL || event.getAction() == InventoryAction.PLACE_ONE ||
+                            event.getAction() == InventoryAction.PLACE_SOME || event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
                         return;
                     }
 
-                    // If player is not the owner and trying to take an item, cancel the event
-                    if (isNotOwner && !player.hasPermission("shantek.postoffice.removeitems") && event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-                        event.setCancelled(true);
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
-                        return;
-                    }
-
-                    if (isNotOwner && !player.hasPermission("shantek.postoffice.removeitems") && !player.isOp()) {
-                        // CHECK IF THE PLAYER DOESN'T HAVE PERMISSION TO USE THIS BARREL, RESTRICT NUMBER KEY CLICKING TO MOVE TO HOTBAR
-                        if (event.getWhoClicked() instanceof Player && event.getClickedInventory() != null) {
-                            ItemStack hotbarItem = event.getClick() == ClickType.NUMBER_KEY ? event.getWhoClicked().getInventory().getItem(event.getHotbarButton()) : null;
-
+                    // Prevent item swapping using hotbar for unauthorized players
+                    if (isNotOwner && !player.hasPermission("shantek.postoffice.removeitems")) {
+                        if (event.getClick() == ClickType.NUMBER_KEY) {
+                            ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
                             if (hotbarItem != null) {
                                 event.setCancelled(true);
-                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.hotBarError));
+                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.denyAction));
                                 return;
                             }
                         }
@@ -114,20 +114,20 @@ public class InventoryClick implements Listener {
                         // Prevent players from swapping items from a barrel while having another item in hand
                         if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
                             event.setCancelled(true);
-                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeItemError));
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.denyAction));
                             return;
                         }
 
                         if (event.getAction() == InventoryAction.HOTBAR_SWAP) {
                             event.setCancelled(true);
-                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.hotBarError));
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.denyAction));
                             return;
                         }
 
                         // Prevent the player from dropping items out of the postbox
                         if (event.getClick() == ClickType.DROP || event.getClick() == ClickType.CONTROL_DROP) {
                             event.setCancelled(true);
-                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.dropItemError));
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.denyAction));
                             return;
                         }
                     }
@@ -139,7 +139,7 @@ public class InventoryClick implements Listener {
                             // If the player is not the owner and trying to add to an existing stack, cancel the event
                             if (isNotOwner && !player.hasPermission("shantek.postoffice.removeitems") && event.getAction() == InventoryAction.PLACE_ALL && item.getAmount() < item.getMaxStackSize()) {
                                 event.setCancelled(true);
-                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.cantStackItems));
+                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.denyAction));
                                 return;
                             }
                             break;

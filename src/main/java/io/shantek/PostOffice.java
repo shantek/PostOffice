@@ -1,18 +1,13 @@
 package io.shantek;
 
+import io.shantek.functions.*;
+import io.shantek.listeners.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.*;
 import java.util.stream.Collectors;
-
-import io.shantek.functions.*;
-import io.shantek.listeners.*;
 import org.bukkit.Bukkit;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.permissions.Permission;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.nio.file.*;
 import java.util.*;
@@ -28,9 +23,7 @@ public final class PostOffice extends JavaPlugin {
     public Helpers helpers;
     public BarrelProtection barrelProtection;
     public TabCompleter tabCompleter;
-
     public static PostOffice instance;
-
     public String customBarrelName = "pobox";
     public File mailFile;
     public int previousItemCount = 0;
@@ -40,6 +33,7 @@ public final class PostOffice extends JavaPlugin {
     public boolean postBoxProtection = true;
     public boolean consoleLogs = true;
     public boolean gotMailDelay = true;
+    public boolean signNotification = true;
 
     public void onEnable() {
 
@@ -50,22 +44,20 @@ public final class PostOffice extends JavaPlugin {
         helpers = new Helpers(this);
         TabCompleter tabCompleter = new TabCompleter(this);
 
-        getCommand("postoffice").setTabCompleter(new TabCompleter(this));
+        Objects.requireNonNull(getCommand("postoffice")).setTabCompleter(new TabCompleter(this));
 
         // Check for a data folder, create it if needed
         helpers.checkForDataFolder();
 
-        this.mailFile = new File(getDataFolder(), "mail.txt");
+        this.mailFile = new File(getDataFolder(), "hasmail.txt");
 
-        getCommand("postoffice").setExecutor(new Commands(this));
+        Objects.requireNonNull(getCommand("postoffice")).setExecutor(new Commands(this));
 
         // Create an instance of UpdateChecker
         this.updateChecker = new UpdateChecker();
 
         // Create an instance of PluginConfig
         this.pluginConfig = new PluginConfig(this);
-
-        registerPluginPermissions();
         pluginConfig.reloadConfigFile();
 
         if (this.mailFile.exists()) {
@@ -112,32 +104,17 @@ public final class PostOffice extends JavaPlugin {
         if (instance == null) {
             instance = new PostOffice();
         }
-
         return instance;
+    }
+
+    @Override
+    public void onDisable() {
+        // Save the cache to file when the plugin is disabled
+        helpers.saveCacheToFile();
     }
 
     public void printInfoMessage(String message) {
         getLogger().info(message); // Print to the console
     }
-
-    private void registerPluginPermissions() {
-        // Register the permission node
-        Permission removeItemsPermission = new Permission("shantek.postoffice.removeitems");
-        PluginManager pm = getServer().getPluginManager();
-        pm.addPermission(removeItemsPermission);
-
-        // Permission for breaking Post Boxes
-        Permission breakPermission = new Permission("shantek.postoffice.break");
-        pm.addPermission(breakPermission);
-
-        // Permission for creating Post Boxes
-        Permission createBoxPermission = new Permission("shantek.postoffice.create");
-        pm.addPermission(createBoxPermission);
-
-        // Permission for breaking Post Boxes
-        Permission updateNotificationPermission = new Permission("shantek.postoffice.updatenotification");
-        pm.addPermission(updateNotificationPermission);
-    }
-
 
 }

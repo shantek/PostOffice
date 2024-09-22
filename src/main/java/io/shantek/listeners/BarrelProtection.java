@@ -3,6 +3,7 @@ package io.shantek.listeners;
 import io.shantek.PostOffice;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -37,17 +38,15 @@ public class BarrelProtection implements Listener {
         Player player = event.getPlayer();
         Block signBlock = event.getBlock();
 
-        if (hasBarrelNearby(signBlock)) {
-            if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.createError));
+        // Get the attached barrel from the sign
+        Block attachedBarrel = postOffice.helpers.getAttachedBarrel(signBlock);
+
+        // Ensure the attached block is a barrel and that it is in the config
+        if (attachedBarrel != null && attachedBarrel.getType() == Material.BARREL) {
+            if (postOffice.helpers.isBarrelInConfig(attachedBarrel)) {
+                // Cancel the sign change event if the barrel is in the config (protected post box)
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.modifySign));
                 event.setCancelled(true);
-            } else {
-                String line2 = event.getLine(1);
-                if (line2 != null && !line2.isEmpty()) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                            postOffice.language.postboxCreated
-                                    .replace("%username%", line2)));
-                }
             }
         }
     }
@@ -61,26 +60,37 @@ public class BarrelProtection implements Listener {
         Player player = event.getPlayer();
         Block brokenBlock = event.getBlock();
 
-        // Check if the broken block is a barrel
-        if (brokenBlock.getState() instanceof Barrel) {
-            Barrel barrel = (Barrel) brokenBlock.getState();
-            String barrelCustomName = barrel.getCustomName();
+        // Check if the broken block is a protected post box (either a barrel or a sign)
+        if (postOffice.helpers.isProtectedPostBox(brokenBlock)) {
+            if (player.isOp() || player.hasPermission("shantek.postoffice.break")) {
+                Block barrelBlock = null;
 
-            if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
-                if (!player.isOp() && !player.hasPermission("shantek.postoffice.break")) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.breakError));
-                    event.setCancelled(true);
+                // Check if the player is breaking a sign
+                if (Tag.SIGNS.isTagged(brokenBlock.getType())) {
+                    // Retrieve the attached barrel if the broken block is a sign
+                    barrelBlock = postOffice.helpers.getAttachedBarrel(brokenBlock);
+                } else if (brokenBlock.getType() == Material.BARREL) {
+                    // If breaking a barrel directly, set it as the barrelBlock
+                    barrelBlock = brokenBlock;
                 }
-            }
-        }
 
-        // Check if the broken block is a sign
-        if (brokenBlock.getState() instanceof Sign) {
-            if (hasBarrelNearby(brokenBlock)) {
-                if (!player.isOp() && !player.hasPermission("shantek.postoffice.break")) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.breakError));
-                    event.setCancelled(true);
+                // Ensure barrelBlock is valid before proceeding
+                if (barrelBlock == null) {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.notRegistered));
+                    return;
                 }
+
+                // Check if the barrel exists in the config (registered post box)
+                if (postOffice.helpers.isBarrelInConfig(barrelBlock)) {
+                    // Call the helper to remove the barrel from the cache and config
+                    postOffice.helpers.removeBarrelFromCache(barrelBlock);
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeFromConfig));
+                }
+
+            } else {
+                // Prevent the player from breaking the post box if they don't have permission
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.noPermission));
+                event.setCancelled(true);
             }
         }
     }
@@ -94,40 +104,12 @@ public class BarrelProtection implements Listener {
         Player player = event.getPlayer();
         Block placedBlock = event.getBlockPlaced();
 
-        if (placedBlock.getState() instanceof Sign && hasBarrelNearby(placedBlock)) {
+        if (placedBlock.getState() instanceof Sign && postOffice.helpers.hasBarrelNearby(placedBlock)) {
             if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.createError));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.noPermission));
                 placedBlock.breakNaturally();
             }
         }
-    }
-
-    private boolean hasBarrelNearby(Block block) {
-        // Check if the given block is a barrel with the custom name
-        if (block.getType() == Material.BARREL) {
-            Barrel barrel = (Barrel) block.getState();
-            String barrelCustomName = barrel.getCustomName();
-
-            if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
-                return true;
-            }
-        }
-
-        // Check if any nearby block is a barrel with the custom name
-        for (BlockFace blockFace : BlockFace.values()) {
-            Block relativeBlock = block.getRelative(blockFace);
-
-            if (relativeBlock.getType() == Material.BARREL) {
-                Barrel barrel = (Barrel) relativeBlock.getState();
-                String barrelCustomName = barrel.getCustomName();
-
-                if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     @EventHandler
@@ -142,8 +124,7 @@ public class BarrelProtection implements Listener {
         // Check if the source is a barrel and the destination is a hopper or hopper minecart
         if (sourceHolder instanceof Barrel && (destinationHolder instanceof Hopper || destinationHolder instanceof HopperMinecart)) {
             Barrel barrel = (Barrel) sourceHolder;
-            String barrelCustomName = barrel.getCustomName();
-            if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+            if (postOffice.helpers.isProtectedPostBox(barrel.getBlock())) {
                 event.setCancelled(true);
             }
         }

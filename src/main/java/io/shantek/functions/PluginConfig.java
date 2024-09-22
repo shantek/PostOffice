@@ -1,17 +1,17 @@
 package io.shantek.functions;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.logging.Level;
-
 import io.shantek.PostOffice;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import java.nio.file.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
-@SuppressWarnings("SameParameterValue")
+import java.util.logging.Level;
+
 public class PluginConfig {
 
     private final PostOffice postOffice;
@@ -20,213 +20,164 @@ public class PluginConfig {
         this.postOffice = postOffice;
     }
 
+    private FileConfiguration barrelsConfig = null;
+    private File barrelsConfigFile = null;
+
     public void reloadConfigFile() {
-        try {
-            postOffice.getLogger().info("Reloading config file."); // Print to the console
+        // Handle config.yml
+        handleFile("config.yml", this::loadConfigFile);
 
-            File configFile = new File(postOffice.getDataFolder(), "config.yml");
+        // Handle lang.yml
+        handleFile("lang.yml", this::loadLangFile);
+    }
 
-            // Check if the config file exists
-            if (!configFile.exists()) {
-                postOffice.getLogger().info("Config file not found. Creating a new one...");
-
-                // Create a new config file based on a template from resources
-                saveDefaultConfig("config.yml", configFile);
-            } else {
-                FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-
-                // Check for missing keys
-                @SuppressWarnings("unused") boolean keysMissing = checkForMissingKeys(config);
-
-                // Save existing values of missing keys
-                Map<String, Object> missingKeyValues = saveMissingKeyValues(config);
-
-                // Create a fresh config file
-                saveDefaultConfig("config.yml", configFile);
-
-                // Load the new config
-                config = YamlConfiguration.loadConfiguration(configFile);
-
-                // Update the new config with missing key values
-                updateConfigWithMissingKeyValues(config, missingKeyValues);
-
-                postOffice.customBarrelName = getString(config, "custom-barrel-name", "pobox");
-                postOffice.language.cantStackItems = getString(config, "cant-stack-items", postOffice.language.cantStackItems);
-                postOffice.language.removeItemError = getString(config, "remove-item-error", postOffice.language.removeItemError);
-                postOffice.language.offHandError = getString(config, "offhand-error", postOffice.language.offHandError);
-                postOffice.language.hotBarError = getString(config, "hotbar-error", postOffice.language.hotBarError);
-                postOffice.language.sentMessage = getString(config, "sent-message", postOffice.language.sentMessage);
-                postOffice.language.receivedMessage = getString(config, "received-message", postOffice.language.receivedMessage);
-                postOffice.language.gotMailMessage = getString(config, "got-mail-message", postOffice.language.gotMailMessage);
-                postOffice.language.createError = getString(config, "create-error", postOffice.language.createError);
-                postOffice.language.breakError = getString(config, "break-error", postOffice.language.breakError);
-                postOffice.language.postboxCreated = getString(config, "postbox-created", postOffice.language.postboxCreated);
-                postOffice.language.pluginUpToDate = getString(config, "plugin-up-to-date", postOffice.language.pluginUpToDate);
-
-                postOffice.postBoxProtection = getBoolean(config, "postbox-protection", true);
-                postOffice.updateNotificationEnabled = getBoolean(config, "update-notification", true);
-                postOffice.consoleLogs = getBoolean(config, "console-logs", true);
-                postOffice.gotMailDelay = getBoolean(config, "got-mail-delay", true);
-
-            }
-
-        } catch (Exception e) {
-            postOffice.getLogger().log(Level.SEVERE, "An error occurred while reloading the config file", e);
+    private void handleFile(String fileName, Runnable loadAction) {
+        File file = new File(postOffice.getDataFolder(), fileName);
+        if (!file.exists()) {
+            postOffice.getLogger().info(fileName + " not found. Creating a new one...");
+            saveDefaultConfig(fileName, file);  // Create default file if not exists
+        } else {
+            postOffice.getLogger().info(fileName + " found. Reloading and checking for missing keys...");
+            loadAction.run();
         }
     }
 
-    private boolean checkForMissingKeys(FileConfiguration config) {
+    private void loadConfigFile() {
+        File configFile = new File(postOffice.getDataFolder(), "config.yml");
+        FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+        if (checkForMissingConfigKeys(config)) {
+            postOffice.getLogger().info("Updating config with missing keys...");
+            updateConfigWithMissingKeyValues(config, saveMissingConfigKey(config), configFile);
+        }
+        postOffice.customBarrelName = getString(config, "custom-barrel-name", "pobox");
+        postOffice.postBoxProtection = getBoolean(config, "postbox-protection", true);
+        postOffice.updateNotificationEnabled = getBoolean(config, "update-notification", true);
+        postOffice.consoleLogs = getBoolean(config, "console-logs", false);
+        postOffice.gotMailDelay = getBoolean(config, "got-mail-delay", true);
+        postOffice.signNotification = getBoolean(config, "sign-notification", true);
+    }
+
+    private void loadLangFile() {
+        File langFile = new File(postOffice.getDataFolder(), "lang.yml");
+        FileConfiguration langConfig = YamlConfiguration.loadConfiguration(langFile);
+        if (checkForMissingLangKeys(langConfig)) {
+            postOffice.getLogger().info("Updating lang with missing keys...");
+            updateConfigWithMissingKeyValues(langConfig, saveMissingLangKey(langConfig), langFile);
+        }
+        postOffice.language.sentMessage = getString(langConfig, "sent-message", postOffice.language.sentMessage);
+        postOffice.language.receivedMessage = getString(langConfig, "received-message", postOffice.language.receivedMessage);
+        postOffice.language.gotMailMessage = getString(langConfig, "got-mail-message", postOffice.language.gotMailMessage);
+        postOffice.language.noPermission = getString(langConfig, "no-permission", postOffice.language.noPermission);
+        postOffice.language.denyAction = getString(langConfig, "deny-action", postOffice.language.denyAction);
+        postOffice.language.notRegistered = getString(langConfig, "not-registered", postOffice.language.notRegistered);
+        postOffice.language.postBoxRemoved = getString(langConfig, "post-box-removed", postOffice.language.postBoxRemoved);
+        postOffice.language.successfulRegistration = getString(langConfig, "successful-registration", postOffice.language.successfulRegistration);
+        postOffice.language.alreadyRegistered = getString(langConfig, "already-registered", postOffice.language.alreadyRegistered);
+        postOffice.language.postboxCreated = getString(langConfig, "postbox-created", postOffice.language.postboxCreated);
+        postOffice.language.removeFromConfig = getString(langConfig, "remove-from-config", postOffice.language.removeFromConfig);
+        postOffice.language.lookAtPostBox = getString(langConfig, "look-at-post-box", postOffice.language.lookAtPostBox);
+        postOffice.language.signOnBarrel = getString(langConfig, "sign-on-barrel", postOffice.language.signOnBarrel);
+        postOffice.language.alreadyClaimed = getString(langConfig, "already-claimed", postOffice.language.alreadyClaimed);
+        postOffice.language.invalidPostbox = getString(langConfig, "invalid-postbox", postOffice.language.invalidPostbox);
+        postOffice.language.successfullyClaimed = getString(langConfig, "successfully-claimed", postOffice.language.successfullyClaimed);
+        postOffice.language.modifySign = getString(langConfig, "modify-sign", postOffice.language.modifySign);
+        postOffice.language.unclaimedPostbox = getString(langConfig, "unclaimed-postbox", postOffice.language.unclaimedPostbox);
+        postOffice.language.userBanned = getString(langConfig, "user-banned", postOffice.language.userBanned);
+        postOffice.language.postBoxOwner = getString(langConfig, "post-box-owner", postOffice.language.postBoxOwner);
+        postOffice.language.claimedFor = getString(langConfig, "claimed-for", postOffice.language.claimedFor);
+        postOffice.language.alreadyHasPostBox = getString(langConfig, "already-has-postbox", postOffice.language.alreadyHasPostBox);
+        postOffice.language.notPlayedBefore = getString(langConfig, "not-played-before", postOffice.language.notPlayedBefore);
+        postOffice.language.claimedForOtherPlayer = getString(langConfig, "claimed-for-other-player", postOffice.language.claimedForOtherPlayer);
+        postOffice.language.pluginUpToDate = getString(langConfig, "plugin-up-to-date", postOffice.language.pluginUpToDate);
+    }
+
+    private boolean checkForMissingConfigKeys(FileConfiguration config) {
+        return checkForMissingKeys(config, Arrays.asList(
+                "custom-barrel-name", "sign-notification", "got-mail-delay", "update-notification", "postbox-protection", "console-logs"
+        ));
+    }
+
+    private boolean checkForMissingLangKeys(FileConfiguration config) {
+        return checkForMissingKeys(config, Arrays.asList(
+                "sent-message", "received-message", "got-mail-message", "no-permission", "deny-action",
+                "not-registered", "post-box-removed", "successful-registration", "already-registered",
+                "postbox-created", "remove-from-config", "look-at-post-box", "sign-on-barrel",
+                "already-claimed", "invalid-postbox", "successfully-claimed", "modify-sign",
+                "unclaimed-postbox", "user-banned", "post-box-owner", "claimed-for",
+                "already-has-postbox", "not-played-before", "claimed-for-other-player", "plugin-up-to-date"
+        ));
+    }
+
+    private boolean checkForMissingKeys(FileConfiguration config, List<String> keysToCheck) {
         boolean keysMissing = false;
-
-        // List of keys to check
-        List<String> keysToCheck = Arrays.asList(
-                "custom-barrel-name", "cant-stack-items", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
-                "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
-                "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay");
-
-        // Check for missing keys
         for (String key : keysToCheck) {
             if (!config.contains(key)) {
-                postOffice.getLogger().warning("Key '" + key + "' not found in the configuration file, reverting to the default.");
+                postOffice.getLogger().warning("Key '" + key + "' not found in the file, reverting to the default.");
                 keysMissing = true;
             }
         }
         return keysMissing;
     }
 
-    private Map<String, Object> saveMissingKeyValues(FileConfiguration config) {
+    private Map<String, Object> saveMissingConfigKey(FileConfiguration config) {
+        return saveMissingKeys(config, Arrays.asList(
+                "custom-barrel-name", "sign-notification", "got-mail-delay", "update-notification", "postbox-protection", "console-logs"
+        ));
+    }
+
+    private Map<String, Object> saveMissingLangKey(FileConfiguration config) {
+        return saveMissingKeys(config, Arrays.asList(
+                "sent-message", "received-message", "got-mail-message", "no-permission", "deny-action",
+                "not-registered", "post-box-removed", "successful-registration", "already-registered",
+                "postbox-created", "remove-from-config", "look-at-post-box", "sign-on-barrel",
+                "already-claimed", "invalid-postbox", "successfully-claimed", "modify-sign",
+                "unclaimed-postbox", "user-banned", "post-box-owner", "claimed-for",
+                "already-has-postbox", "not-played-before", "claimed-for-other-player", "plugin-up-to-date"
+        ));
+    }
+
+    private Map<String, Object> saveMissingKeys(FileConfiguration config, List<String> keysToCheck) {
         Map<String, Object> missingKeyValues = new HashMap<>();
-
-        // List of keys to check
-        List<String> keysToCheck = Arrays.asList(
-                "custom-barrel-name", "cant-stack-items", "remove-item-error", "offhand-error", "hotbar-error", "drop-item-error",
-                "sent-message", "received-message", "got-mail-message", "update-notification", "postbox-protection",
-                "create-error", "break-error", "console-logs", "postbox-created", "plugin-up-to-date", "got-mail-delay");
-
-        // Save existing values of missing keys
         for (String key : keysToCheck) {
             if (config.contains(key)) {
-                Object value = config.get(key);
-                missingKeyValues.put(key, value);
+                missingKeyValues.put(key, config.get(key));
             }
         }
         return missingKeyValues;
     }
 
-    private void updateConfigWithMissingKeyValues(FileConfiguration config, Map<String, Object> missingKeyValues) {
-        // Update the new config with missing key values
+    private void updateConfigWithMissingKeyValues(FileConfiguration config, Map<String, Object> missingKeyValues, File destination) {
         for (Map.Entry<String, Object> entry : missingKeyValues.entrySet()) {
             config.set(entry.getKey(), entry.getValue());
         }
-
-        // Save the updated config
-        saveConfigSilently(config);
+        saveConfigSilently(config, destination);  // Pass the correct file to save to
     }
 
     private void saveDefaultConfig(String resourceName, File destination) {
-        try (InputStream resourceStream = getClass().getResourceAsStream("/config/" + resourceName)) {
+        try (InputStream resourceStream = getClass().getResourceAsStream("/" + resourceName)) {
             if (resourceStream != null) {
                 Files.copy(resourceStream, destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                //getLogger().info("Default config file created successfully.");
             } else {
-                postOffice.getLogger().warning("Failed to create default config file. Resource not found.");
+                postOffice.getLogger().warning("Failed to create default " + resourceName + ". Resource not found.");
             }
         } catch (IOException e) {
-            postOffice.getLogger().log(Level.SEVERE, "Error creating default config file", e);
+            postOffice.getLogger().log(Level.SEVERE, "Error creating default file: " + resourceName, e);
         }
     }
 
     private String getString(FileConfiguration config, String key, String defaultValue) {
-        if (config.contains(key) && config.isString(key)) {
-            String originalValue = config.getString(key);
-            assert originalValue != null;
-            String updatedValue = originalValue.replaceAll("(?m)^\\s+|\\s+$", "")  // Remove leading/trailing spaces, tabs, and indentation
-                    .replaceAll("\\s+", " ");  // Collapse multiple spaces into a single space
-
-            // Log removal to the console if changes were made
-            if (!originalValue.equals(updatedValue)) {
-                if (postOffice.consoleLogs) {
-                    postOffice.getLogger().info("Extra spaces removed from key '" + key + "'");
-                }
-            }
-
-
-            // Check for a string split across two lines
-            if (!originalValue.equals(updatedValue) && originalValue.contains("\n")) {
-                updatedValue = originalValue.replace("\n", "");  // Remove newline characters
-                if (postOffice.consoleLogs) {
-                    postOffice.getLogger().info("Indentation removed from key '" + key + "'");
-                }
-            }
-
-
-
-            // Save the updated value back to the config
-            config.set(key, updatedValue);
-            saveConfigSilently(config); // Custom method to save the configuration without logging exceptions
-
-            return updatedValue;
-        } else {
-            // Log a warning if the key is not found or is of unexpected type
-            postOffice.getLogger().warning("Key '" + key + "' not found in the configuration file, reverting to the default.");
-
-            // Set the default value in the configuration
-            config.set(key, defaultValue);
-
-            // Save the configuration with the default value
-            saveConfigSilently(config); // Custom method to save the configuration without logging exceptions
-
-            return defaultValue;
-        }
+        return config.getString(key, defaultValue);
     }
 
     private boolean getBoolean(FileConfiguration config, String key, boolean defaultValue) {
-        if (config.contains(key) && config.isBoolean(key)) {
-            boolean originalValue = config.getBoolean(key);
-
-            // Save the updated value back to the config
-            config.set(key, originalValue);
-            saveConfigSilently(config); // Custom method to save the configuration without logging exceptions
-
-            return originalValue;
-        } else {
-            // Log a warning if the key is not found or is of unexpected type
-            postOffice.getLogger().warning("Key '" + key + "' not found in the configuration file, reverting to the default.");
-
-            // Set the default value in the configuration
-            config.set(key, defaultValue);
-
-            // Save the configuration with the default value
-            saveConfigSilently(config); // Custom method to save the configuration without logging exceptions
-
-            return defaultValue;
-        }
+        return config.getBoolean(key, defaultValue);
     }
 
-    private void saveConfigSilently(FileConfiguration config) {
+    private void saveConfigSilently(FileConfiguration config, File destination) {
         try {
-            config.save(new File(postOffice.getDataFolder(), "config.yml"));
+            config.save(destination);
         } catch (IOException e) {
-            // Log the exception or handle it as needed (e.g., printStackTrace())
-        }
-    }
-
-    public void setCustomBarrelName(String newCustomBarrelName) {
-        try {
-            File configFile = new File(postOffice.getDataFolder(), "config.yml");
-            FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-
-            // Update the custom barrel name in the configuration
-            config.set("custom-barrel-name", newCustomBarrelName);
-
-            // Save the updated configuration
-            saveConfigSilently(config);
-
-            // Update the custom barrel name in the PostOffice instance
-            postOffice.customBarrelName = newCustomBarrelName;
-
-        } catch (Exception e) {
-            postOffice.getLogger().log(Level.SEVERE, "An error occurred while updating the custom barrel name", e);
+            postOffice.getLogger().log(Level.SEVERE, "An error occurred while saving the file " + destination.getName(), e);
         }
     }
 
