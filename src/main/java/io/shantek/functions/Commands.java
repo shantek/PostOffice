@@ -359,7 +359,7 @@ public class Commands implements CommandExecutor {
                             return true;
                         }
 
-                        if (targetBlock.getState() instanceof Sign) {
+                        if (!(targetBlock.getState() instanceof Sign)) {
                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
                             return true;
                         }
