@@ -345,13 +345,12 @@ public class Helpers {
         return barrelsCache.containsKey(blockLocationString);
     }
 
-    private void loadBarrelsIntoCache() {
+    public void loadBarrelsIntoCache() {
         barrelsCache.clear(); // Clear the cache before reloading
 
         FileConfiguration barrelsConfig = getBarrelsConfig();
         if (barrelsConfig.contains("barrels")) {
             Set<String> keys = Objects.requireNonNull(barrelsConfig.getConfigurationSection("barrels")).getKeys(false);
-            //postOffice.getLogger().info("Loading barrels into cache. Found keys: " + keys);
 
             for (String key : keys) {
                 String path = "barrels." + key;
@@ -369,15 +368,9 @@ public class Helpers {
                     }
                 }
 
-                // Create a BarrelData object and store it in the cache
+                // Create a BarrelData object with corrected constructor parameters
                 BarrelData barrelData = new BarrelData(ownerUUID, state, signLocation);
                 barrelsCache.put(key, barrelData); // Add to cache
-
-                /*
-                postOffice.getLogger().info("Added barrel to cache at location: " + key + ", Owner: "
-                        + (ownerUUID != null ? ownerUUID : "none") + ", State: " + state + ", Sign: " + signLocation);
-
-                */
             }
         } else {
             postOffice.getLogger().warning("No barrels found in barrels.yml during cache load.");

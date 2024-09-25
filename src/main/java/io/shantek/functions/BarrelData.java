@@ -7,10 +7,10 @@ public class BarrelData {
     private final String signLocation;
     private final String state;
 
-    public BarrelData(UUID ownerUUID, String signLocation, String state) {
+    public BarrelData(UUID ownerUUID, String state, String signLocation) {
         this.ownerUUID = ownerUUID;
-        this.signLocation = signLocation;
         this.state = state;
+        this.signLocation = signLocation;
     }
 
     public UUID getOwnerUUID() {
