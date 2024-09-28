@@ -26,7 +26,8 @@ Available now on [Modrinth](https://modrinth.com/plugin/postoffice), [CurgeForge
 - Admin/mods can look at a sign and use '/postoffice claim playername' to claim a post box on behalf of another player.
 - Enjoy your awesome post office on your SMP!
 
-![Plugin Usage Stats](https://bstats.org/signatures/bukkit/Post%20Office.svg)
+## YouTube Tutorial
+[![YouTube](http://i.ytimg.com/vi/skb3oYxVzfg/hqdefault.jpg)](https://www.youtube.com/watch?v=skb3oYxVzfg)
 
 ## Commands
 Below are the commands used to manage the post office barrels and plugin:
@@ -78,3 +79,6 @@ Any player with this permission will be notified if there is an update to the pl
 
 ### License
 Distributed under the GNU General Public License v3.0.
+
+![Plugin Usage Stats](https://bstats.org/signatures/bukkit/Post%20Office.svg)
+
