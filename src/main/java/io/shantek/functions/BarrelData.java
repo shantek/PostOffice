@@ -9,8 +9,8 @@ public class BarrelData {
 
     public BarrelData(UUID ownerUUID, String state, String signLocation) {
         this.ownerUUID = ownerUUID;
-        this.state = state;
         this.signLocation = signLocation;
+        this.state = state;
     }
 
     public UUID getOwnerUUID() {

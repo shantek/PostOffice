@@ -381,8 +381,8 @@ public class Helpers {
         String barrelLocationString = getBlockLocationString(barrelBlock);
         String signLocationString = getBlockLocationString(signBlock);
 
-        // Create the BarrelData object with correct sign location and state
-        BarrelData barrelData = new BarrelData(ownerUUID, signLocationString, state);
+        // Create the BarrelData object with correct order of parameters
+        BarrelData barrelData = new BarrelData(ownerUUID, state, signLocationString);
 
         // Add or update the barrel data in the cache
         barrelsCache.put(barrelLocationString, barrelData);
@@ -395,6 +395,7 @@ public class Helpers {
         // Optionally save the cache to disk immediately
         saveCacheToFile();
     }
+
 
     public void saveCacheToFile() {
         FileConfiguration barrelsConfig = getBarrelsConfig();
