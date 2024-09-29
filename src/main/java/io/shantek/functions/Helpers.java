@@ -73,28 +73,16 @@ public class Helpers {
 
     public String getPlayerPostBoxLocation(UUID playerUUID) {
         FileConfiguration barrelsConfig = getBarrelsConfig();
-
-        // Loop through all barrels to find the one owned by the player
         for (String barrelLocation : Objects.requireNonNull(barrelsConfig.getConfigurationSection("barrels")).getKeys(false)) {
             String ownerUUIDString = barrelsConfig.getString("barrels." + barrelLocation + ".owner");
             if (ownerUUIDString != null && ownerUUIDString.equals(playerUUID.toString())) {
-
-                // Check if world, x, y, z are stored properly
-                String worldName = barrelsConfig.getString("barrels." + barrelLocation + ".world", "Unknown World");
-                int x = barrelsConfig.getInt("barrels." + barrelLocation + ".x", Integer.MIN_VALUE);
-                int y = barrelsConfig.getInt("barrels." + barrelLocation + ".y", Integer.MIN_VALUE);
-                int z = barrelsConfig.getInt("barrels." + barrelLocation + ".z", Integer.MIN_VALUE);
-
-                // Check if coordinates are valid (i.e., not the fallback value)
-                if (x == Integer.MIN_VALUE || y == Integer.MIN_VALUE || z == Integer.MIN_VALUE) {
-                    return "Unknown location"; // Coordinates are not valid
+                Block barrelBlock = getBlockFromLocationString(barrelLocation);
+                if (barrelBlock != null) {
+                    return barrelBlock.getWorld().getName() + " [" + barrelBlock.getX() + ", " + barrelBlock.getY() + ", " + barrelBlock.getZ() + "]";
                 }
-
-                // Return formatted location string
-                return worldName + " [" + x + ", " + y + ", " + z + "]";
             }
         }
-        return "Unknown location"; // Fallback if no post box is found
+        return "Unknown location";
     }
 
     public int countNonNullItems(ItemStack[] items) {
@@ -143,33 +131,11 @@ public class Helpers {
         String signLocationString = barrelsConfig.getString("barrels." + barrelLocationString + ".sign");
 
         if (signLocationString != null) {
-            String[] parts = signLocationString.split("_");
-
-            // Ensure the parts are valid (should be 4 parts: world, x, y, z)
-            if (parts.length == 4) {
-                String worldName = parts[0];
-                int x, y, z;
-
-                try {
-                    x = Integer.parseInt(parts[1]);
-                    y = Integer.parseInt(parts[2]);
-                    z = Integer.parseInt(parts[3]);
-                } catch (NumberFormatException e) {
-                    postOffice.getLogger().warning("Invalid sign coordinates in config for barrel: " + barrelLocationString);
-                    return null; // Invalid coordinates, return null
-                }
-
-                World world = Bukkit.getWorld(worldName);
-                if (world != null) {
-                    return world.getBlockAt(x, y, z); // Return the block at the saved sign location
-                } else {
-                    postOffice.getLogger().warning("World not found for barrel: " + barrelLocationString);
-                }
-            } else {
-                postOffice.getLogger().warning("Invalid sign location string format for barrel: " + barrelLocationString);
-            }
+            // Use the helper method to get the sign block
+            return getBlockFromLocationString(signLocationString);
         }
 
+        postOffice.getLogger().warning("Sign location not found for barrel: " + barrelLocationString);
         return null; // Sign not found or invalid format
     }
 
@@ -199,19 +165,8 @@ public class Helpers {
             String storedSignLocation = barrelsConfig.getString("barrels." + barrelLocation + ".sign");
 
             if (signLocationString.equals(storedSignLocation)) {
-                // The sign matches, get the barrel block
-                String[] parts = barrelLocation.split("_");
-                if (parts.length == 4) {
-                    String worldName = parts[0];
-                    int x = Integer.parseInt(parts[1]);
-                    int y = Integer.parseInt(parts[2]);
-                    int z = Integer.parseInt(parts[3]);
-
-                    World world = Bukkit.getWorld(worldName);
-                    if (world != null) {
-                        return world.getBlockAt(x, y, z); // Return the barrel block
-                    }
-                }
+                // The sign matches, get the barrel block using the updated method
+                return getBlockFromLocationString(barrelLocation);
             }
         }
         return null; // No barrel found for this sign
@@ -298,39 +253,22 @@ public class Helpers {
     public void removeBarrelFromCache(Block barrelBlock) {
         String barrelLocationString = getBlockLocationString(barrelBlock);
 
-        // Retrieve the associated sign before removing the barrel from the cache
         BarrelData barrelData = barrelsCache.get(barrelLocationString);
         if (barrelData != null) {
             String signLocationString = barrelData.getSignLocation();
             if (signLocationString != null) {
-                // Get the sign block from its location string
-                String[] parts = signLocationString.split("_");
-                if (parts.length == 4) {
-                    World world = Bukkit.getWorld(parts[0]);
-                    int x = Integer.parseInt(parts[1]);
-                    int y = Integer.parseInt(parts[2]);
-                    int z = Integer.parseInt(parts[3]);
-
-                    if (world != null) {
-                        Block signBlock = world.getBlockAt(x, y, z);
-                        if (signBlock.getState() instanceof Sign) {
-                            // Clear the sign text (e.g., remove the player's name and "Unclaimed" message)
-                            Sign sign = (Sign) signBlock.getState();
-                            sign.setLine(0, ""); // Clear the first line
-                            sign.setLine(1, ""); // Clear the second line
-                            sign.setLine(2, ""); // Clear the third line
-                            sign.setLine(3, ""); // Clear the fourth line
-                            sign.update(); // Update the sign
-                        }
+                Block signBlock = getBlockFromLocationString(signLocationString);
+                if (signBlock != null && signBlock.getState() instanceof Sign) {
+                    Sign sign = (Sign) signBlock.getState();
+                    for (int i = 0; i < 4; i++) {
+                        sign.setLine(i, ""); // Clear sign text
                     }
+                    sign.update();
                 }
             }
         }
 
-        // Remove the barrel from the cache
         barrelsCache.remove(barrelLocationString);
-
-        // Save the cache to file immediately
         saveCacheToFile();
     }
 
@@ -488,6 +426,40 @@ public class Helpers {
             postOffice.getLogger().severe("Could not save barrels.yml: " + e.getMessage());
         }
     }
+
+    public Block getBlockFromLocationString(String locationString) {
+        // Split the string into parts by "_"
+        String[] parts = locationString.split("_");
+
+        // Ensure there are at least 4 parts (world and coordinates)
+        if (parts.length < 4) {
+            postOffice.getLogger().warning("Invalid location string format: " + locationString);
+            return null;
+        }
+
+        try {
+            // The last three parts are x, y, and z
+            int x = Integer.parseInt(parts[parts.length - 3]);
+            int y = Integer.parseInt(parts[parts.length - 2]);
+            int z = Integer.parseInt(parts[parts.length - 1]);
+
+            // The rest is the world name, so join everything before the last 3 parts
+            String worldName = String.join("_", Arrays.copyOf(parts, parts.length - 3));
+
+            // Get the world and return the block at the given coordinates
+            World world = Bukkit.getWorld(worldName);
+            if (world != null) {
+                return world.getBlockAt(x, y, z);
+            } else {
+                postOffice.getLogger().warning("World not found: " + worldName);
+            }
+        } catch (NumberFormatException e) {
+            postOffice.getLogger().warning("Invalid number format in location string: " + locationString + " - Error: " + e.getMessage());
+        }
+
+        return null;
+    }
+
 
     public Block getSignFromConfig(Block barrelBlock) {
         String barrelLocationString = getBlockLocationString(barrelBlock); // Convert block to location string
