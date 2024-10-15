@@ -102,7 +102,7 @@ public class InventoryClose implements Listener {
         player.sendMessage(ChatColor.translateAlternateColorCodes('&',
                 plugin.language.sentMessage
                         .replace("%sender%", player.getName())
-                        .replace("%receiver%", Bukkit.getOfflinePlayer(boxOwnerUUID).getName())));
+                        .replace("%receiver%", Objects.requireNonNull(Bukkit.getOfflinePlayer(boxOwnerUUID).getName()))));
 
         if (plugin.consoleLogs) {
             plugin.getLogger().info(player.getName() + " added mail for " + Bukkit.getOfflinePlayer(boxOwnerUUID).getName());
