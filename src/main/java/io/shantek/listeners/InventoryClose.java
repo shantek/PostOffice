@@ -27,81 +27,101 @@ public class InventoryClose implements Listener {
         Inventory inventory = event.getInventory();
         Player player = (Player) event.getPlayer();
 
-        // Check if the inventory is a barrel
-        if (inventory.getType() == InventoryType.BARREL) {
-            Block clickedBlock = Objects.requireNonNull(event.getInventory().getLocation()).getBlock();
-
-            if (clickedBlock.getType() == Material.BARREL) {
-                if (postOffice.helpers.isBarrelInConfig(clickedBlock)) {
-
-                    // This barrel is in the config, treat it as a valid post box
-                    UUID boxOwnerUUID = postOffice.helpers.getOwnerUUID(clickedBlock);
-
-                    if (boxOwnerUUID == null) {
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.unclaimedPostbox));
-                    } else {
-
-                        if (postOffice.consoleLogs) {
-                            OfflinePlayer boxOwner = postOffice.helpers.getPlayer(boxOwnerUUID);
-                            plugin.getLogger().info("Closing valid post box. Owner: " + boxOwner.getName());
-                        }
-
-                    }
-
-                    // Check if the player owns the post box
-                    if (boxOwnerUUID != null && postOffice.helpers.isPostBoxOwner(clickedBlock, player)) {
-                        // Player owns the post box - clear the "You have mail" message from the sign
-                        Block signBlock = postOffice.helpers.getSignFromConfig(clickedBlock);
-                        if (signBlock != null && signBlock.getState() instanceof Sign) {
-                            Sign sign = (Sign) signBlock.getState();
-                            sign.setLine(2, ""); // Clear the 3rd line
-                            sign.update();
-                        }
-
-                        // Remove any mail notifications (from the internal mail list)
-                        postOffice.playersWithMail.remove(player.getUniqueId().toString());
-                        postOffice.helpers.saveMailFile();
-
-                    } else if (boxOwnerUUID != null) {
-                        // Player does not own the post box - check for item changes
-                        postOffice.newItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
-                        if (postOffice.newItemCount > postOffice.previousItemCount) {
-                            // Update the sign to notify the owner of mail
-                            Block signBlock = postOffice.helpers.getSignFromConfig(clickedBlock);
-                            if (postOffice.signNotification && signBlock != null && signBlock.getState() instanceof Sign) {
-                                Sign sign = (Sign) signBlock.getState();
-                                sign.setLine(2, ChatColor.GREEN + "You have mail"); // Set "You have mail" on the 3rd line
-                                sign.update();
-                            }
-
-                            // Send message to the player
-                            player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                    postOffice.language.sentMessage
-                                            .replace("%sender%", player.getName())
-                                            .replace("%receiver%", Bukkit.getOfflinePlayer(boxOwnerUUID).getName())));
-
-                            // Add the owner to the mail list
-                            if (postOffice.consoleLogs) {
-                                plugin.getLogger().info(player.getName() + " added mail for " + Bukkit.getOfflinePlayer(boxOwnerUUID).getName());
-                            }
-                            postOffice.playersWithMail.add(boxOwnerUUID.toString());
-                            postOffice.helpers.saveMailFile();
-
-                            // Notify the owner if they are online
-                            Player owner = Bukkit.getPlayer(boxOwnerUUID);
-                            if (owner != null) {
-                                owner.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                        postOffice.language.receivedMessage
-                                                .replace("%sender%", player.getName())
-                                                .replace("%receiver%", owner.getName())));
-                            }
-                        }
-                    }
-                }
-            }
+        if (isBarrelInventory(inventory, event)) {
+            Block barrelBlock = getBarrelBlock(event);
+            processBarrelInventoryClose(plugin, inventory, player, barrelBlock);
         }
     }
 
+    private boolean isBarrelInventory(Inventory inventory, InventoryCloseEvent event) {
+        return inventory.getType() == InventoryType.BARREL
+                && Objects.requireNonNull(event.getInventory().getLocation()).getBlock().getType() == Material.BARREL;
+    }
+
+    private void processBarrelInventoryClose(PostOffice plugin, Inventory inventory, Player player, Block barrelBlock) {
+
+        UUID boxOwnerUUID = postOffice.helpers.getOwnerUUID(barrelBlock);
+
+        if (boxOwnerUUID == null) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.language.unclaimedPostbox));
+        } else {
+            logValidPostBox(plugin, postOffice.helpers.getPlayer(boxOwnerUUID));
+        }
+
+        if (boxOwnerUUID != null && postOffice.helpers.isPostBoxOwner(barrelBlock, player)) {
+            clearSignAndNotifications(plugin, barrelBlock, player);
+        } else if (boxOwnerUUID != null) {
+            checkForItemChanges(plugin, inventory, barrelBlock, player, boxOwnerUUID);
+        }
+    }
+
+    private void logValidPostBox(PostOffice plugin, OfflinePlayer boxOwner) {
+        if (plugin.consoleLogs) {
+            plugin.getLogger().info("Closing valid post box. Owner: " + boxOwner.getName());
+        }
+    }
+
+    private void clearSignAndNotifications(PostOffice plugin, Block barrelBlock, Player player) {
+        Block signBlock = postOffice.helpers.getSignFromConfig(barrelBlock);
+
+        if (signBlock != null && signBlock.getState() instanceof Sign) {
+            Sign sign = (Sign) signBlock.getState();
+            sign.setLine(2, "");
+            sign.update();
+        }
+
+        plugin.playersWithMail.remove(player.getUniqueId().toString());
+        postOffice.helpers.saveMailFile();
+    }
+
+    private void checkForItemChanges(PostOffice plugin, Inventory inventory, Block barrelBlock, Player player, UUID boxOwnerUUID) {
+        plugin.newItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
+
+        if (plugin.newItemCount > plugin.previousItemCount) {
+            updateSignAndNotifyOwner(plugin, barrelBlock, player, boxOwnerUUID);
+        }
+    }
+
+    private void updateSignAndNotifyOwner(PostOffice plugin, Block barrelBlock, Player player, UUID boxOwnerUUID) {
+        Block signBlock = plugin.helpers.getSignFromConfig(barrelBlock);
+
+        if (plugin.signNotification && signBlock != null && signBlock.getState() instanceof Sign) {
+            Sign sign = (Sign) signBlock.getState();
+            sign.setLine(2, ChatColor.GREEN + "You have mail");
+            sign.update();
+        }
+
+        sendPlayerMessage(plugin, player, boxOwnerUUID);
+        plugin.playersWithMail.add(boxOwnerUUID.toString());
+        plugin.helpers.saveMailFile();
+
+        notifyOwner(plugin, player, boxOwnerUUID);
+    }
+
+    private void sendPlayerMessage(PostOffice plugin, Player player, UUID boxOwnerUUID) {
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                plugin.language.sentMessage
+                        .replace("%sender%", player.getName())
+                        .replace("%receiver%", Bukkit.getOfflinePlayer(boxOwnerUUID).getName())));
+
+        if (plugin.consoleLogs) {
+            plugin.getLogger().info(player.getName() + " added mail for " + Bukkit.getOfflinePlayer(boxOwnerUUID).getName());
+        }
+    }
+
+    private void notifyOwner(PostOffice plugin, Player player, UUID boxOwnerUUID) {
+        Player owner = Bukkit.getPlayer(boxOwnerUUID);
+        if (owner != null) {
+            owner.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                    plugin.language.receivedMessage
+                            .replace("%sender%", player.getName())
+                            .replace("%receiver%", owner.getName())));
+        }
+    }
+
+    private Block getBarrelBlock(InventoryCloseEvent event) {
+        return Objects.requireNonNull(event.getInventory().getLocation()).getBlock();
+    }
 }
 
 
