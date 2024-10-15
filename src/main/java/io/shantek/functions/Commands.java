@@ -213,12 +213,8 @@ public class Commands implements CommandExecutor {
                 // Get the block the player is looking at (sign or barrel)
                 Block targetBlock = postOffice.helpers.getBlockLookingAt(player, 6);
 
-                // Exit out if they aren't looking at a block or are too far away
-                if (targetBlock == null) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
-                    return true;
-                }
 
+                // Exit out if they aren't looking at a block or are too far away
                 if (targetBlock == null || !(targetBlock.getState() instanceof Sign)) {
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
                     return true;
@@ -380,7 +376,7 @@ public class Commands implements CommandExecutor {
                 return true;
             }
 
-            if (targetBlock == null || !(targetBlock.getState() instanceof Sign)) {
+            if (!(targetBlock.getState() instanceof Sign)) {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
                 return true;
             }
