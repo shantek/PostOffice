@@ -36,7 +36,7 @@ public class InventoryClick implements Listener {
         }
 
         if (isDoubleClickOnPlayerInventory(event, clickedInventory, player)) {
-            cancelIfBarrelNameMatches(event, player, player.getOpenInventory().getTopInventory());
+            cancelIfBarrelNameMatches(event, player.getOpenInventory().getTopInventory());
             return;
         }
 
@@ -52,7 +52,7 @@ public class InventoryClick implements Listener {
                 (clickedInventory == player.getInventory() || clickedInventory.getType() == InventoryType.PLAYER);
     }
 
-    private void cancelIfBarrelNameMatches(InventoryClickEvent event, Player player, Inventory inventory) {
+    private void cancelIfBarrelNameMatches(InventoryClickEvent event, Inventory inventory) {
         Block clickedBlock = Objects.requireNonNull(inventory.getLocation()).getBlock();
         if (isBarrelWithName(clickedBlock, PostOffice.instance.customBarrelName)) {
             event.setCancelled(true);
