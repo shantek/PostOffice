@@ -338,7 +338,7 @@ public class Commands implements CommandExecutor {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.successfullyClaimed));
 
                 // Update the sign to display the player's name on the second line
-                if (targetBlock != null && targetBlock.getState() instanceof Sign) {
+                if (targetBlock.getState() instanceof Sign) {
                     Sign sign = (Sign) targetBlock.getState();
                     sign.setLine(1, player.getName()); // Set the player's name on the 2nd line
                     sign.update();
@@ -433,7 +433,7 @@ public class Commands implements CommandExecutor {
             postOffice.helpers.addOrUpdateBarrelInCache(attachedBarrel, targetBlock, targetPlayerUUID, "claimed");
 
             // Update the sign to display the player's name on the second line
-            if (targetBlock != null && targetBlock.getState() instanceof Sign) {
+            if (targetBlock.getState() instanceof Sign) {
                 Sign sign = (Sign) targetBlock.getState();
                 sign.setLine(1, targetPlayer.getName()); // Set the player's name on the 2nd line
                 sign.update();

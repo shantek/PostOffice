@@ -41,7 +41,7 @@ public class InventoryClick implements Listener {
         if (event.getClick() == ClickType.DOUBLE_CLICK) {
             if (clickedInventory == player.getInventory() || clickedInventory.getType() == InventoryType.PLAYER) {
                 Inventory topInventory = player.getOpenInventory().getTopInventory();
-                if (topInventory != null && topInventory.getType() == InventoryType.BARREL) {
+                if (topInventory.getType() == InventoryType.BARREL) {
                     Block clickedBlock = Objects.requireNonNull(topInventory.getLocation()).getBlock();
                     if (clickedBlock.getType() == Material.BARREL) {
                         BlockState blockState = clickedBlock.getState();
