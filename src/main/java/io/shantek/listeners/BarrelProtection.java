@@ -123,14 +123,18 @@ public class BarrelProtection implements Listener {
         }
 
         InventoryHolder sourceHolder = event.getSource().getHolder();
-        InventoryHolder destinationHolder = event.getDestination().getHolder();
+        if (!(sourceHolder instanceof Barrel)) {
+            return;
+        }
 
-        // Check if the source is a barrel and the destination is a hopper or hopper minecart
-        if (sourceHolder instanceof Barrel && (destinationHolder instanceof Hopper || destinationHolder instanceof HopperMinecart)) {
-            Barrel barrel = (Barrel) sourceHolder;
-            if (postOffice.helpers.isProtectedPostBox(barrel.getBlock())) {
-                event.setCancelled(true);
-            }
+        InventoryHolder destinationHolder = event.getDestination().getHolder();
+        if (!(destinationHolder instanceof Hopper || destinationHolder instanceof HopperMinecart)) {
+            return;
+        }
+
+        Barrel barrel = (Barrel) sourceHolder;
+        if (postOffice.helpers.isProtectedPostBox(barrel.getBlock())) {
+            event.setCancelled(true);
         }
     }
 
