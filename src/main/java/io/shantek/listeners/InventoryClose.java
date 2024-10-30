@@ -29,7 +29,10 @@ public class InventoryClose implements Listener {
 
         if (isBarrelInventory(inventory, event)) {
             Block barrelBlock = getBarrelBlock(event);
-            processBarrelInventoryClose(plugin, inventory, player, barrelBlock);
+
+            if (postOffice.helpers.isBarrelInConfig(barrelBlock)) {
+                processBarrelInventoryClose(plugin, inventory, player, barrelBlock);
+            }
         }
     }
 
