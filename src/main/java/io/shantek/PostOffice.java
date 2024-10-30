@@ -34,6 +34,7 @@ public final class PostOffice extends JavaPlugin {
     public boolean consoleLogs = true;
     public boolean gotMailDelay = true;
     public boolean signNotification = true;
+    public boolean hopperProtection = false;
 
     public void onEnable() {
 

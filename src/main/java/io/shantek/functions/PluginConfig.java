@@ -55,6 +55,7 @@ public class PluginConfig {
         postOffice.consoleLogs = getBoolean(config, "console-logs", false);
         postOffice.gotMailDelay = getBoolean(config, "got-mail-delay", true);
         postOffice.signNotification = getBoolean(config, "sign-notification", true);
+        postOffice.hopperProtection = getBoolean(config, "hopper-protection", false);
     }
 
     private void loadLangFile() {
@@ -93,7 +94,7 @@ public class PluginConfig {
 
     private boolean checkForMissingConfigKeys(FileConfiguration config) {
         return checkForMissingKeys(config, Arrays.asList(
-                "custom-barrel-name", "sign-notification", "got-mail-delay", "update-notification", "postbox-protection", "console-logs"
+                "custom-barrel-name", "sign-notification", "got-mail-delay", "update-notification", "postbox-protection", "console-logs", "hopper-protection"
         ));
     }
 
@@ -121,7 +122,7 @@ public class PluginConfig {
 
     private Map<String, Object> saveMissingConfigKey(FileConfiguration config) {
         return saveMissingKeys(config, Arrays.asList(
-                "custom-barrel-name", "sign-notification", "got-mail-delay", "update-notification", "postbox-protection", "console-logs"
+                "custom-barrel-name", "sign-notification", "got-mail-delay", "update-notification", "postbox-protection", "console-logs", "hopper-protection"
         ));
     }
 

@@ -14,6 +14,10 @@ got-mail-delay: true
 # Post Boxes? Disable if you prefer to use something like WorldGuard
 postbox-protection: true
 
+# Hopper protection stops items being removed from your post boxes
+# Disabled by default as this can cause lag with excessive amounts of hoppers
+hopper-protection: false
+
 # Do you want to check for updates when restarting the server?
 # This will also message any server ops to notify them each time they log on.
 update-notification: true
