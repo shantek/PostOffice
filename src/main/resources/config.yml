@@ -26,3 +26,10 @@ update-notification: true
 # start up/shut down messages as well as warnings/errors. Disabling this will
 # remove the less important console logs like the mail file being updated etc.
 console-logs: false
+
+
+
+# Config file version
+# Do not manually change this setting
+# Used to update out of date config files
+config-version: 1
