@@ -59,7 +59,8 @@ public final class PostOffice extends JavaPlugin {
 
         // Create an instance of PluginConfig
         this.pluginConfig = new PluginConfig(this);
-        pluginConfig.reloadConfigFile();
+        pluginConfig.loadConfig();
+        pluginConfig.loadLangConfig();
 
         if (this.mailFile.exists()) {
             try (Stream<String> lines = Files.lines(mailFile.toPath())) {
