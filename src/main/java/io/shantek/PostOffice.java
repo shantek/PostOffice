@@ -35,6 +35,7 @@ public final class PostOffice extends JavaPlugin {
     public boolean gotMailDelay = true;
     public boolean signNotification = true;
     public boolean hopperProtection = false;
+    public boolean debugLogs = false;
 
     public void onEnable() {
 
@@ -59,8 +60,8 @@ public final class PostOffice extends JavaPlugin {
 
         // Create an instance of PluginConfig
         this.pluginConfig = new PluginConfig(this);
-        pluginConfig.loadConfig();
-        pluginConfig.loadLangConfig();
+        pluginConfig.initializeAndLoadConfig();
+        pluginConfig.checkAndUpdateLang();
 
         if (this.mailFile.exists()) {
             try (Stream<String> lines = Files.lines(mailFile.toPath())) {

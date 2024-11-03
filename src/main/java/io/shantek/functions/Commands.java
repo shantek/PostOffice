@@ -132,8 +132,8 @@ public class Commands implements CommandExecutor {
         if (sender.hasPermission("shantek.postoffice.reload") || sender.isOp()) {
 
             // Reload all the config and language file
-            postOffice.pluginConfig.loadConfig();
-            postOffice.pluginConfig.loadLangConfig();
+            postOffice.pluginConfig.initializeAndLoadConfig();
+            postOffice.pluginConfig.checkAndUpdateLang();
             postOffice.helpers.saveCacheToFile();  // Save cache instead of config directly
             postOffice.helpers.reloadBarrelsConfig();
             sender.sendMessage(ChatColor.GREEN + "Post Office config file has been reloaded.");
