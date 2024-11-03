@@ -27,6 +27,9 @@ update-notification: true
 # remove the less important console logs like the mail file being updated etc.
 console-logs: false
 
+# Having plugin issues? Enable debug logs to help troubleshoot issues
+# These extra detailed messages are printed to the console only
+debug: false
 
 
 # Config file version
