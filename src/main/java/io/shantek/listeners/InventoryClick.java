@@ -92,8 +92,6 @@ public class InventoryClick implements Listener {
                 event.setCancelled(true);
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', PostOffice.instance.language.denyAction));
             }
-
-
         }
     }
 

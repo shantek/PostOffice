@@ -35,6 +35,10 @@ public class PlayerJoin implements Listener {
             Bukkit.getScheduler().runTaskLater(postOffice, () -> {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.gotMailMessage));
             }, messageDelay);
+
+            if (postOffice.debugLogs) {
+                postOffice.getLogger().severe("Sent mail notification to player " + player.getName() + " (" + player.getUniqueId() + ")");
+            }
         }
 
         if (postOffice.updateNotificationEnabled && (player.isOp() || player.hasPermission("shantek.postoffice.updatenotification"))) {

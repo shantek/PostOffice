@@ -187,7 +187,7 @@ public class PluginConfig {
         postOffice.updateNotificationEnabled = newConfig.getBoolean("update-notification", true);
         postOffice.consoleLogs = newConfig.getBoolean("console-logs", true);
         postOffice.debugLogs = newConfig.getBoolean("debug", false);
-        postOffice.getLogger().info("Configuration values loaded into memory.");
+        postOffice.getLogger().info("Configuration file loaded into memory.");
     }
 
     //endregion
@@ -367,7 +367,7 @@ public class PluginConfig {
         postOffice.language.notPlayedBefore = newLang.getString("not-played-before","&a[Post Office] &4The player %player% has not played on this server.");
         postOffice.language.claimedForOtherPlayer = newLang.getString("claimed-for-other-player","&a[Post Office] &aA post box has been created for you.");
         postOffice.language.pluginUpToDate = newLang.getString("plugin-up-to-date","Your plugin is up-to-date.");
-
+        postOffice.getLogger().info("Lang file loaded into memory.");
     }
 
     //endregion

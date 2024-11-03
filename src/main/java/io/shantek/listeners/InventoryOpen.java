@@ -45,6 +45,10 @@ public class InventoryOpen implements Listener {
                     } else {
                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.userBanned));
                         event.setCancelled(true);
+
+                        if (postOffice.debugLogs) {
+                            postOffice.getLogger().severe("Player " + player.getName() + " (" + player.getUniqueId() + ") tried to use a post box but doesn't have the use permission/is banned.");
+                        }
                     }
 
                 }
