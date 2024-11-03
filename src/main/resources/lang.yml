@@ -89,3 +89,11 @@ claimed-for-other-player: "&a[Post Office] &aA post box has been created for you
 
 # Message shown in the console to inform the server owner the plugin is up to date
 plugin-up-to-date: "Your plugin is up to date."
+
+
+
+
+# Lang file version
+# Do not manually change this setting
+# Used to update out of date lang files
+lang-version: 1
