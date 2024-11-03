@@ -82,10 +82,18 @@ public class InventoryClick implements Listener {
                 return;
             }
 
+            if (player.isOp() || player.hasPermission("shantek.postoffice.removeitems") || !isNotOwner) {
+
+                // Allow them to remove the items.
+                return;
+            }
+
             if (isItemAlreadyInBarrel(event, clickedInventory)) {
                 event.setCancelled(true);
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', PostOffice.instance.language.denyAction));
             }
+
+
         }
     }
 
