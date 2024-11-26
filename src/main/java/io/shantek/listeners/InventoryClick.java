@@ -74,15 +74,15 @@ public class InventoryClick implements Listener {
         Block clickedBlock = Objects.requireNonNull(clickedInventory.getLocation()).getBlock();
         if (isBarrelWithName(clickedBlock, PostOffice.instance.customBarrelName)) {
             String ownerName = findOwnerName(clickedBlock, player);
-            boolean isNotOwner = !ownerName.equalsIgnoreCase(player.getName());
+            boolean isOwner = ownerName.equalsIgnoreCase(player.getName());
 
-            if (shouldCancelEvent(event, player, isNotOwner)) {
+            if (shouldCancelEvent(event, player, isOwner)) {
                 event.setCancelled(true);
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', PostOffice.instance.language.denyAction));
                 return;
             }
 
-            if (player.isOp() || player.hasPermission("shantek.postoffice.removeitems") || !isNotOwner) {
+            if (player.isOp() || player.hasPermission("shantek.postoffice.removeitems") || isOwner) {
 
                 // Allow them to remove the items.
                 return;
@@ -109,8 +109,8 @@ public class InventoryClick implements Listener {
         return "";
     }
 
-    private boolean shouldCancelEvent(InventoryClickEvent event, Player player, boolean isNotOwner) {
-        return (!player.isOp() && isNotOwner && !player.hasPermission("shantek.postoffice.removeitems")) &&
+    private boolean shouldCancelEvent(InventoryClickEvent event, Player player, boolean isOwner) {
+        return (!player.isOp() && !isOwner && !player.hasPermission("shantek.postoffice.removeitems")) &&
                 (event.getAction().name().contains("PICKUP") || event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY ||
                         event.getClick() == ClickType.NUMBER_KEY || event.getAction() == InventoryAction.SWAP_WITH_CURSOR ||
                         event.getAction() == InventoryAction.HOTBAR_SWAP || event.getClick() == ClickType.DROP || event.getClick() == ClickType.CONTROL_DROP);
