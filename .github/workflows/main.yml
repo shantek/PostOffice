@@ -1,22 +1,20 @@
-name: Build project and create GitHub Release
+name: PostOffice – Auto Build & Release with Build Number
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0  # Fetch all history for all tags and branches
 
-      - name: Set up JDK 16
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
         uses: actions/setup-java@v2
         with:
           distribution: adopt
@@ -27,64 +25,92 @@ jobs:
         with:
           maven-version: 3.8.1
 
-      - name: Get version from pom.xml
-        id: version
-        run: echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-
-      - name: Check if tag exists
-        id: tag_exists
+      - name: Read build number
+        id: build_number
         run: |
-          if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
-            echo "TAG_EXISTS=true" >> $GITHUB_ENV
+          BUILD=$(cat build.number)
+          echo "BUILD_NUMBER=$BUILD" >> $GITHUB_ENV
+
+      - name: Check if release already exists
+        id: check_release
+        run: |
+          EXISTS=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" \
+            https://api.github.com/repos/${{ github.repository }}/releases/tags/build-${{ env.BUILD_NUMBER }} | jq -r '.id // empty')
+          if [[ -n "$EXISTS" ]]; then
+            echo "RELEASE_EXISTS=true" >> $GITHUB_ENV
           else
-            echo "TAG_EXISTS=false" >> $GITHUB_ENV
+            echo "RELEASE_EXISTS=false" >> $GITHUB_ENV
           fi
 
-      - name: Exit if tag exists
-        if: env.TAG_EXISTS == 'true'
-        run: echo "Tag v${{ env.VERSION }} already exists. Skipping build and release."
-
-      - name: Fetch commit messages
-        if: env.TAG_EXISTS == 'false'
-        id: fetch_commits
+      - name: Skip if release already exists
+        if: env.RELEASE_EXISTS == 'true'
         run: |
-          git fetch --tags
-          LAST_TAG=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=1))
-          COMMIT_MESSAGES=$(git log $LAST_TAG..HEAD --pretty=format:"- %s")
-          echo "COMMIT_MESSAGES<<EOF" >> $GITHUB_ENV
-          echo "Full Changelog:" >> $GITHUB_ENV
-          echo "" >> $GITHUB_ENV
-          echo "$COMMIT_MESSAGES" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "Build #${{ env.BUILD_NUMBER }} already released. Skipping."
+          exit 0
 
       - name: Build project
-        if: env.TAG_EXISTS == 'false'
         run: mvn package -B
 
-      - name: List files in target directory
-        if: env.TAG_EXISTS == 'false'
-        run: ls -al ./target/
+      - name: Rename .jar to include build number
+        run: |
+          mv ./target/PostOffice*.jar ./target/PostOffice-build-${{ env.BUILD_NUMBER }}.jar
 
-      - name: Create Release
-        if: env.TAG_EXISTS == 'false'
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Generate changelog
+        id: changelog
+        run: |
+          git fetch --tags
+          LAST_TAG=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=1) || echo "")
+          LOG=$(git log $LAST_TAG..HEAD --pretty=format:"- %s")
+          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "$LOG" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ env.VERSION }}
-          release_name: Release ${{ env.VERSION }}
-          body: ${{ env.COMMIT_MESSAGES }}
+          tag_name: build-${{ env.BUILD_NUMBER }}
+          name: Release ${{ env.BUILD_NUMBER }}
+          body: ${{ env.CHANGELOG }}
           draft: false
           prerelease: false
+          files: ./target/PostOffice-build-${{ env.BUILD_NUMBER }}.jar
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
-      - name: Upload Release Asset
-        if: env.TAG_EXISTS == 'false'
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/PostOffice-${{ env.VERSION }}.jar
-          asset_name: PostOffice-${{ env.VERSION }}.jar
-          asset_content_type: application/java-archive
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Notify Discord
+        run: |
+          BUILD_NUMBER=${{ env.BUILD_NUMBER }}
+          FILENAME="PostOffice-build-${BUILD_NUMBER}.jar"
+          JSON_PAYLOAD=$(jq -n \
+            --arg title "PostOffice - Release #$BUILD_NUMBER" \
+            --arg desc "${{ env.CHANGELOG }}" \
+            --arg url "https://github.com/${{ github.repository }}/releases/tag/build-${BUILD_NUMBER}" \
+            --arg download "https://github.com/${{ github.repository }}/releases/download/build-${BUILD_NUMBER}/$FILENAME" \
+            --arg filename "$FILENAME" \
+            --arg thumb "https://cdn.modrinth.com/data/9mkWBW5N/4182b18a24feb77cb54358aaa0d85a3d73e5a62e_96.webp" \
+            '{
+              "embeds": [{
+                "title": $title,
+                "url": $url,
+                "description": $desc,
+                "color": 7506394,
+                "fields": [
+                  {
+                    "name": "Download",
+                    "value": "[\($filename)](\($download))"
+                  },
+                  {
+                    "name": "Releases",
+                    "value": "[View All Releases](https://www.github.com/shantek/PostOffice/releases)"
+                  }
+                ],
+                "thumbnail": { "url": $thumb },
+                "footer": { "text": "Shantek • GitHub Release" },
+                "timestamp": (now | todate)
+              }]
+            }')
+
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "$JSON_PAYLOAD" \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
