@@ -14,7 +14,7 @@ Turn barrels into secure player mailboxes with claims, protection, and notificat
 > 🔄 **Version 2 is a full rewrite.** You’ll need to re-register existing post boxes.  
 > Just remove the player’s name from the sign and follow the steps below.
 
-### 🔧 [Get the latest development builds here](https://shantek.dev/job/PostOffice/)
+### 🔧 [Get the latest development builds here](https://github.com/shantek/PostOffice/releases/)
 
 ---
 
