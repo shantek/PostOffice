@@ -1,6 +1,7 @@
 package io.shantek.listeners;
 
 import io.shantek.PostOffice;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -24,6 +25,7 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class BarrelProtection implements Listener {
 
@@ -45,12 +47,29 @@ public class BarrelProtection implements Listener {
         // Get the attached barrel from the sign
         Block attachedBarrel = postOffice.helpers.getAttachedBarrel(signBlock);
 
-        // Ensure the attached block is a barrel and that it is in the config
         if (attachedBarrel != null && attachedBarrel.getType() == Material.BARREL) {
             if (postOffice.helpers.isBarrelInConfig(attachedBarrel)) {
-                // Cancel the sign change event if the barrel is in the config (protected post box)
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.modifySign));
-                event.setCancelled(true);
+
+                if (player.hasPermission("shantek.postoffice.register")) {
+                    String rawLine = Optional.ofNullable(event.getLine(0)).orElse("");
+                    String attemptedLine0 = ChatColor.translateAlternateColorCodes('&', rawLine);
+
+                    // Cancel the event to prevent default update
+                    event.setCancelled(true);
+
+                    // Manually apply the player's input (even if blank)
+                    Bukkit.getScheduler().runTaskLater(postOffice, () -> {
+                        BlockState state = signBlock.getState();
+                        if (state instanceof Sign) {
+                            Sign sign = (Sign) state;
+                            sign.setLine(0, attemptedLine0); // May be ""
+                            sign.update();
+                        }
+                    }, 1L);
+                } else {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.modifySign));
+                    event.setCancelled(true);
+                }
             }
         }
     }
