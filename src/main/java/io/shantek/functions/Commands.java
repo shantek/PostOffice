@@ -23,34 +23,38 @@ public class Commands implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("postoffice")) {
-
-            if (args[0].equalsIgnoreCase("remove")) {
-                return onCommandRemove(sender);
-            }
-            else if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-                return onCommandReload(sender);
-
-            } else if (args[0].equalsIgnoreCase("info")) {
-                return onCommandInfo(sender);
-
-            } else if (args[0].equalsIgnoreCase("register")) {
-                return onCommandRegister(sender);
-
-            } else if (args[0].equalsIgnoreCase("claim") && args.length == 2) {
-                return onCommandClaimOthers(sender, args);
-
-            } else if (args[0].equalsIgnoreCase("claim")) {
-                return onCommandClaim(sender);
-
-            } else {
-                // Invalid command format
-                sender.sendMessage(ChatColor.RED + "Unknown command or insufficient permission.");
-                return false;
-            }
+        if (!cmd.getName().equalsIgnoreCase("postoffice")) {
+            return false;
         }
-        return false;
+
+        if (args.length == 0) {
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("remove")) {
+            return onCommandRemove(sender);
+
+        } else if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+            return onCommandReload(sender);
+
+        } else if (args[0].equalsIgnoreCase("info")) {
+            return onCommandInfo(sender);
+
+        } else if (args[0].equalsIgnoreCase("register")) {
+            return onCommandRegister(sender);
+
+        } else if (args[0].equalsIgnoreCase("claim") && args.length == 2) {
+            return onCommandClaimOthers(sender, args);
+
+        } else if (args[0].equalsIgnoreCase("claim")) {
+            return onCommandClaim(sender);
+
+        } else {
+            sender.sendMessage(ChatColor.RED + "Unknown command or insufficient permission.");
+            return true;
+        }
     }
+
 
     public boolean onCommandRemove(CommandSender sender) {
 
