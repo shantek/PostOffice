@@ -40,7 +40,7 @@ Turn barrels into secure player mailboxes with claims, protection, and notificat
 
 ## 🎥 YouTube Tutorial
 
-[![YouTube](http://i.ytimg.com/vi/skb3oYxVzfg/hqdefault.jpg)](https://www.youtube.com/watch?v=skb3oYxVzfg)
+[![YouTube](http://i.ytimg.com/vi/WJtsFSBOviI/hqdefault.jpg)](https://www.youtube.com/watch?v=WJtsFSBOviI)
 
 ---
 
