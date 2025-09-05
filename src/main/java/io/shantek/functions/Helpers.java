@@ -336,32 +336,46 @@ public class Helpers {
 
 
     public void saveCacheToFile() {
-        FileConfiguration barrelsConfig = getBarrelsConfig();
+        FileConfiguration cfg = getBarrelsConfig();
 
-        // Clear the existing barrels section in the config
-        barrelsConfig.set("barrels", null);
+        cfg.set("barrels", null);
 
-        // Iterate over the cache and save each barrel to the config
         for (Map.Entry<String, BarrelData> entry : barrelsCache.entrySet()) {
             String barrelLocationString = entry.getKey();
             BarrelData barrelData = entry.getValue();
-
             String path = "barrels." + barrelLocationString;
-            barrelsConfig.set(path + ".owner", barrelData.getOwnerUUID() != null ? barrelData.getOwnerUUID().toString() : "none");
-            barrelsConfig.set(path + ".sign", barrelData.getSignLocation());
-            barrelsConfig.set(path + ".state", barrelData.getState());
 
-            // Parse location from the key (world, x, y, z)
-            String[] parts = barrelLocationString.split("_");
-            if (parts.length == 4) {
-                barrelsConfig.set(path + ".world", parts[0]);
-                barrelsConfig.set(path + ".x", Integer.parseInt(parts[1]));
-                barrelsConfig.set(path + ".y", Integer.parseInt(parts[2]));
-                barrelsConfig.set(path + ".z", Integer.parseInt(parts[3]));
+            cfg.set(path + ".owner", barrelData.getOwnerUUID() != null ? barrelData.getOwnerUUID().toString() : "none");
+            cfg.set(path + ".sign",  barrelData.getSignLocation());
+            cfg.set(path + ".state", barrelData.getState());
+
+            // Write world/x/y/z in an underscore-safe way
+            Block barrelBlock = getBlockFromLocationString(barrelLocationString);
+            if (barrelBlock != null) {
+                cfg.set(path + ".world", barrelBlock.getWorld().getName());
+                cfg.set(path + ".x", barrelBlock.getX());
+                cfg.set(path + ".y", barrelBlock.getY());
+                cfg.set(path + ".z", barrelBlock.getZ());
+            } else {
+                // Fallback: parse last 3 as coords, join the rest as world
+                String[] parts = barrelLocationString.split("_");
+                if (parts.length >= 4) {
+                    try {
+                        int x = Integer.parseInt(parts[parts.length - 3]);
+                        int y = Integer.parseInt(parts[parts.length - 2]);
+                        int z = Integer.parseInt(parts[parts.length - 1]);
+                        String worldName = String.join("_", Arrays.copyOf(parts, parts.length - 3));
+                        cfg.set(path + ".world", worldName);
+                        cfg.set(path + ".x", x);
+                        cfg.set(path + ".y", y);
+                        cfg.set(path + ".z", z);
+                    } catch (NumberFormatException ignored) {
+                        // leave these out if malformed
+                    }
+                }
             }
         }
 
-        // Save the config to disk
         saveBarrelsConfig();
     }
 
@@ -462,29 +476,35 @@ public class Helpers {
 
 
     public Block getSignFromConfig(Block barrelBlock) {
-        String barrelLocationString = getBlockLocationString(barrelBlock); // Convert block to location string
-        String path = "barrels." + barrelLocationString + ".sign"; // Use this location string in the config
+        String barrelLocationString = getBlockLocationString(barrelBlock);
+        String path = "barrels." + barrelLocationString + ".sign";
 
-        // Look up the sign location in the config
-        if (barrelsConfig.contains(path)) {
-            String signLocation = barrelsConfig.getString(path);
-            assert signLocation != null;
-            String[] parts = signLocation.split("_");
+        FileConfiguration cfg = getBarrelsConfig(); // make sure it's loaded
+        if (!cfg.contains(path)) return null;
 
-            if (parts.length == 4) {
-                String worldName = parts[0];
-                int x = Integer.parseInt(parts[1]);
-                int y = Integer.parseInt(parts[2]);
-                int z = Integer.parseInt(parts[3]);
+        String signLocation = cfg.getString(path);
+        if (signLocation == null || signLocation.isEmpty()) return null;
 
-                World world = Bukkit.getWorld(worldName);
-                if (world != null) {
-                    return world.getBlockAt(x, y, z); // Return the block at the saved sign location
-                }
-            }
+        String[] parts = signLocation.split("_");
+        if (parts.length < 4) return null; // need world + x + y + z
+
+        int len = parts.length;
+        int x, y, z;
+        try {
+            x = Integer.parseInt(parts[len - 3]);
+            y = Integer.parseInt(parts[len - 2]);
+            z = Integer.parseInt(parts[len - 1]);
+        } catch (NumberFormatException e) {
+            return null; // malformed coords
         }
-        return null; // Sign not found in the config
+
+        String worldName = String.join("_", java.util.Arrays.copyOf(parts, len - 3));
+        World world = Bukkit.getWorld(worldName);
+        if (world == null) return null;
+
+        return world.getBlockAt(x, y, z);
     }
+
 
     //endregion
 
