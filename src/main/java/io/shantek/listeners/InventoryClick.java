@@ -82,6 +82,13 @@ public class InventoryClick implements Listener {
                 return;
             }
 
+            if (postOffice.helpers.isBlacklisted(event.getCurrentItem().getType())
+                    || postOffice.helpers.isBlacklisted(event.getCursor().getType())) {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', PostOffice.instance.language.blacklistedItem));
+                event.setCancelled(true);
+                return;
+            }
+
             if (player.isOp() || player.hasPermission("shantek.postoffice.removeitems") || isOwner) {
 
                 // Allow them to remove the items.

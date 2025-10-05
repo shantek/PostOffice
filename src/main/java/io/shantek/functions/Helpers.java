@@ -27,9 +27,42 @@ public class Helpers {
         loadBarrelsIntoCache(); // Load data from barrels.yml into the cache at startup
     }
 
+    private FileConfiguration blacklistConfig = null;
+    private File blacklistConfigFile = null;
+    private Set<Material> blacklistedItems = new HashSet<>();
+
     public Map<String, BarrelData> barrelsCache;
     private FileConfiguration barrelsConfig = null;
     private File barrelsConfigFile = null;
+
+    public void loadBlacklist() {
+        if (blacklistConfigFile == null) {
+            blacklistConfigFile = new File(postOffice.getDataFolder(), "blacklist.yml");
+        }
+
+        if (!blacklistConfigFile.exists()) {
+            postOffice.saveResource("blacklist.yml", false);
+        }
+
+        blacklistConfig = YamlConfiguration.loadConfiguration(blacklistConfigFile);
+        blacklistedItems.clear();
+
+        List<String> itemNames = blacklistConfig.getStringList("items");
+        for (String name : itemNames) {
+            try {
+                Material material = Material.valueOf(name.toUpperCase(Locale.ROOT));
+                blacklistedItems.add(material);
+            } catch (IllegalArgumentException e) {
+                postOffice.getLogger().warning("Invalid material in blacklist.yml: " + name);
+            }
+        }
+
+        postOffice.getLogger().info("Loaded " + blacklistedItems.size() + " blacklisted items.");
+    }
+
+    public boolean isBlacklisted(Material material) {
+        return blacklistedItems.contains(material);
+    }
 
     //region Post box management
 

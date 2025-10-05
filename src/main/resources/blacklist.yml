@@ -1,0 +1,10 @@
+#
+# This blacklist prevents items being added or removed from your post boxes
+#
+# Anything you add here can no longer be left for players. Perfect if you wish to
+# prevent specific items being traded in post boxes
+#
+
+items:
+  - BEDROCK
+  - COMMAND_BLOCK

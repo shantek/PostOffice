@@ -367,6 +367,7 @@ public class PluginConfig {
         postOffice.language.notPlayedBefore = newLang.getString("not-played-before","&a[Post Office] &4The player %player% has not played on this server.");
         postOffice.language.claimedForOtherPlayer = newLang.getString("claimed-for-other-player","&a[Post Office] &aA post box has been created for you.");
         postOffice.language.pluginUpToDate = newLang.getString("plugin-up-to-date","Your plugin is up-to-date.");
+        postOffice.language.blacklistedItem = newLang.getString("blacklisted-item", "&a[Post Office] &4This is a blacklisted item.");
         postOffice.getLogger().info("Lang file loaded into memory.");
     }
 

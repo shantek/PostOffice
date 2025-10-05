@@ -34,6 +34,7 @@ public class Language {
     public String notPlayedBefore = "&a[Post Office] &4The player %player% has not played on this server.";
     public String claimedForOtherPlayer = "&a[Post Office] &aA post box has been created for you.";
     public String pluginUpToDate = "Your plugin is up-to-date.";
+    public String blacklistedItem = "&a[Post Office] &4This item is blacklisted item.";
 
     public UpdateChecker updateChecker;
     public PluginConfig pluginConfig;

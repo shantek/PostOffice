@@ -140,6 +140,8 @@ public class Commands implements CommandExecutor {
             postOffice.pluginConfig.initializeAndLoadLang();
             postOffice.helpers.saveCacheToFile();  // Save cache instead of config directly
             postOffice.helpers.reloadBarrelsConfig();
+            postOffice.helpers.loadBlacklist();
+
             sender.sendMessage(ChatColor.GREEN + "Post Office config file has been reloaded.");
             return true;
         } else {

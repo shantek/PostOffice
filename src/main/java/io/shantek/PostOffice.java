@@ -93,6 +93,10 @@ public final class PostOffice extends JavaPlugin {
         }
         // Register event listeners
         registerEventListeners();
+
+        // Load our blacklist from config
+        helpers.loadBlacklist();
+
     }
 
     public void registerEventListeners() {

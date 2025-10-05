@@ -90,10 +90,12 @@ claimed-for-other-player: "&a[Post Office] &aA post box has been created for you
 # Message shown in the console to inform the server owner the plugin is up to date
 plugin-up-to-date: "Your plugin is up to date."
 
+# Message shown when a blacklisted item is attempted to be placed in a barrel
+blacklisted-item: "&a[Post Office] &4This is a blacklisted item."
 
 
 
 # Lang file version
 # Do not manually change this setting
 # Used to update out of date lang files
-lang-version: 1
+lang-version: 2
