@@ -27,34 +27,37 @@ public class InventoryOpen implements Listener {
         Inventory inventory = event.getInventory();
         Player player = (Player) event.getPlayer();
 
-        if (inventory.getType() == InventoryType.BARREL) {
-
-            Block clickedBlock = Objects.requireNonNull(inventory.getLocation()).getBlock();
-
-            BlockState blockState = clickedBlock.getState();
-
-            if (blockState instanceof Barrel) {
-                Barrel barrel = (Barrel) blockState;
-
-                if (barrel.getCustomName() != null && barrel.getCustomName().equalsIgnoreCase(postOffice.customBarrelName)) {
-
-                    if (player.hasPermission("shantek.postoffice.use")) {
-
-                        // They have permission to use the post office system. Let them open the post box
-                        postOffice.previousItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
-                    } else {
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.userBanned));
-                        event.setCancelled(true);
-
-                        if (postOffice.debugLogs) {
-                            postOffice.getLogger().severe("Player " + player.getName() + " (" + player.getUniqueId() + ") tried to use a post box but doesn't have the use permission/is banned.");
-                        }
-                    }
-
-                }
-            }
-
+        // Skip any non-barrel or virtual inventories (no location)
+        if (inventory.getType() != InventoryType.BARREL || inventory.getLocation() == null) {
+            return;
         }
-    }
 
+        Block clickedBlock = Objects.requireNonNull(inventory.getLocation()).getBlock();
+
+        BlockState blockState = clickedBlock.getState();
+
+        if (blockState instanceof Barrel) {
+            Barrel barrel = (Barrel) blockState;
+
+            if (barrel.getCustomName() != null && barrel.getCustomName().equalsIgnoreCase(postOffice.customBarrelName)) {
+
+                if (player.hasPermission("shantek.postoffice.use")) {
+
+                    // They have permission to use the post office system. Let them open the post box
+                    postOffice.previousItemCount = postOffice.helpers.countNonNullItems(inventory.getContents());
+                } else {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.userBanned));
+                    event.setCancelled(true);
+
+                    if (postOffice.debugLogs) {
+                        postOffice.getLogger().severe("Player " + player.getName() + " (" + player.getUniqueId() + ") tried to use a post box but doesn't have the use permission/is banned.");
+                    }
+                }
+
+            }
+        }
+
+    }
 }
+
+

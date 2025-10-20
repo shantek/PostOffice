@@ -27,6 +27,11 @@ public class InventoryClose implements Listener {
         Inventory inventory = event.getInventory();
         Player player = (Player) event.getPlayer();
 
+        // Skip any non-barrel or virtual inventories (no location)
+        if (inventory.getType() != InventoryType.BARREL || inventory.getLocation() == null) {
+            return;
+        }
+
         if (isBarrelInventory(inventory, event)) {
             Block barrelBlock = getBarrelBlock(event);
 
