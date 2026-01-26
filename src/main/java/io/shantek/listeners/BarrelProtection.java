@@ -115,12 +115,49 @@ public class BarrelProtection implements Listener {
         Player player = event.getPlayer();
         Block placedBlock = event.getBlockPlaced();
 
-        if (placedBlock.getState() instanceof Sign && postOffice.helpers.hasBarrelNearby(placedBlock)) {
-            if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.noPermission));
-                placedBlock.breakNaturally();
+        if (placedBlock.getState() instanceof Sign) {
+            // Check if there's a barrel nearby
+            Block nearbyBarrel = findNearbyBarrel(placedBlock);
+
+            if (nearbyBarrel != null) {
+                Barrel barrel = (Barrel) nearbyBarrel.getState();
+                String barrelName = barrel.getCustomName();
+
+                // If it's an unregistered secondary barrel, allow sign placement
+                if (barrelName != null && barrelName.equalsIgnoreCase(PostOffice.SECONDARY_BARREL_NAME)) {
+                    if (!postOffice.helpers.isBarrelInConfig(nearbyBarrel)) {
+                        // Unregistered secondary barrel - allow anyone to place sign
+                        return;
+                    }
+                }
+
+                // For primary boxes or registered secondary boxes, need permission
+                if (!player.isOp() && !player.hasPermission("shantek.postoffice.create")) {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.noPermission));
+                    placedBlock.breakNaturally();
+                }
             }
         }
+    }
+
+    private Block findNearbyBarrel(Block signBlock) {
+        BlockFace[] adjacentFaces = {
+                BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN
+        };
+
+        for (BlockFace face : adjacentFaces) {
+            Block adjacentBlock = signBlock.getRelative(face);
+            if (adjacentBlock.getType() == Material.BARREL) {
+                Barrel barrel = (Barrel) adjacentBlock.getState();
+                String barrelName = barrel.getCustomName();
+                if (barrelName != null &&
+                        (barrelName.equalsIgnoreCase(postOffice.customBarrelName) ||
+                                barrelName.equalsIgnoreCase(PostOffice.SECONDARY_BARREL_NAME))) {
+                    return adjacentBlock;
+                }
+            }
+        }
+        return null;
     }
 
     @EventHandler
