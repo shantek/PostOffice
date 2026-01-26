@@ -1,6 +1,7 @@
 package io.shantek.listeners;
 
 import io.shantek.PostOffice;
+import io.shantek.functions.Helpers;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.Player;
@@ -10,6 +11,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -78,6 +80,26 @@ public class InventoryClose implements Listener {
             sign.update();
         }
 
+        // Also clear all secondary box signs for this owner
+        UUID playerUUID = player.getUniqueId();
+        List<Helpers.BarrelInfo> allBoxes = plugin.helpers.getAllBoxesForPlayer(playerUUID);
+        for (Helpers.BarrelInfo boxInfo : allBoxes) {
+            if ("secondary".equals(boxInfo.state)) {
+                // Get the secondary box's barrel block
+                World world = Bukkit.getWorld(boxInfo.world);
+                if (world != null) {
+                    Block secondaryBarrel = world.getBlockAt(boxInfo.x, boxInfo.y, boxInfo.z);
+                    Block secondarySign = plugin.helpers.getSignFromConfig(secondaryBarrel);
+                    
+                    if (secondarySign != null && secondarySign.getState() instanceof Sign) {
+                        Sign secSign = (Sign) secondarySign.getState();
+                        secSign.setLine(2, "");
+                        secSign.update();
+                    }
+                }
+            }
+        }
+
         plugin.playersWithMail.remove(player.getUniqueId().toString());
         postOffice.helpers.saveMailFile();
     }
@@ -97,6 +119,27 @@ public class InventoryClose implements Listener {
             Sign sign = (Sign) signBlock.getState();
             sign.setLine(2, ChatColor.GREEN + "You have mail");
             sign.update();
+        }
+
+        // Also update all secondary box signs for this owner
+        if (plugin.signNotification && boxOwnerUUID != null) {
+            List<Helpers.BarrelInfo> allBoxes = plugin.helpers.getAllBoxesForPlayer(boxOwnerUUID);
+            for (Helpers.BarrelInfo boxInfo : allBoxes) {
+                if ("secondary".equals(boxInfo.state)) {
+                    // Get the secondary box's barrel block
+                    World world = Bukkit.getWorld(boxInfo.world);
+                    if (world != null) {
+                        Block secondaryBarrel = world.getBlockAt(boxInfo.x, boxInfo.y, boxInfo.z);
+                        Block secondarySign = plugin.helpers.getSignFromConfig(secondaryBarrel);
+                        
+                        if (secondarySign != null && secondarySign.getState() instanceof Sign) {
+                            Sign secSign = (Sign) secondarySign.getState();
+                            secSign.setLine(2, ChatColor.GREEN + "You have mail");
+                            secSign.update();
+                        }
+                    }
+                }
+            }
         }
 
         sendPlayerMessage(plugin, player, boxOwnerUUID);
