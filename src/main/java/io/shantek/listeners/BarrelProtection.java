@@ -85,34 +85,22 @@ public class BarrelProtection implements Listener {
 
         // Check if the broken block is a protected post box (either a barrel or a sign)
         if (postOffice.helpers.isProtectedPostBox(brokenBlock)) {
-            if (player.isOp() || player.hasPermission("shantek.postoffice.break")) {
-                Block barrelBlock = null;
+            // Check if it's actually registered in the config
+            Block barrelBlock = null;
 
-                // Check if the player is breaking a sign
-                if (Tag.SIGNS.isTagged(brokenBlock.getType())) {
-                    // Retrieve the attached barrel if the broken block is a sign
-                    barrelBlock = postOffice.helpers.getAttachedBarrel(brokenBlock);
-                } else if (brokenBlock.getType() == Material.BARREL) {
-                    // If breaking a barrel directly, set it as the barrelBlock
-                    barrelBlock = brokenBlock;
-                }
+            // Check if the player is breaking a sign
+            if (Tag.SIGNS.isTagged(brokenBlock.getType())) {
+                // Retrieve the attached barrel if the broken block is a sign
+                barrelBlock = postOffice.helpers.getAttachedBarrel(brokenBlock);
+            } else if (brokenBlock.getType() == Material.BARREL) {
+                // If breaking a barrel directly, set it as the barrelBlock
+                barrelBlock = brokenBlock;
+            }
 
-                // Ensure barrelBlock is valid before proceeding
-                if (barrelBlock == null) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.notRegistered));
-                    return;
-                }
-
-                // Check if the barrel exists in the config (registered post box)
-                if (postOffice.helpers.isBarrelInConfig(barrelBlock)) {
-                    // Call the helper to remove the barrel from the cache and config
-                    postOffice.helpers.removeBarrelFromCache(barrelBlock);
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.removeFromConfig));
-                }
-
-            } else {
-                // Prevent the player from breaking the post box if they don't have permission
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.noPermission));
+            // If the barrel is registered, prevent breaking
+            if (barrelBlock != null && postOffice.helpers.isBarrelInConfig(barrelBlock)) {
+                // Nobody can break it - must use /postoffice remove command
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.useRemoveCommand));
                 event.setCancelled(true);
             }
         }
