@@ -57,7 +57,10 @@ public class Commands implements CommandExecutor {
             return onCommandList(sender, args);
 
         } else if (args[0].equalsIgnoreCase("removesecondary") && args.length == 2) {
-            return onCommandRemoveSecondary(sender, args);
+            return onCommandRemoveSecondaryPlayer(sender, args);
+
+        } else if (args[0].equalsIgnoreCase("removesecondary") && args.length == 1) {
+            return onCommandRemoveSecondaryLookingAt(sender);
 
         } else {
             sender.sendMessage(ChatColor.RED + "Unknown command or insufficient permission.");
@@ -70,6 +73,12 @@ public class Commands implements CommandExecutor {
 
         if (sender instanceof Player) {
             Player player = (Player) sender;
+
+            // Only admins with register permission can use remove command
+            if (!player.hasPermission("shantek.postoffice.register") && !player.isOp()) {
+                invalidPermission(sender);
+                return false;
+            }
 
             // Get the block the player is looking at (sign or barrel)
             Block targetBlock = postOffice.helpers.getBlockLookingAt(player, 6);
@@ -103,18 +112,9 @@ public class Commands implements CommandExecutor {
                 return true;
             }
 
-            // Get the barrel state and owner
+            // Get the barrel state
             String barrelState = postOffice.helpers.getBarrelState(barrelBlock);
             UUID boxOwnerUUID = postOffice.helpers.getOwnerUUID(barrelBlock);
-
-            // Permission check: Must be owner OR have admin permission
-            boolean isOwner = boxOwnerUUID != null && player.getUniqueId().equals(boxOwnerUUID);
-            boolean hasAdminPerm = player.hasPermission("shantek.postoffice.register") || player.isOp();
-
-            if (!isOwner && !hasAdminPerm) {
-                invalidPermission(sender);
-                return false;
-            }
 
             // Optionally clear the sign associated with the post box
             Block signBlock = postOffice.helpers.getSignForBarrel(barrelBlock);
@@ -139,9 +139,9 @@ public class Commands implements CommandExecutor {
             if ("claimed".equals(barrelState) && boxOwnerUUID != null) {
                 int secondaryCount = postOffice.helpers.countPlayerSecondaryBoxes(boxOwnerUUID);
                 if (secondaryCount > 0) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', 
-                        postOffice.language.secondaryBoxesWillNotWork
-                                .replace("%count%", String.valueOf(secondaryCount))));
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                            postOffice.language.secondaryBoxesWillNotWork
+                                    .replace("%count%", String.valueOf(secondaryCount))));
                 }
             }
 
@@ -232,17 +232,17 @@ public class Commands implements CommandExecutor {
                             postOffice.language.secondaryBoxInfo
                                     .replace("%owner%", owner)
                     ));
-                    
+
                     // Show primary box location
                     UUID ownerUUID = postOffice.helpers.getOwnerUUID(barrelBlock);
                     if (ownerUUID != null) {
                         Block primaryBox = postOffice.helpers.getPrimaryBoxForPlayer(ownerUUID);
                         if (primaryBox != null) {
                             String primaryLocation = String.format("%s [%d, %d, %d]",
-                                primaryBox.getWorld().getName(),
-                                primaryBox.getX(),
-                                primaryBox.getY(),
-                                primaryBox.getZ());
+                                    primaryBox.getWorld().getName(),
+                                    primaryBox.getX(),
+                                    primaryBox.getY(),
+                                    primaryBox.getZ());
                             player.sendMessage(ChatColor.GRAY + "Primary box: " + ChatColor.WHITE + primaryLocation);
                         }
                     }
@@ -549,7 +549,7 @@ public class Commands implements CommandExecutor {
             int currentCount = postOffice.helpers.countPlayerSecondaryBoxes(playerUUID);
             if (currentCount >= postOffice.maxSecondaryBoxes) {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                        postOffice.language.maxSecondaryBoxes.replace("%max%", 
+                        postOffice.language.maxSecondaryBoxes.replace("%max%",
                                 String.valueOf(postOffice.maxSecondaryBoxes))));
                 return true;
             }
@@ -579,8 +579,8 @@ public class Commands implements CommandExecutor {
         if (attachedBarrel.getState() instanceof Barrel) {
             Barrel barrel = (Barrel) attachedBarrel.getState();
             if (barrel.getCustomName() == null || !barrel.getCustomName().equalsIgnoreCase(PostOffice.SECONDARY_BARREL_NAME)) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', 
-                    postOffice.language.barrelMustBeNamedSecondary));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        postOffice.language.barrelMustBeNamedSecondary));
                 return true;
             }
         }
@@ -633,8 +633,8 @@ public class Commands implements CommandExecutor {
         sender.sendMessage(ChatColor.GREEN + "=== Post Boxes for " + ChatColor.WHITE + targetPlayerName + ChatColor.GREEN + " ===");
 
         for (Helpers.BarrelInfo box : boxes) {
-            String type = box.state.equals("claimed") ? "PRIMARY" : 
-                         box.state.equals("secondary") ? "SECONDARY" : "REGISTERED";
+            String type = box.state.equals("claimed") ? "PRIMARY" :
+                    box.state.equals("secondary") ? "SECONDARY" : "REGISTERED";
             String location = String.format("%s [%d, %d, %d]",
                     box.world, box.x, box.y, box.z);
 
@@ -645,7 +645,90 @@ public class Commands implements CommandExecutor {
         return true;
     }
 
-    public boolean onCommandRemoveSecondary(CommandSender sender, String[] args) {
+    public boolean onCommandRemoveSecondaryLookingAt(CommandSender sender) {
+        // Allow players with claim permission to remove secondary boxes
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "This command can only be used by players.");
+            return true;
+        }
+
+        Player player = (Player) sender;
+
+        // Check permission - claim permission can remove secondary, register can remove any
+        boolean hasClaimPerm = player.hasPermission("shantek.postoffice.claim");
+        boolean hasRegisterPerm = player.hasPermission("shantek.postoffice.register");
+
+        if (!hasClaimPerm && !hasRegisterPerm && !player.isOp()) {
+            invalidPermission(sender);
+            return false;
+        }
+
+        // Get the block the player is looking at
+        Block targetBlock = postOffice.helpers.getBlockLookingAt(player, 6);
+
+        if (targetBlock == null) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
+            return true;
+        }
+
+        Block barrelBlock = null;
+
+        // Check if the player is looking at a sign
+        if (Tag.SIGNS.isTagged(targetBlock.getType())) {
+            // Retrieve the attached barrel
+            barrelBlock = postOffice.helpers.getAttachedBarrel(targetBlock);
+        } else if (targetBlock.getType() == Material.BARREL) {
+            // Player is looking directly at a barrel
+            barrelBlock = targetBlock;
+        }
+
+        // Ensure we have a valid barrel block
+        if (barrelBlock == null || barrelBlock.getType() != Material.BARREL) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
+            return true;
+        }
+
+        // Check if the barrel exists in the config
+        if (!postOffice.helpers.isBarrelInConfig(barrelBlock)) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.notRegistered));
+            return true;
+        }
+
+        // Check if it's actually a secondary box
+        String barrelState = postOffice.helpers.getBarrelState(barrelBlock);
+        if (!"secondary".equals(barrelState)) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.notSecondaryBox));
+            return true;
+        }
+
+        // If player only has claim permission (not register), must be owner
+        if (hasClaimPerm && !hasRegisterPerm && !player.isOp()) {
+            UUID boxOwnerUUID = postOffice.helpers.getOwnerUUID(barrelBlock);
+            if (boxOwnerUUID == null || !player.getUniqueId().equals(boxOwnerUUID)) {
+                invalidPermission(sender);
+                return false;
+            }
+        }
+
+        // Clear the sign
+        Block signBlock = postOffice.helpers.getSignForBarrel(barrelBlock);
+        if (signBlock != null && signBlock.getState() instanceof Sign) {
+            Sign sign = (Sign) signBlock.getState();
+            for (int i = 0; i < 4; i++) {
+                sign.setLine(i, "");
+            }
+            sign.update();
+        }
+
+        // Remove the secondary box
+        postOffice.helpers.removeBarrelFromCache(barrelBlock);
+
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.secondaryBoxRemoved));
+
+        return true;
+    }
+
+    public boolean onCommandRemoveSecondaryPlayer(CommandSender sender, String[] args) {
         if (!sender.hasPermission("shantek.postoffice.register") && !sender.isOp()) {
             invalidPermission(sender);
             return false;
