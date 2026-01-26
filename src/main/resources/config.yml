@@ -31,6 +31,11 @@ console-logs: false
 # These extra detailed messages are printed to the console only
 debug: false
 
+# Maximum number of secondary post boxes a player can have at their bases/homes
+# These boxes act as remote access points to their main post office box
+# Set to -1 for unlimited secondary boxes
+max-secondary-boxes: 5
+
 
 # Config file version
 # Do not manually change this setting
