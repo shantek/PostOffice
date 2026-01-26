@@ -1,4 +1,3 @@
-
 # Confirmation message shown to the sender when leaving mail in another post box.
 # %receiver% will be replaced with the person sending the mail
 sent-message: "&a[Post Office] &aMail sent to %receiver%."
@@ -108,6 +107,7 @@ primary-box-missing-owner: "&a[Post Office] &4Your primary post box is missing. 
 no-secondary-boxes: "&a[Post Office] &e%player% has no secondary boxes."
 all-secondary-boxes-removed-admin: "&a[Post Office] &aRemoved %count% secondary box(es) for %player%."
 barrel-must-be-named-secondary: "&a[Post Office] &4The barrel must be renamed to 'secondary' in an anvil first."
+use-remove-command: "&a[Post Office] &4You must use /postoffice remove to remove this post box."
 
 
 # Lang file version
