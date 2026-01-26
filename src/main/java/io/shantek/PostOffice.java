@@ -25,6 +25,7 @@ public final class PostOffice extends JavaPlugin {
     public TabCompleter tabCompleter;
     public static PostOffice instance;
     public String customBarrelName = "pobox";
+    public static final String SECONDARY_BARREL_NAME = "secondary"; // Hardcoded, not configurable
     public File mailFile;
     public int previousItemCount = 0;
     public int newItemCount = 0;
@@ -36,6 +37,8 @@ public final class PostOffice extends JavaPlugin {
     public boolean signNotification = true;
     public boolean hopperProtection = false;
     public boolean debugLogs = false;
+    public int maxSecondaryBoxes = 5;
+
 
     public void onEnable() {
 
