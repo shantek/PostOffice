@@ -187,6 +187,7 @@ public class PluginConfig {
         postOffice.updateNotificationEnabled = newConfig.getBoolean("update-notification", true);
         postOffice.consoleLogs = newConfig.getBoolean("console-logs", true);
         postOffice.debugLogs = newConfig.getBoolean("debug", false);
+        postOffice.maxSecondaryBoxes = newConfig.getInt("max-secondary-boxes", 5);
         postOffice.getLogger().info("Configuration file loaded into memory.");
     }
 
@@ -368,6 +369,23 @@ public class PluginConfig {
         postOffice.language.claimedForOtherPlayer = newLang.getString("claimed-for-other-player","&a[Post Office] &aA post box has been created for you.");
         postOffice.language.pluginUpToDate = newLang.getString("plugin-up-to-date","Your plugin is up-to-date.");
         postOffice.language.blacklistedItem = newLang.getString("blacklisted-item", "&a[Post Office] &4This is a blacklisted item.");
+        
+        // Secondary box messages
+        postOffice.language.secondaryBoxRegistered = newLang.getString("secondary-box-registered", "&a[Post Office] &aSecondary post box registered successfully!");
+        postOffice.language.secondaryBoxRemoved = newLang.getString("secondary-box-removed", "&a[Post Office] &aSecondary post box removed successfully.");
+        postOffice.language.noPrimaryBox = newLang.getString("no-primary-box", "&a[Post Office] &4You need to claim a primary post box first before adding a secondary box.");
+        postOffice.language.maxSecondaryBoxes = newLang.getString("max-secondary-boxes", "&a[Post Office] &4You've reached the maximum of %max% secondary boxes!");
+        postOffice.language.notSecondaryBox = newLang.getString("not-secondary-box", "&a[Post Office] &4This is not a secondary post box.");
+        postOffice.language.secondaryBoxInfo = newLang.getString("secondary-box-info", "&a[Post Office] &aThis is a secondary post box owned by %owner%");
+        postOffice.language.secondaryBoxesWillNotWork = newLang.getString("secondary-boxes-will-not-work", "&a[Post Office] &eWarning: You have %count% secondary box(es) that will not work until you claim a new primary box.");
+        postOffice.language.playerNotFound = newLang.getString("player-not-found", "&a[Post Office] &4Player not found.");
+        postOffice.language.noPostBoxes = newLang.getString("no-post-boxes", "&a[Post Office] &e%player% has no post boxes.");
+        postOffice.language.primaryBoxMissing = newLang.getString("primary-box-missing", "&a[Post Office] &4This secondary box's primary post box is missing. Contact %owner% or an admin.");
+        postOffice.language.primaryBoxMissingOwner = newLang.getString("primary-box-missing-owner", "&a[Post Office] &4Your primary post box is missing. Please claim a new primary box for your secondary boxes to work.");
+        postOffice.language.noSecondaryBoxes = newLang.getString("no-secondary-boxes", "&a[Post Office] &e%player% has no secondary boxes.");
+        postOffice.language.allSecondaryBoxesRemovedAdmin = newLang.getString("all-secondary-boxes-removed-admin", "&a[Post Office] &aRemoved %count% secondary box(es) for %player%.");
+        postOffice.language.barrelMustBeNamedSecondary = newLang.getString("barrel-must-be-named-secondary", "&a[Post Office] &4The barrel must be renamed to 'secondary' in an anvil first.");
+        
         postOffice.getLogger().info("Lang file loaded into memory.");
     }
 
