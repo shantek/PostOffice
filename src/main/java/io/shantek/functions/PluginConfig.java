@@ -137,7 +137,7 @@ public class PluginConfig {
                     return;
                 }
                 Files.copy(defConfigStream, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-           }
+            }
 
             // Clear the in-memory configuration
             config = new YamlConfiguration();
@@ -369,7 +369,7 @@ public class PluginConfig {
         postOffice.language.claimedForOtherPlayer = newLang.getString("claimed-for-other-player","&a[Post Office] &aA post box has been created for you.");
         postOffice.language.pluginUpToDate = newLang.getString("plugin-up-to-date","Your plugin is up-to-date.");
         postOffice.language.blacklistedItem = newLang.getString("blacklisted-item", "&a[Post Office] &4This is a blacklisted item.");
-        
+
         // Secondary box messages
         postOffice.language.secondaryBoxRegistered = newLang.getString("secondary-box-registered", "&a[Post Office] &aSecondary post box registered successfully!");
         postOffice.language.secondaryBoxRemoved = newLang.getString("secondary-box-removed", "&a[Post Office] &aSecondary post box removed successfully.");
@@ -385,7 +385,8 @@ public class PluginConfig {
         postOffice.language.noSecondaryBoxes = newLang.getString("no-secondary-boxes", "&a[Post Office] &e%player% has no secondary boxes.");
         postOffice.language.allSecondaryBoxesRemovedAdmin = newLang.getString("all-secondary-boxes-removed-admin", "&a[Post Office] &aRemoved %count% secondary box(es) for %player%.");
         postOffice.language.barrelMustBeNamedSecondary = newLang.getString("barrel-must-be-named-secondary", "&a[Post Office] &4The barrel must be renamed to 'secondary' in an anvil first.");
-        
+        postOffice.language.useRemoveCommand = newLang.getString("use-remove-command", "&a[Post Office] &4You must use /postoffice remove to remove this post box.");
+
         postOffice.getLogger().info("Lang file loaded into memory.");
     }
 
