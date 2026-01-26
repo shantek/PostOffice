@@ -539,6 +539,159 @@ public class Helpers {
     }
 
 
+    // Get the state of a barrel (claimed, registered, secondary, etc.)
+    public String getBarrelState(Block barrelBlock) {
+        String barrelLocationString = getBlockLocationString(barrelBlock);
+        BarrelData barrelData = barrelsCache.get(barrelLocationString);
+        return barrelData != null ? barrelData.getState() : null;
+    }
+
+    // Check if a barrel is a secondary box
+    public boolean isSecondaryBox(Block barrelBlock) {
+        String state = getBarrelState(barrelBlock);
+        return "secondary".equals(state);
+    }
+
+    // Get the primary (claimed) box for a player
+    public Block getPrimaryBoxForPlayer(UUID playerUUID) {
+        FileConfiguration barrelsConfig = getBarrelsConfig();
+        
+        if (barrelsConfig.contains("barrels")) {
+            ConfigurationSection barrelsSection = barrelsConfig.getConfigurationSection("barrels");
+            
+            if (barrelsSection != null) {
+                for (String barrelLocation : barrelsSection.getKeys(false)) {
+                    String ownerUUIDString = barrelsConfig.getString("barrels." + barrelLocation + ".owner");
+                    String state = barrelsConfig.getString("barrels." + barrelLocation + ".state");
+                    
+                    if (ownerUUIDString != null && 
+                        ownerUUIDString.equals(playerUUID.toString()) && 
+                        "claimed".equals(state)) {
+                        return getBlockFromLocationString(barrelLocation);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    // Count how many secondary boxes a player has
+    public int countPlayerSecondaryBoxes(UUID playerUUID) {
+        int count = 0;
+        FileConfiguration barrelsConfig = getBarrelsConfig();
+        
+        if (barrelsConfig.contains("barrels")) {
+            ConfigurationSection barrelsSection = barrelsConfig.getConfigurationSection("barrels");
+            
+            if (barrelsSection != null) {
+                for (String barrelLocation : barrelsSection.getKeys(false)) {
+                    String ownerUUIDString = barrelsConfig.getString("barrels." + barrelLocation + ".owner");
+                    String state = barrelsConfig.getString("barrels." + barrelLocation + ".state");
+                    
+                    if (ownerUUIDString != null && 
+                        ownerUUIDString.equals(playerUUID.toString()) && 
+                        "secondary".equals(state)) {
+                        count++;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+    // Get all boxes (primary + secondary) for a player
+    public List<BarrelInfo> getAllBoxesForPlayer(UUID playerUUID) {
+        List<BarrelInfo> boxes = new ArrayList<>();
+        FileConfiguration barrelsConfig = getBarrelsConfig();
+        
+        if (barrelsConfig.contains("barrels")) {
+            ConfigurationSection barrelsSection = barrelsConfig.getConfigurationSection("barrels");
+            
+            if (barrelsSection != null) {
+                for (String barrelLocation : barrelsSection.getKeys(false)) {
+                    String ownerUUIDString = barrelsConfig.getString("barrels." + barrelLocation + ".owner");
+                    
+                    if (ownerUUIDString != null && ownerUUIDString.equals(playerUUID.toString())) {
+                        String state = barrelsConfig.getString("barrels." + barrelLocation + ".state");
+                        Block block = getBlockFromLocationString(barrelLocation);
+                        
+                        if (block != null) {
+                            boxes.add(new BarrelInfo(
+                                state,
+                                block.getWorld().getName(),
+                                block.getX(),
+                                block.getY(),
+                                block.getZ()
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+        
+        return boxes;
+    }
+
+    // Remove all secondary boxes for a player (used when removing primary box)
+    public void removeAllSecondaryBoxesForPlayer(UUID playerUUID) {
+        FileConfiguration barrelsConfig = getBarrelsConfig();
+        List<String> toRemove = new ArrayList<>();
+        
+        if (barrelsConfig.contains("barrels")) {
+            ConfigurationSection barrelsSection = barrelsConfig.getConfigurationSection("barrels");
+            
+            if (barrelsSection != null) {
+                for (String barrelLocation : barrelsSection.getKeys(false)) {
+                    String ownerUUIDString = barrelsConfig.getString("barrels." + barrelLocation + ".owner");
+                    String state = barrelsConfig.getString("barrels." + barrelLocation + ".state");
+                    
+                    if (ownerUUIDString != null && 
+                        ownerUUIDString.equals(playerUUID.toString()) && 
+                        "secondary".equals(state)) {
+                        toRemove.add(barrelLocation);
+                    }
+                }
+            }
+        }
+        
+        // Remove all secondary boxes
+        for (String barrelLocation : toRemove) {
+            Block barrelBlock = getBlockFromLocationString(barrelLocation);
+            if (barrelBlock != null) {
+                // Clear the sign if it exists
+                Block signBlock = getSignForBarrel(barrelBlock);
+                if (signBlock != null && signBlock.getState() instanceof Sign) {
+                    Sign sign = (Sign) signBlock.getState();
+                    for (int i = 0; i < 4; i++) {
+                        sign.setLine(i, "");
+                    }
+                    sign.update();
+                }
+            }
+            barrelsCache.remove(barrelLocation);
+        }
+        
+        if (!toRemove.isEmpty()) {
+            saveCacheToFile();
+            postOffice.getLogger().info("Removed " + toRemove.size() + " secondary box(es) for player " + playerUUID);
+        }
+    }
+
+    // Simple data class for storing barrel info
+    public static class BarrelInfo {
+        public String state;
+        public String world;
+        public int x, y, z;
+        
+        public BarrelInfo(String state, String world, int x, int y, int z) {
+            this.state = state;
+            this.world = world;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+    }
+
     //endregion
 
 }
