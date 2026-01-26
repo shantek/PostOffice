@@ -54,7 +54,8 @@ public class InventoryClick implements Listener {
 
     private void cancelIfBarrelNameMatches(InventoryClickEvent event, Inventory inventory) {
         Block clickedBlock = Objects.requireNonNull(inventory.getLocation()).getBlock();
-        if (isBarrelWithName(clickedBlock, PostOffice.instance.customBarrelName)) {
+        if (isBarrelWithName(clickedBlock, PostOffice.instance.customBarrelName) || 
+            isBarrelWithName(clickedBlock, PostOffice.SECONDARY_BARREL_NAME)) {
             event.setCancelled(true);
         }
     }
@@ -72,7 +73,12 @@ public class InventoryClick implements Listener {
 
     private void handleBarrelInteractions(InventoryClickEvent event, Player player, Inventory clickedInventory) {
         Block clickedBlock = Objects.requireNonNull(clickedInventory.getLocation()).getBlock();
-        if (isBarrelWithName(clickedBlock, PostOffice.instance.customBarrelName)) {
+        
+        // Check if it's either a primary or secondary post box
+        boolean isPrimaryBox = isBarrelWithName(clickedBlock, PostOffice.instance.customBarrelName);
+        boolean isSecondaryBox = isBarrelWithName(clickedBlock, PostOffice.SECONDARY_BARREL_NAME);
+        
+        if (isPrimaryBox || isSecondaryBox) {
             String ownerName = findOwnerName(clickedBlock, player);
             boolean isOwner = ownerName.equalsIgnoreCase(player.getName());
 
