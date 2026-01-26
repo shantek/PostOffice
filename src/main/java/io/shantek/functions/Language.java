@@ -35,7 +35,7 @@ public class Language {
     public String claimedForOtherPlayer = "&a[Post Office] &aA post box has been created for you.";
     public String pluginUpToDate = "Your plugin is up-to-date.";
     public String blacklistedItem = "&a[Post Office] &4This item is blacklisted item.";
-    
+
     // Secondary box messages
     public String secondaryBoxRegistered = "&a[Post Office] &aSecondary post box registered successfully!";
     public String secondaryBoxRemoved = "&a[Post Office] &aSecondary post box removed successfully.";
@@ -51,6 +51,7 @@ public class Language {
     public String noSecondaryBoxes = "&a[Post Office] &e%player% has no secondary boxes.";
     public String allSecondaryBoxesRemovedAdmin = "&a[Post Office] &aRemoved %count% secondary box(es) for %player%.";
     public String barrelMustBeNamedSecondary = "&a[Post Office] &4The barrel must be renamed to 'secondary' in an anvil first.";
+    public String useRemoveCommand = "&a[Post Office] &4You must use /postoffice remove to remove this post box.";
 
 
     public UpdateChecker updateChecker;
