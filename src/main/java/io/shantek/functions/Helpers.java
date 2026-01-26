@@ -207,17 +207,19 @@ public class Helpers {
 
     // Check if there's a barrel with the custom name nearby
     public boolean hasBarrelNearby(Block block) {
-        // Check if the given block is a barrel with the custom name
+        // Check if the given block is a barrel with the custom name or "secondary"
         if (block.getType() == Material.BARREL) {
             Barrel barrel = (Barrel) block.getState();
             String barrelCustomName = barrel.getCustomName();
 
-            if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+            if (barrelCustomName != null &&
+                    (barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName) ||
+                            barrelCustomName.equalsIgnoreCase(PostOffice.SECONDARY_BARREL_NAME))) {
                 return true;
             }
         }
 
-        // Check if any nearby block is a barrel with the custom name
+        // Check if any nearby block is a barrel with the custom name or "secondary"
         for (BlockFace blockFace : BlockFace.values()) {
             Block relativeBlock = block.getRelative(blockFace);
 
@@ -225,7 +227,9 @@ public class Helpers {
                 Barrel barrel = (Barrel) relativeBlock.getState();
                 String barrelCustomName = barrel.getCustomName();
 
-                if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+                if (barrelCustomName != null &&
+                        (barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName) ||
+                                barrelCustomName.equalsIgnoreCase(PostOffice.SECONDARY_BARREL_NAME))) {
                     return true;
                 }
             }
@@ -239,7 +243,10 @@ public class Helpers {
         if (block.getType() == Material.BARREL) {
             Barrel barrel = (Barrel) block.getState();
             String barrelCustomName = barrel.getCustomName();
-            return barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName);
+            // Protect both primary boxes (custom name) and secondary boxes (hardcoded "secondary")
+            return barrelCustomName != null &&
+                    (barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName) ||
+                            barrelCustomName.equalsIgnoreCase(PostOffice.SECONDARY_BARREL_NAME));
         } else if (Tag.SIGNS.isTagged(block.getType())) {
             return isSignNextToProtectedBarrel(block);
         }
@@ -257,7 +264,10 @@ public class Helpers {
             if (adjacentBlock.getType() == Material.BARREL) {
                 Barrel barrel = (Barrel) adjacentBlock.getState();
                 String barrelCustomName = barrel.getCustomName();
-                if (barrelCustomName != null && barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName)) {
+                // Protect signs attached to both primary and secondary boxes
+                if (barrelCustomName != null &&
+                        (barrelCustomName.equalsIgnoreCase(postOffice.customBarrelName) ||
+                                barrelCustomName.equalsIgnoreCase(PostOffice.SECONDARY_BARREL_NAME))) {
                     return true;
                 }
             }
@@ -555,18 +565,18 @@ public class Helpers {
     // Get the primary (claimed) box for a player
     public Block getPrimaryBoxForPlayer(UUID playerUUID) {
         FileConfiguration barrelsConfig = getBarrelsConfig();
-        
+
         if (barrelsConfig.contains("barrels")) {
             ConfigurationSection barrelsSection = barrelsConfig.getConfigurationSection("barrels");
-            
+
             if (barrelsSection != null) {
                 for (String barrelLocation : barrelsSection.getKeys(false)) {
                     String ownerUUIDString = barrelsConfig.getString("barrels." + barrelLocation + ".owner");
                     String state = barrelsConfig.getString("barrels." + barrelLocation + ".state");
-                    
-                    if (ownerUUIDString != null && 
-                        ownerUUIDString.equals(playerUUID.toString()) && 
-                        "claimed".equals(state)) {
+
+                    if (ownerUUIDString != null &&
+                            ownerUUIDString.equals(playerUUID.toString()) &&
+                            "claimed".equals(state)) {
                         return getBlockFromLocationString(barrelLocation);
                     }
                 }
@@ -579,18 +589,18 @@ public class Helpers {
     public int countPlayerSecondaryBoxes(UUID playerUUID) {
         int count = 0;
         FileConfiguration barrelsConfig = getBarrelsConfig();
-        
+
         if (barrelsConfig.contains("barrels")) {
             ConfigurationSection barrelsSection = barrelsConfig.getConfigurationSection("barrels");
-            
+
             if (barrelsSection != null) {
                 for (String barrelLocation : barrelsSection.getKeys(false)) {
                     String ownerUUIDString = barrelsConfig.getString("barrels." + barrelLocation + ".owner");
                     String state = barrelsConfig.getString("barrels." + barrelLocation + ".state");
-                    
-                    if (ownerUUIDString != null && 
-                        ownerUUIDString.equals(playerUUID.toString()) && 
-                        "secondary".equals(state)) {
+
+                    if (ownerUUIDString != null &&
+                            ownerUUIDString.equals(playerUUID.toString()) &&
+                            "secondary".equals(state)) {
                         count++;
                     }
                 }
@@ -603,32 +613,32 @@ public class Helpers {
     public List<BarrelInfo> getAllBoxesForPlayer(UUID playerUUID) {
         List<BarrelInfo> boxes = new ArrayList<>();
         FileConfiguration barrelsConfig = getBarrelsConfig();
-        
+
         if (barrelsConfig.contains("barrels")) {
             ConfigurationSection barrelsSection = barrelsConfig.getConfigurationSection("barrels");
-            
+
             if (barrelsSection != null) {
                 for (String barrelLocation : barrelsSection.getKeys(false)) {
                     String ownerUUIDString = barrelsConfig.getString("barrels." + barrelLocation + ".owner");
-                    
+
                     if (ownerUUIDString != null && ownerUUIDString.equals(playerUUID.toString())) {
                         String state = barrelsConfig.getString("barrels." + barrelLocation + ".state");
                         Block block = getBlockFromLocationString(barrelLocation);
-                        
+
                         if (block != null) {
                             boxes.add(new BarrelInfo(
-                                state,
-                                block.getWorld().getName(),
-                                block.getX(),
-                                block.getY(),
-                                block.getZ()
+                                    state,
+                                    block.getWorld().getName(),
+                                    block.getX(),
+                                    block.getY(),
+                                    block.getZ()
                             ));
                         }
                     }
                 }
             }
         }
-        
+
         return boxes;
     }
 
@@ -636,24 +646,24 @@ public class Helpers {
     public void removeAllSecondaryBoxesForPlayer(UUID playerUUID) {
         FileConfiguration barrelsConfig = getBarrelsConfig();
         List<String> toRemove = new ArrayList<>();
-        
+
         if (barrelsConfig.contains("barrels")) {
             ConfigurationSection barrelsSection = barrelsConfig.getConfigurationSection("barrels");
-            
+
             if (barrelsSection != null) {
                 for (String barrelLocation : barrelsSection.getKeys(false)) {
                     String ownerUUIDString = barrelsConfig.getString("barrels." + barrelLocation + ".owner");
                     String state = barrelsConfig.getString("barrels." + barrelLocation + ".state");
-                    
-                    if (ownerUUIDString != null && 
-                        ownerUUIDString.equals(playerUUID.toString()) && 
-                        "secondary".equals(state)) {
+
+                    if (ownerUUIDString != null &&
+                            ownerUUIDString.equals(playerUUID.toString()) &&
+                            "secondary".equals(state)) {
                         toRemove.add(barrelLocation);
                     }
                 }
             }
         }
-        
+
         // Remove all secondary boxes
         for (String barrelLocation : toRemove) {
             Block barrelBlock = getBlockFromLocationString(barrelLocation);
@@ -670,7 +680,7 @@ public class Helpers {
             }
             barrelsCache.remove(barrelLocation);
         }
-        
+
         if (!toRemove.isEmpty()) {
             saveCacheToFile();
             postOffice.getLogger().info("Removed " + toRemove.size() + " secondary box(es) for player " + playerUUID);
@@ -682,7 +692,7 @@ public class Helpers {
         public String state;
         public String world;
         public int x, y, z;
-        
+
         public BarrelInfo(String state, String world, int x, int y, int z) {
             this.state = state;
             this.world = world;
