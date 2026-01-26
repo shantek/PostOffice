@@ -35,6 +35,23 @@ public class Language {
     public String claimedForOtherPlayer = "&a[Post Office] &aA post box has been created for you.";
     public String pluginUpToDate = "Your plugin is up-to-date.";
     public String blacklistedItem = "&a[Post Office] &4This item is blacklisted item.";
+    
+    // Secondary box messages
+    public String secondaryBoxRegistered = "&a[Post Office] &aSecondary post box registered successfully!";
+    public String secondaryBoxRemoved = "&a[Post Office] &aSecondary post box removed successfully.";
+    public String noPrimaryBox = "&a[Post Office] &4You need to claim a primary post box first before adding a secondary box.";
+    public String maxSecondaryBoxes = "&a[Post Office] &4You've reached the maximum of %max% secondary boxes!";
+    public String notSecondaryBox = "&a[Post Office] &4This is not a secondary post box.";
+    public String secondaryBoxInfo = "&a[Post Office] &aThis is a secondary post box owned by %owner%";
+    public String secondaryBoxesWillNotWork = "&a[Post Office] &eWarning: You have %count% secondary box(es) that will not work until you claim a new primary box.";
+    public String playerNotFound = "&a[Post Office] &4Player not found.";
+    public String noPostBoxes = "&a[Post Office] &e%player% has no post boxes.";
+    public String primaryBoxMissing = "&a[Post Office] &4This secondary box's primary post box is missing. Contact %owner% or an admin.";
+    public String primaryBoxMissingOwner = "&a[Post Office] &4Your primary post box is missing. Please claim a new primary box for your secondary boxes to work.";
+    public String noSecondaryBoxes = "&a[Post Office] &e%player% has no secondary boxes.";
+    public String allSecondaryBoxesRemovedAdmin = "&a[Post Office] &aRemoved %count% secondary box(es) for %player%.";
+    public String barrelMustBeNamedSecondary = "&a[Post Office] &4The barrel must be renamed to 'secondary' in an anvil first.";
+
 
     public UpdateChecker updateChecker;
     public PluginConfig pluginConfig;
