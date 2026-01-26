@@ -93,9 +93,24 @@ plugin-up-to-date: "Your plugin is up to date."
 # Message shown when a blacklisted item is attempted to be placed in a barrel
 blacklisted-item: "&a[Post Office] &4This is a blacklisted item."
 
+# Secondary box messages
+secondary-box-registered: "&a[Post Office] &aSecondary post box registered successfully!"
+secondary-box-removed: "&a[Post Office] &aSecondary post box removed successfully."
+no-primary-box: "&a[Post Office] &4You need to claim a primary post box first before adding a secondary box."
+max-secondary-boxes: "&a[Post Office] &4You've reached the maximum of %max% secondary boxes!"
+not-secondary-box: "&a[Post Office] &4This is not a secondary post box."
+secondary-box-info: "&a[Post Office] &aThis is a secondary post box owned by %owner%"
+secondary-boxes-will-not-work: "&a[Post Office] &eWarning: You have %count% secondary box(es) that will not work until you claim a new primary box."
+player-not-found: "&a[Post Office] &4Player not found."
+no-post-boxes: "&a[Post Office] &e%player% has no post boxes."
+primary-box-missing: "&a[Post Office] &4This secondary box's primary post box is missing. Contact %owner% or an admin."
+primary-box-missing-owner: "&a[Post Office] &4Your primary post box is missing. Please claim a new primary box for your secondary boxes to work."
+no-secondary-boxes: "&a[Post Office] &e%player% has no secondary boxes."
+all-secondary-boxes-removed-admin: "&a[Post Office] &aRemoved %count% secondary box(es) for %player%."
+barrel-must-be-named-secondary: "&a[Post Office] &4The barrel must be renamed to 'secondary' in an anvil first."
 
 
 # Lang file version
 # Do not manually change this setting
 # Used to update out of date lang files
-lang-version: 2
+lang-version: 3
