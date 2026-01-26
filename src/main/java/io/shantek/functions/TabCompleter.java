@@ -35,6 +35,11 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
                 if (sender.hasPermission("shantek.postoffice.register")) {
                     completions.add("register");
                     completions.add("remove");
+                    completions.add("list");
+                    completions.add("removesecondary");
+                }
+                if (sender.hasPermission("shantek.postoffice.claim")) {
+                    completions.add("secondary");
                 }
 
                 // Commands all players have access to
@@ -47,6 +52,28 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
                         .collect(Collectors.toList());
             } else if (args.length == 2 && args[0].equalsIgnoreCase("claim") && sender.hasPermission("shantek.postoffice.claim.others")) {
                 // Populate online players' names for claim.others permission
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    completions.add(player.getName());
+                }
+
+                // Filter players based on partial input
+                return completions.stream()
+                        .filter(c -> c.toLowerCase().startsWith(args[1].toLowerCase()))
+                        .sorted()
+                        .collect(Collectors.toList());
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("list") && sender.hasPermission("shantek.postoffice.register")) {
+                // Populate online players' names for list command
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    completions.add(player.getName());
+                }
+
+                // Filter players based on partial input
+                return completions.stream()
+                        .filter(c -> c.toLowerCase().startsWith(args[1].toLowerCase()))
+                        .sorted()
+                        .collect(Collectors.toList());
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("removesecondary") && sender.hasPermission("shantek.postoffice.register")) {
+                // Populate online players' names for removesecondary command
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     completions.add(player.getName());
                 }
