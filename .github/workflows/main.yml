@@ -5,116 +5,99 @@ on:
     branches: [master]
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      release_exists: ${{ steps.check_release.outputs.exists }}
+      build_number: ${{ steps.read_build.outputs.number }}
+      tag_build_number: ${{ steps.read_build.outputs.tag_number }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read build number
+        id: read_build
+        run: |
+          BUILD=$(cat build.number)
+          echo "number=$BUILD" >> $GITHUB_OUTPUT
+          echo "tag_number=$(echo "$BUILD" | tr '.' '_')" >> $GITHUB_OUTPUT
+
+      - name: Check if release already exists (authoritative)
+        id: check_release
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          TAG="build-${{ steps.read_build.outputs.tag_number }}"
+
+          if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Release $TAG already exists — skipping build."
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "No release found — proceeding with build."
+          fi
+
   build:
+    needs: check
+    if: ${{ needs.check.outputs.release_exists == 'false' }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
-          distribution: adopt
+          distribution: temurin
           java-version: 16
-
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.2
-        with:
-          maven-version: 3.8.1
-
-      - name: Read build number
-        id: build_number
-        run: |
-          BUILD=$(cat build.number)
-          echo "BUILD_NUMBER=$BUILD" >> $GITHUB_ENV
-
-      - name: Check if release already exists
-        id: check_release
-        run: |
-          EXISTS=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" \
-            https://api.github.com/repos/${{ github.repository }}/releases/tags/build-${{ env.BUILD_NUMBER }} | jq -r '.id // empty')
-          if [[ -n "$EXISTS" ]]; then
-            echo "RELEASE_EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "RELEASE_EXISTS=false" >> $GITHUB_ENV
-          fi
-
-      - name: Skip if release already exists
-        if: env.RELEASE_EXISTS == 'true'
-        run: |
-          echo "Build #${{ env.BUILD_NUMBER }} already released. Skipping."
-          exit 0
 
       - name: Build project
         run: mvn package -B
 
-      - name: Rename .jar to include build number
+      - name: Rename JAR to include build number
         run: |
-          mv ./target/PostOffice*.jar ./target/PostOffice-build-${{ env.BUILD_NUMBER }}.jar
+          mv target/PostOffice*.jar \
+             target/PostOffice-build-${{ needs.check.outputs.build_number }}.jar
 
       - name: Generate changelog
-        id: changelog
         run: |
           git fetch --tags
-          LAST_TAG=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=1) || echo "")
-          LOG=$(git log $LAST_TAG..HEAD --pretty=format:"- %s")
+          LAST_TAG=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=1) 2>/dev/null || echo "")
           echo "CHANGELOG<<EOF" >> $GITHUB_ENV
-          echo "$LOG" >> $GITHUB_ENV
+          git log $LAST_TAG..HEAD --pretty=format:"- %s" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: build-${{ env.BUILD_NUMBER }}
-          name: Release ${{ env.BUILD_NUMBER }}
+          tag_name: build-${{ needs.check.outputs.tag_build_number }}
+          name: Release ${{ needs.check.outputs.build_number }}
           body: ${{ env.CHANGELOG }}
-          draft: false
-          prerelease: false
-          files: ./target/PostOffice-build-${{ env.BUILD_NUMBER }}.jar
+          files: target/PostOffice-build-${{ needs.check.outputs.build_number }}.jar
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
+      # 🧯 Discord sometimes closes the connection early (ECONNRESET)
+      # This prevents a false failure while still posting successfully
       - name: Notify Discord
-        run: |
-          BUILD_NUMBER=${{ env.BUILD_NUMBER }}
-          FILENAME="PostOffice-build-${BUILD_NUMBER}.jar"
-          JSON_PAYLOAD=$(jq -n \
-            --arg title "PostOffice - Release #$BUILD_NUMBER" \
-            --arg desc "${{ env.CHANGELOG }}" \
-            --arg url "https://github.com/${{ github.repository }}/releases/tag/build-${BUILD_NUMBER}" \
-            --arg download "https://github.com/${{ github.repository }}/releases/download/build-${BUILD_NUMBER}/$FILENAME" \
-            --arg filename "$FILENAME" \
-            --arg thumb "https://cdn.modrinth.com/data/9mkWBW5N/4182b18a24feb77cb54358aaa0d85a3d73e5a62e_96.webp" \
-            '{
-              "embeds": [{
-                "title": $title,
-                "url": $url,
-                "description": $desc,
-                "color": 7506394,
-                "fields": [
-                  {
-                    "name": "Download",
-                    "value": "[\($filename)](\($download))"
-                  },
-                  {
-                    "name": "Releases",
-                    "value": "[View All Releases](https://www.github.com/shantek/PostOffice/releases)"
-                  }
-                ],
-                "thumbnail": { "url": $thumb },
-                "footer": { "text": "Shantek • GitHub Release" },
-                "timestamp": (now | todate)
-              }]
-            }')
+        continue-on-error: true
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          filename: target/PostOffice-build-${{ needs.check.outputs.build_number }}.jar
+          embed-title: "📦 PostOffice – Build #${{ needs.check.outputs.build_number }}"
+          embed-description: |
+            **Plugin:** PostOffice  
+            **Build:** `${{ needs.check.outputs.build_number }}`
 
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d "$JSON_PAYLOAD" \
-               ${{ secrets.DISCORD_WEBHOOK_URL }}
-      - name: Trigger WordPress GitHub Releases Sync
-        run: |
-          curl -s -o /dev/null -w "%{http_code}" "${{ secrets.WORDPRESS_SYNC_URL }}"
+            **Changelog:**
+            ${{ env.CHANGELOG }}
 
+            ✅ Build completed successfully!
+          embed-color: 3066993
+          embed-thumbnail-url: https://cdn.modrinth.com/data/9mkWBW5N/79bf8c49a51efa2176517f4f9743aa6a57d3927b_96.webp
+          embed-footer-text: "PostOffice • Direct File Upload"
