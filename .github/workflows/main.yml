@@ -63,13 +63,33 @@ jobs:
           mv target/PostOffice*.jar \
              target/PostOffice-build-${{ needs.check.outputs.build_number }}.jar
 
+      # ✅ FIXED changelog generation (safe + first-release friendly)
       - name: Generate changelog
+        shell: bash
         run: |
+          set -euo pipefail
           git fetch --tags
-          LAST_TAG=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=1) 2>/dev/null || echo "")
-          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
-          git log $LAST_TAG..HEAD --pretty=format:"- %s" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+
+          LAST_TAG="$(git describe --tags --abbrev=0 "$(git rev-list --tags --max-count=1)" 2>/dev/null || true)"
+
+          if [[ -n "$LAST_TAG" ]]; then
+            RANGE="${LAST_TAG}..HEAD"
+          else
+            RANGE="HEAD"
+          fi
+
+          LOG="$(git log ${RANGE} --pretty=format:'- %s' || true)"
+
+          # Optional: cap length for Discord safety
+          LOG="${LOG:0:3500}"
+
+          DELIM="CHANGELOG_$(date +%s)_$RANDOM"
+
+          {
+            echo "CHANGELOG<<${DELIM}"
+            echo "$LOG"
+            echo "${DELIM}"
+          } >> "$GITHUB_ENV"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
@@ -81,8 +101,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      # 🧯 Discord sometimes closes the connection early (ECONNRESET)
-      # This prevents a false failure while still posting successfully
+      # 🧯 Discord ECONNRESET-safe
       - name: Notify Discord
         continue-on-error: true
         uses: tsickert/discord-webhook@v5.3.0
