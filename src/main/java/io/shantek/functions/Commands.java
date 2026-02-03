@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Commands implements CommandExecutor {
 
@@ -61,6 +62,12 @@ public class Commands implements CommandExecutor {
 
         } else if (args[0].equalsIgnoreCase("removesecondary") && args.length == 1) {
             return onCommandRemoveSecondaryLookingAt(sender);
+
+        } else if (args[0].equalsIgnoreCase("log")) {
+            return onCommandLog(sender, args);
+
+        } else if (args[0].equalsIgnoreCase("history")) {
+            return onCommandHistory(sender, args);
 
         } else {
             sender.sendMessage(ChatColor.RED + "Unknown command or insufficient permission.");
@@ -143,6 +150,13 @@ public class Commands implements CommandExecutor {
                             postOffice.language.secondaryBoxesWillNotWork
                                     .replace("%count%", String.valueOf(secondaryCount))));
                 }
+            }
+
+            // Log the removal before actually removing
+            if ("secondary".equals(barrelState) && boxOwnerUUID != null) {
+                postOffice.logManager.logSecondaryRemoved(barrelBlock.getLocation(), boxOwnerUUID, player.getUniqueId());
+            } else if (boxOwnerUUID != null) {
+                postOffice.logManager.logBoxRemoved(barrelBlock.getLocation(), boxOwnerUUID, player.getUniqueId());
             }
 
             // Call the helper to remove the barrel from the cache and config
@@ -325,6 +339,9 @@ public class Commands implements CommandExecutor {
 
                 postOffice.helpers.saveCacheToFile(); // Save the cache to disk
 
+                // Log the box registration
+                postOffice.logManager.logBoxRegistered(attachedBarrel.getLocation(), player.getUniqueId());
+
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.successfulRegistration));
                 return true;
 
@@ -399,6 +416,10 @@ public class Commands implements CommandExecutor {
 
                 // Claim the post box for the player and update the state to 'claimed'
                 postOffice.helpers.addOrUpdateBarrelInCache(attachedBarrel, targetBlock, playerUUID, "claimed");
+
+                // Log the box claim
+                postOffice.logManager.logBoxClaimed(attachedBarrel.getLocation(), playerUUID, player.getUniqueId());
+
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.successfullyClaimed));
 
                 // Update the sign to display the player's name on the second line
@@ -495,6 +516,9 @@ public class Commands implements CommandExecutor {
 
             // Claim the post box for the target player and update the state to 'claimed'
             postOffice.helpers.addOrUpdateBarrelInCache(attachedBarrel, targetBlock, targetPlayerUUID, "claimed");
+
+            // Log the box claim (claimed by admin for another player)
+            postOffice.logManager.logBoxClaimed(attachedBarrel.getLocation(), targetPlayerUUID, player.getUniqueId());
 
             // Update the sign to display the player's name on the second line
             if (targetBlock.getState() instanceof Sign) {
@@ -593,6 +617,9 @@ public class Commands implements CommandExecutor {
 
         // Register the secondary box
         postOffice.helpers.addOrUpdateBarrelInCache(attachedBarrel, targetBlock, playerUUID, "secondary");
+
+        // Log the secondary box registration
+        postOffice.logManager.logSecondaryRegistered(attachedBarrel.getLocation(), playerUUID);
 
         // Update the sign to display the player's name
         if (targetBlock.getState() instanceof Sign) {
@@ -720,6 +747,12 @@ public class Commands implements CommandExecutor {
             sign.update();
         }
 
+        // Log the removal
+        UUID boxOwnerUUID = postOffice.helpers.getOwnerUUID(barrelBlock);
+        if (boxOwnerUUID != null) {
+            postOffice.logManager.logSecondaryRemoved(barrelBlock.getLocation(), boxOwnerUUID, player.getUniqueId());
+        }
+
         // Remove the secondary box
         postOffice.helpers.removeBarrelFromCache(barrelBlock);
 
@@ -751,6 +784,20 @@ public class Commands implements CommandExecutor {
             return true;
         }
 
+        // Log each secondary box removal before removing them
+        List<Helpers.BarrelInfo> secondaryBoxes = postOffice.helpers.getAllBoxesForPlayer(playerUUID);
+        UUID actorUUID = sender instanceof Player ? ((Player) sender).getUniqueId() : playerUUID;
+
+        for (Helpers.BarrelInfo boxInfo : secondaryBoxes) {
+            if ("secondary".equals(boxInfo.state)) {
+                World world = Bukkit.getWorld(boxInfo.world);
+                if (world != null) {
+                    Location loc = new Location(world, boxInfo.x, boxInfo.y, boxInfo.z);
+                    postOffice.logManager.logSecondaryRemoved(loc, playerUUID, actorUUID);
+                }
+            }
+        }
+
         // Remove all secondary boxes
         postOffice.helpers.removeAllSecondaryBoxesForPlayer(playerUUID);
 
@@ -761,6 +808,342 @@ public class Commands implements CommandExecutor {
 
         return true;
     }
+
+    public boolean onCommandLog(CommandSender sender, String[] args) {
+        // Only admins can view full logs
+        if (!sender.hasPermission("shantek.postoffice.register") && !sender.isOp()) {
+            invalidPermission(sender);
+            return false;
+        }
+
+        int days = -1; // Default to all logs
+        int page = 1; // Default to page 1
+        String typeFilter = null; // Filter by log type
+        String playerFilter = null; // Filter by player name
+
+        // Parse arguments
+        // Format: /postoffice log [timeframe] [page] [type:<type>] [player:<name>]
+        // Examples:
+        //   /postoffice log 30d
+        //   /postoffice log type:claimed
+        //   /postoffice log player:Steve
+        //   /postoffice log 7d type:deposited
+        //   /postoffice log type:withdrawn player:Alex
+        //   /postoffice log 30d 2 type:claimed
+
+        for (int i = 1; i < args.length; i++) {
+            String arg = args[i];
+
+            // Check for type filter
+            if (arg.toLowerCase().startsWith("type:")) {
+                String type = arg.substring(5).toLowerCase();
+                // Map user-friendly names to log types
+                switch (type) {
+                    case "registered":
+                    case "register":
+                        typeFilter = LogManager.LOG_BOX_REGISTERED;
+                        break;
+                    case "claimed":
+                    case "claim":
+                        typeFilter = LogManager.LOG_BOX_CLAIMED;
+                        break;
+                    case "removed":
+                    case "remove":
+                        typeFilter = LogManager.LOG_BOX_REMOVED;
+                        break;
+                    case "secondary":
+                    case "secondary_registered":
+                        typeFilter = LogManager.LOG_SECONDARY_REGISTERED;
+                        break;
+                    case "secondary_removed":
+                        typeFilter = LogManager.LOG_SECONDARY_REMOVED;
+                        break;
+                    case "deposited":
+                    case "deposit":
+                    case "items_deposited":
+                        typeFilter = LogManager.LOG_ITEM_DEPOSITED;
+                        break;
+                    case "withdrawn":
+                    case "withdraw":
+                    case "items_withdrawn":
+                        typeFilter = LogManager.LOG_ITEM_WITHDRAWN;
+                        break;
+                    default:
+                        sender.sendMessage(ChatColor.RED + "Invalid log type. Valid types: registered, claimed, removed, secondary, secondary_removed, deposited, withdrawn");
+                        return true;
+                }
+                continue;
+            }
+
+            // Check for player filter
+            if (arg.toLowerCase().startsWith("player:")) {
+                playerFilter = arg.substring(7);
+                continue;
+            }
+
+            // Check if it's a timeframe (ends with 'd')
+            if (arg.endsWith("d")) {
+                try {
+                    days = Integer.parseInt(arg.substring(0, arg.length() - 1));
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(ChatColor.RED + "Invalid timeframe format. Use format like '30d' for 30 days.");
+                    return true;
+                }
+                continue;
+            }
+
+            // Otherwise it's a page number
+            try {
+                page = Integer.parseInt(arg);
+            } catch (NumberFormatException e) {
+                sender.sendMessage(ChatColor.RED + "Invalid argument: " + arg);
+                sender.sendMessage(ChatColor.YELLOW + "Usage: /postoffice log [timeframe] [page] [type:<type>] [player:<name>]");
+                return true;
+            }
+        }
+
+        if (page < 1) {
+            sender.sendMessage(ChatColor.RED + "Page number must be 1 or greater.");
+            return true;
+        }
+
+        int entriesPerPage = 10;
+        List<LogManager.LogEntry> logs = postOffice.logManager.getAdminLogs(days, page, entriesPerPage, typeFilter, playerFilter);
+        int totalLogs = postOffice.logManager.getAdminLogsCount(days, typeFilter, playerFilter);
+        int totalPages = (int) Math.ceil((double) totalLogs / entriesPerPage);
+
+        if (logs.isEmpty()) {
+            if (page > 1) {
+                sender.sendMessage(ChatColor.RED + "No logs found on page " + page + ".");
+            } else {
+                String filterInfo = "";
+                if (typeFilter != null || playerFilter != null) {
+                    filterInfo = " matching your filters";
+                }
+                sender.sendMessage(ChatColor.YELLOW + "No logs found" + filterInfo + ".");
+            }
+            return true;
+        }
+
+        // Build header with filter information
+        String timeframeText = days > 0 ? " (Last " + days + " days)" : "";
+        String filterText = "";
+        if (typeFilter != null) {
+            filterText += " [Type: " + getTypeDisplayName(typeFilter) + "]";
+        }
+        if (playerFilter != null) {
+            filterText += " [Player: " + playerFilter + "]";
+        }
+        sender.sendMessage(ChatColor.GOLD + "Post Office Logs" + timeframeText + filterText);
+        sender.sendMessage(ChatColor.GOLD + "-------------------------");
+
+        // Display logs
+        for (LogManager.LogEntry log : logs) {
+            displayLogEntry(sender, log);
+        }
+
+        // Build command arguments for pagination
+        String baseCommand = "/postoffice log";
+        if (days > 0) baseCommand += " " + days + "d";
+        if (typeFilter != null) baseCommand += " type:" + getTypeShortName(typeFilter);
+        if (playerFilter != null) baseCommand += " player:" + playerFilter;
+
+        // Display simple text-based navigation that works for all clients
+        if (page > 1 || page < totalPages) {
+            StringBuilder nav = new StringBuilder(ChatColor.GRAY + "Navigation: ");
+
+            if (page > 1) {
+                nav.append(ChatColor.GREEN).append(baseCommand).append(" ").append(page - 1)
+                   .append(ChatColor.GRAY).append(" (previous)");
+            }
+
+            if (page > 1 && page < totalPages) {
+                nav.append(" | ");
+            }
+
+            if (page < totalPages) {
+                nav.append(ChatColor.GREEN).append(baseCommand).append(" ").append(page + 1)
+                   .append(ChatColor.GRAY).append(" (next)");
+            }
+
+            sender.sendMessage(nav.toString());
+        }
+
+        return true;
+    }
+
+    private String getTypeDisplayName(String logType) {
+        switch (logType) {
+            case LogManager.LOG_BOX_REGISTERED: return "Registered";
+            case LogManager.LOG_BOX_CLAIMED: return "Claimed";
+            case LogManager.LOG_BOX_REMOVED: return "Removed";
+            case LogManager.LOG_SECONDARY_REGISTERED: return "Secondary Registered";
+            case LogManager.LOG_SECONDARY_REMOVED: return "Secondary Removed";
+            case LogManager.LOG_ITEM_DEPOSITED: return "+";
+            case LogManager.LOG_ITEM_WITHDRAWN: return "-";
+            default: return "Unknown";
+        }
+    }
+
+    private String getTypeShortName(String logType) {
+        switch (logType) {
+            case LogManager.LOG_BOX_REGISTERED: return "registered";
+            case LogManager.LOG_BOX_CLAIMED: return "claimed";
+            case LogManager.LOG_BOX_REMOVED: return "removed";
+            case LogManager.LOG_SECONDARY_REGISTERED: return "secondary";
+            case LogManager.LOG_SECONDARY_REMOVED: return "secondary_removed";
+            case LogManager.LOG_ITEM_DEPOSITED: return "+";
+            case LogManager.LOG_ITEM_WITHDRAWN: return "-";
+            default: return "unknown";
+        }
+    }
+
+    public boolean onCommandHistory(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "This command can only be used by players.");
+            return true;
+        }
+
+        Player player = (Player) sender;
+        UUID playerUUID = player.getUniqueId();
+
+        // Check if player has a post box
+        if (!postOffice.helpers.doesPlayerHavePostBox(playerUUID)) {
+            sender.sendMessage(ChatColor.RED + "You don't have a post box registered.");
+            return true;
+        }
+
+        int page = 1; // Default to page 1
+
+        // Parse page argument
+        if (args.length >= 2) {
+            try {
+                page = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                sender.sendMessage(ChatColor.RED + "Invalid page number.");
+                return true;
+            }
+        }
+
+        if (page < 1) {
+            sender.sendMessage(ChatColor.RED + "Page number must be 1 or greater.");
+            return true;
+        }
+
+        // Get player history limit from config
+        int playerHistoryDays = postOffice.getConfig().getInt("player-history-days", 30);
+
+        int entriesPerPage = 10;
+        List<LogManager.LogEntry> history = postOffice.logManager.getPlayerHistory(playerUUID, playerHistoryDays, page, entriesPerPage);
+        int totalLogs = postOffice.logManager.getPlayerHistoryCount(playerUUID, playerHistoryDays);
+        int totalPages = (int) Math.ceil((double) totalLogs / entriesPerPage);
+
+        if (history.isEmpty()) {
+            if (page > 1) {
+                sender.sendMessage(ChatColor.RED + "No history found on page " + page + ".");
+            } else {
+                sender.sendMessage(ChatColor.YELLOW + "No mail history found. You haven't received any items yet.");
+            }
+            return true;
+        }
+
+        // Display header
+        String timeframeText = playerHistoryDays > 0 ? " - " + playerHistoryDays + " days" : "";
+
+        sender.sendMessage(ChatColor.GOLD + "Post Office History" + timeframeText);
+        sender.sendMessage(ChatColor.GOLD + "-------------------------");
+
+
+        // Display history
+        for (LogManager.LogEntry log : history) {
+            displayPlayerHistoryEntry(sender, log);
+        }
+
+        // Display simple text-based navigation
+        if (page > 1 || page < totalPages) {
+            StringBuilder nav = new StringBuilder(ChatColor.GRAY + "Navigation: ");
+
+            if (page > 1) {
+                nav.append(ChatColor.GREEN).append("/postoffice history ").append(page - 1)
+                   .append(ChatColor.GRAY).append(" (previous)");
+            }
+
+            if (page > 1 && page < totalPages) {
+                nav.append(" | ");
+            }
+
+            if (page < totalPages) {
+                nav.append(ChatColor.GREEN).append("/postoffice history ").append(page + 1)
+                   .append(ChatColor.GRAY).append(" (next)");
+            }
+
+            sender.sendMessage(ChatColor.GOLD + "Page " + page + " of " + totalPages + " (" + totalLogs + " total)");
+
+            sender.sendMessage(nav.toString());
+        }
+
+        return true;
+    }
+
+    private void displayLogEntry(CommandSender sender, LogManager.LogEntry log) {
+        String actorName = LogManager.getPlayerName(log.actor);
+        String ownerName = log.owner != null ? LogManager.getPlayerName(log.owner) : "N/A";
+        String timeAgo = LogManager.formatTimeAgo(log.timestamp);
+
+        switch (log.type) {
+            case LogManager.LOG_BOX_REGISTERED:
+                sender.sendMessage(ChatColor.DARK_GREEN + "▪ " + ChatColor.YELLOW + actorName + ChatColor.GRAY + " registered " + ChatColor.DARK_GRAY + log.location + ChatColor.YELLOW + " • " + timeAgo);
+                break;
+
+            case LogManager.LOG_BOX_CLAIMED:
+                sender.sendMessage(ChatColor.GREEN + "▪ " + ChatColor.YELLOW + actorName + ChatColor.GRAY + " claimed " + ChatColor.DARK_GRAY + log.location + ChatColor.YELLOW + " • " + timeAgo);
+                break;
+
+            case LogManager.LOG_BOX_REMOVED:
+                String removedBy = actorName.equals(ownerName) ? actorName : actorName + " (owner: " + ownerName + ")";
+                sender.sendMessage(ChatColor.RED + "▪ " + ChatColor.WHITE + log.getTypeDisplay() +
+                    ChatColor.GRAY + " by " + ChatColor.YELLOW + removedBy);
+                sender.sendMessage(ChatColor.GRAY + "  Location: " + log.location + " • " + timeAgo);
+
+
+                break;
+
+            case LogManager.LOG_SECONDARY_REGISTERED:
+                sender.sendMessage(ChatColor.LIGHT_PURPLE + "▪ " + ChatColor.YELLOW + actorName + ChatColor.GRAY + " created secondary box " + ChatColor.DARK_GRAY + log.location + ChatColor.YELLOW + " • " + timeAgo);
+                break;
+
+            case LogManager.LOG_SECONDARY_REMOVED:
+                sender.sendMessage(ChatColor.RED + "▪ " + ChatColor.YELLOW + actorName + ChatColor.RED + " removed secondary box " + ChatColor.DARK_GRAY + log.location + ChatColor.YELLOW + " • " + timeAgo);
+                break;
+
+            case LogManager.LOG_ITEM_DEPOSITED:
+                sender.sendMessage(ChatColor.GREEN + "▪ " + ChatColor.YELLOW + actorName + ChatColor.GREEN + " +" + LogManager.formatItemList(log.items) + ChatColor.YELLOW + " for " + ownerName + " • " + timeAgo);
+                break;
+
+            case LogManager.LOG_ITEM_WITHDRAWN:
+                sender.sendMessage(ChatColor.RED + "▪ " + ChatColor.YELLOW + actorName + ChatColor.RED + " -" + LogManager.formatItemList(log.items) + ChatColor.YELLOW + " from " + ownerName + " • " + timeAgo);
+                break;
+
+            default:
+                sender.sendMessage(ChatColor.WHITE + "▪ " + log.getTypeDisplay() + " • " + timeAgo);
+                break;
+        }
+    }
+
+    private void displayPlayerHistoryEntry(CommandSender sender, LogManager.LogEntry log) {
+        String senderName = LogManager.getPlayerName(log.actor);
+        String timeAgo = LogManager.formatTimeAgo(log.timestamp);
+
+        sender.sendMessage(
+                ChatColor.GREEN + "▪ " +
+                        ChatColor.YELLOW + senderName +
+                        ChatColor.GRAY + ": " +
+                        LogManager.formatItemList(log.items) +
+                        ChatColor.DARK_GRAY + " • " +
+                        ChatColor.GRAY + timeAgo
+        );
+    }
+
 
     public void invalidPermission(CommandSender sender)
     {

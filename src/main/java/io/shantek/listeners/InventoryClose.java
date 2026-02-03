@@ -10,7 +10,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -54,13 +56,23 @@ public class InventoryClose implements Listener {
 
         if (boxOwnerUUID == null) {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.language.unclaimedPostbox));
-        } else {
-            logValidPostBox(plugin, postOffice.helpers.getPlayer(boxOwnerUUID));
+            return;
+        }
+        
+        logValidPostBox(plugin, postOffice.helpers.getPlayer(boxOwnerUUID));
+
+        // Get the snapshot of what the inventory looked like when opened
+        String barrelLocation = postOffice.helpers.getBlockLocationString(barrelBlock);
+        ItemStack[] beforeSnapshot = plugin.inventoryTracker.getAndRemoveSnapshot(player.getUniqueId(), barrelLocation);
+        
+        // Log inventory changes
+        if (beforeSnapshot != null) {
+            logInventoryChanges(plugin, beforeSnapshot, inventory.getContents(), boxOwnerUUID, player);
         }
 
-        if (boxOwnerUUID != null && postOffice.helpers.isPostBoxOwner(barrelBlock, player)) {
+        if (postOffice.helpers.isPostBoxOwner(barrelBlock, player)) {
             clearSignAndNotifications(plugin, barrelBlock, player);
-        } else if (boxOwnerUUID != null) {
+        } else {
             checkForItemChanges(plugin, inventory, barrelBlock, player, boxOwnerUUID);
         }
     }
@@ -172,6 +184,68 @@ public class InventoryClose implements Listener {
 
     private Block getBarrelBlock(InventoryCloseEvent event) {
         return Objects.requireNonNull(event.getInventory().getLocation()).getBlock();
+    }
+
+    /**
+     * Compare before and after snapshots to log what items were deposited or withdrawn
+     */
+    private void logInventoryChanges(PostOffice plugin, ItemStack[] before, ItemStack[] after, UUID boxOwnerUUID, Player player) {
+        List<ItemStack> deposited = new ArrayList<>();
+        List<ItemStack> withdrawn = new ArrayList<>();
+
+        // Create maps to track item counts
+        java.util.Map<String, Integer> beforeCounts = new java.util.HashMap<>();
+        java.util.Map<String, Integer> afterCounts = new java.util.HashMap<>();
+
+        // Count items in before snapshot
+        for (ItemStack item : before) {
+            if (item != null && item.getType() != Material.AIR) {
+                String key = item.getType().name();
+                beforeCounts.put(key, beforeCounts.getOrDefault(key, 0) + item.getAmount());
+            }
+        }
+
+        // Count items in after snapshot
+        for (ItemStack item : after) {
+            if (item != null && item.getType() != Material.AIR) {
+                String key = item.getType().name();
+                afterCounts.put(key, afterCounts.getOrDefault(key, 0) + item.getAmount());
+            }
+        }
+
+        // Compare to find what changed
+        java.util.Set<String> allKeys = new java.util.HashSet<>();
+        allKeys.addAll(beforeCounts.keySet());
+        allKeys.addAll(afterCounts.keySet());
+
+        for (String key : allKeys) {
+            int beforeCount = beforeCounts.getOrDefault(key, 0);
+            int afterCount = afterCounts.getOrDefault(key, 0);
+            int diff = afterCount - beforeCount;
+
+            if (diff > 0) {
+                // Items were added
+                deposited.add(new ItemStack(Material.valueOf(key), diff));
+            } else if (diff < 0) {
+                // Items were removed
+                withdrawn.add(new ItemStack(Material.valueOf(key), -diff));
+            }
+        }
+
+        // Log deposited items
+        if (!deposited.isEmpty()) {
+            boolean isOwner = player.getUniqueId().equals(boxOwnerUUID);
+            if (!isOwner) {
+                // Someone else deposited items into this box
+                plugin.logManager.logItemsDeposited(boxOwnerUUID, player.getUniqueId(), deposited);
+            }
+        }
+
+        // Log withdrawn items
+        if (!withdrawn.isEmpty()) {
+            boolean isAdmin = player.hasPermission("shantek.postoffice.register") && !player.getUniqueId().equals(boxOwnerUUID);
+            plugin.logManager.logItemsWithdrawn(boxOwnerUUID, player.getUniqueId(), withdrawn, isAdmin);
+        }
     }
 }
 

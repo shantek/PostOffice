@@ -5,7 +5,8 @@ import io.shantek.listeners.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,6 +24,8 @@ public final class PostOffice extends JavaPlugin {
     public Helpers helpers;
     public BarrelProtection barrelProtection;
     public TabCompleter tabCompleter;
+    public io.shantek.functions.LogManager logManager;
+    public InventoryTracker inventoryTracker;
     public static PostOffice instance;
     public String customBarrelName = "pobox";
     public static final String SECONDARY_BARREL_NAME = "secondary"; // Hardcoded, not configurable
@@ -48,6 +51,8 @@ public final class PostOffice extends JavaPlugin {
         barrelProtection = new BarrelProtection(this);
         helpers = new Helpers(this);
         TabCompleter tabCompleter = new TabCompleter(this);
+        logManager = new io.shantek.functions.LogManager(this);
+        inventoryTracker = new InventoryTracker(this);
 
         Objects.requireNonNull(getCommand("postoffice")).setTabCompleter(new TabCompleter(this));
 
@@ -108,6 +113,7 @@ public final class PostOffice extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new InventoryOpen(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoin(this), this);
         Bukkit.getPluginManager().registerEvents(new BarrelProtection(this), this);
+        Bukkit.getPluginManager().registerEvents(inventoryTracker, this);
     }
 
     public static PostOffice getInstance() {
@@ -121,6 +127,11 @@ public final class PostOffice extends JavaPlugin {
     public void onDisable() {
         // Save the cache to file when the plugin is disabled
         helpers.saveCacheToFile();
+        
+        // Close the log database connection
+        if (logManager != null) {
+            logManager.close();
+        }
     }
 
     public void printInfoMessage(String message) {
