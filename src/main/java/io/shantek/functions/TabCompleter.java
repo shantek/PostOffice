@@ -123,7 +123,21 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
                         .filter(c -> c.toLowerCase().startsWith(args[1].toLowerCase()))
                         .sorted()
                         .collect(Collectors.toList());
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("secondary") &&
+                            sender.hasPermission("shantek.postoffice.claim.others")) {
+
+                // Populate online players' names for secondary <player>
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    completions.add(player.getName());
+                }
+
+                return completions.stream()
+                        .filter(c -> c.toLowerCase().startsWith(args[1].toLowerCase()))
+                        .sorted()
+                        .collect(Collectors.toList());
             }
+
+
         }
 
         return Collections.emptyList();

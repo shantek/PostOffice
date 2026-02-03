@@ -51,6 +51,9 @@ public class Commands implements CommandExecutor {
         } else if (args[0].equalsIgnoreCase("claim")) {
             return onCommandClaim(sender);
 
+        } else if (args[0].equalsIgnoreCase("secondary") && args.length == 2) {
+            return onCommandSecondaryForOther(sender, args);
+
         } else if (args[0].equalsIgnoreCase("secondary")) {
             return onCommandSecondary(sender);
 
@@ -633,6 +636,103 @@ public class Commands implements CommandExecutor {
 
         return true;
     }
+
+    public boolean onCommandSecondaryForOther(CommandSender sender, String[] args) {
+
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "This command can only be used by players.");
+            return true;
+        }
+
+        Player admin = (Player) sender;
+
+        // Permission check
+        if (!admin.hasPermission("shantek.postoffice.claim.others") && !admin.isOp()) {
+            invalidPermission(sender);
+            return false;
+        }
+
+        String targetPlayerName = args[1];
+        OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(targetPlayerName);
+
+        if (!targetPlayer.hasPlayedBefore()) {
+            admin.sendMessage(ChatColor.RED + "That player has never joined the server.");
+            return true;
+        }
+
+        UUID targetUUID = targetPlayer.getUniqueId();
+
+        // Target must already have a PRIMARY box
+        if (!postOffice.helpers.doesPlayerHavePostBox(targetUUID)) {
+            admin.sendMessage(ChatColor.RED + "That player does not have a primary post box.");
+            return true;
+        }
+
+        // Secondary box limit check
+        if (postOffice.maxSecondaryBoxes != -1) {
+            int currentCount = postOffice.helpers.countPlayerSecondaryBoxes(targetUUID);
+            if (currentCount >= postOffice.maxSecondaryBoxes) {
+                admin.sendMessage(ChatColor.RED + "That player already has the maximum number of secondary boxes.");
+                return true;
+            }
+        }
+
+        // Get block admin is looking at
+        Block targetBlock = postOffice.helpers.getBlockLookingAt(admin, 6);
+
+        if (targetBlock == null || !(targetBlock.getState() instanceof Sign)) {
+            admin.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.lookAtPostBox));
+            return true;
+        }
+
+        // Ensure sign is attached to a barrel
+        Block attachedBarrel = postOffice.helpers.getAttachedBarrel(targetBlock);
+        if (attachedBarrel == null || attachedBarrel.getType() != Material.BARREL) {
+            admin.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.signOnBarrel));
+            return true;
+        }
+
+        // Barrel must be named SECONDARY
+        if (attachedBarrel.getState() instanceof Barrel) {
+            Barrel barrel = (Barrel) attachedBarrel.getState();
+            if (barrel.getCustomName() == null ||
+                    !barrel.getCustomName().equalsIgnoreCase(PostOffice.SECONDARY_BARREL_NAME)) {
+
+                admin.sendMessage(ChatColor.RED + "The barrel must be named '" + PostOffice.SECONDARY_BARREL_NAME + "'");
+                return true;
+            }
+        }
+
+        // Prevent double registration
+        if (postOffice.helpers.isBarrelInConfig(attachedBarrel)) {
+            admin.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.alreadyRegistered));
+            return true;
+        }
+
+        // Register secondary box for target player
+        postOffice.helpers.addOrUpdateBarrelInCache(attachedBarrel, targetBlock, targetUUID, "secondary");
+
+        // Log it (admin action)
+        postOffice.logManager.logSecondaryRegistered(attachedBarrel.getLocation(), targetUUID);
+
+        // Update sign with target player's name
+        Sign sign = (Sign) targetBlock.getState();
+        sign.setLine(1, targetPlayer.getName());
+        sign.update();
+
+        postOffice.helpers.saveCacheToFile();
+
+        // Feedback
+        admin.sendMessage(ChatColor.GREEN + "Secondary post box registered for " + targetPlayer.getName());
+
+        if (targetPlayer.isOnline()) {
+            Objects.requireNonNull(targetPlayer.getPlayer())
+                    .sendMessage(ChatColor.GREEN + "An admin has registered a secondary post box for you.");
+        }
+
+        return true;
+    }
+
 
     public boolean onCommandList(CommandSender sender, String[] args) {
         if (!sender.hasPermission("shantek.postoffice.register") && !sender.isOp()) {
