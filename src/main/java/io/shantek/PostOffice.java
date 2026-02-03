@@ -6,7 +6,6 @@ import io.shantek.listeners.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
