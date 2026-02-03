@@ -36,8 +36,18 @@ debug: false
 # Set to -1 for unlimited secondary boxes
 max-secondary-boxes: 5
 
+# Number of days players can view their mail history (/postoffice history)
+# Players will only see items deposited into their box within this timeframe
+# Set to -1 to show all history with no time limit
+player-history-days: 30
+
+# Number of days to retain all logs before purging them
+# This applies to all admin logs (/postoffice log)
+# Set to -1 to never purge logs (keep forever)
+log-retention-days: 90
+
 
 # Config file version
 # Do not manually change this setting
 # Used to update out of date config files
-config-version: 1
+config-version: 2
