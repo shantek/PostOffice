@@ -53,6 +53,13 @@ public class Language {
     public String barrelMustBeNamedSecondary = "&a[Post Office] &4The barrel must be renamed to 'secondary' in an anvil first.";
     public String useRemoveCommand = "&a[Post Office] &4You must use /postoffice remove to remove this post box.";
 
+    // Remote open command (/postbox)
+    public String noPostBoxClaimed = "&a[Post Office] &4You haven't claimed a post box yet.";
+    public String remoteOpenNoPermission = "&a[Post Office] &4You don't have permission to open post boxes remotely.";
+    public String remoteOpenOthersNoPermission = "&a[Post Office] &4You don't have permission to open other players' post boxes.";
+    public String remoteOpenPlayerNotFound = "&a[Post Office] &4Player not found or has never joined this server.";
+    public String remoteOpenTargetNoBox = "&a[Post Office] &4%player% doesn't have a post box claimed.";
+
 
     public UpdateChecker updateChecker;
     public PluginConfig pluginConfig;

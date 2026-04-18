@@ -109,8 +109,15 @@ all-secondary-boxes-removed-admin: "&a[Post Office] &aRemoved %count% secondary 
 barrel-must-be-named-secondary: "&a[Post Office] &4The barrel must be renamed to 'secondary' in an anvil first."
 use-remove-command: "&a[Post Office] &4You must use /postoffice remove to remove this post box."
 
+# Remote open command (/postbox)
+no-post-box-claimed: "&a[Post Office] &4You haven't claimed a post box yet."
+remote-open-no-permission: "&a[Post Office] &4You don't have permission to open post boxes remotely."
+remote-open-others-no-permission: "&a[Post Office] &4You don't have permission to open other players' post boxes."
+remote-open-player-not-found: "&a[Post Office] &4Player not found or has never joined this server."
+remote-open-target-no-box: "&a[Post Office] &4%player% doesn't have a post box claimed."
+
 
 # Lang file version
 # Do not manually change this setting
 # Used to update out of date lang files
-lang-version: 3
+lang-version: 4

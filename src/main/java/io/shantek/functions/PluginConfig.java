@@ -188,6 +188,8 @@ public class PluginConfig {
         postOffice.consoleLogs = newConfig.getBoolean("console-logs", true);
         postOffice.debugLogs = newConfig.getBoolean("debug", false);
         postOffice.maxSecondaryBoxes = newConfig.getInt("max-secondary-boxes", 5);
+        postOffice.playerHistoryDays = newConfig.getInt("player-history-days", 30);
+        postOffice.logRetentionDays = newConfig.getInt("log-retention-days", 90);
         postOffice.getLogger().info("Configuration file loaded into memory.");
     }
 
@@ -386,6 +388,13 @@ public class PluginConfig {
         postOffice.language.allSecondaryBoxesRemovedAdmin = newLang.getString("all-secondary-boxes-removed-admin", "&a[Post Office] &aRemoved %count% secondary box(es) for %player%.");
         postOffice.language.barrelMustBeNamedSecondary = newLang.getString("barrel-must-be-named-secondary", "&a[Post Office] &4The barrel must be renamed to 'secondary' in an anvil first.");
         postOffice.language.useRemoveCommand = newLang.getString("use-remove-command", "&a[Post Office] &4You must use /postoffice remove to remove this post box.");
+
+        // Remote open command (/postbox)
+        postOffice.language.noPostBoxClaimed = newLang.getString("no-post-box-claimed", "&a[Post Office] &4You haven't claimed a post box yet.");
+        postOffice.language.remoteOpenNoPermission = newLang.getString("remote-open-no-permission", "&a[Post Office] &4You don't have permission to open post boxes remotely.");
+        postOffice.language.remoteOpenOthersNoPermission = newLang.getString("remote-open-others-no-permission", "&a[Post Office] &4You don't have permission to open other players' post boxes.");
+        postOffice.language.remoteOpenPlayerNotFound = newLang.getString("remote-open-player-not-found", "&a[Post Office] &4Player not found or has never joined this server.");
+        postOffice.language.remoteOpenTargetNoBox = newLang.getString("remote-open-target-no-box", "&a[Post Office] &4%player% doesn't have a post box claimed.");
 
         postOffice.getLogger().info("Lang file loaded into memory.");
     }

@@ -161,7 +161,7 @@ public class Helpers {
         String barrelLocationString = getBlockLocationString(barrelBlock);
 
         // Retrieve the sign's location from the config
-        String signLocationString = barrelsConfig.getString("barrels." + barrelLocationString + ".sign");
+        String signLocationString = getBarrelsConfig().getString("barrels." + barrelLocationString + ".sign");
 
         if (signLocationString != null) {
             // Use the helper method to get the sign block

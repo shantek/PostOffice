@@ -9,6 +9,9 @@ commands:
     description: Post office plugin commands
     aliases: [po]
     permission: shantek.postoffice.use
+  postbox:
+    description: Remotely open your post box
+    permission: shantek.postoffice.openremote
 
 permissions:
   shantek.postoffice.use:
@@ -41,4 +44,12 @@ permissions:
 
   shantek.postoffice.updatenotification:
     description: Notifies OPs/admins/mods of a plugin update.
+    default: op
+
+  shantek.postoffice.openremote:
+    description: Allows a player to open their own post box remotely via /postbox.
+    default: op
+
+  shantek.postoffice.openremote.others:
+    description: Allows opening another player's post box remotely via /postbox <player>.
     default: op

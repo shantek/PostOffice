@@ -2,6 +2,8 @@ package io.shantek;
 
 import io.shantek.functions.*;
 import io.shantek.listeners.*;
+import io.shantek.functions.PostBoxCommand;
+import io.shantek.functions.PostBoxTabCompleter;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +42,8 @@ public final class PostOffice extends JavaPlugin {
     public boolean hopperProtection = false;
     public boolean debugLogs = false;
     public int maxSecondaryBoxes = 5;
+    public int playerHistoryDays = 30;
+    public int logRetentionDays = 90;
 
 
     public void onEnable() {
@@ -54,6 +58,10 @@ public final class PostOffice extends JavaPlugin {
         inventoryTracker = new InventoryTracker(this);
 
         Objects.requireNonNull(getCommand("postoffice")).setTabCompleter(new TabCompleter(this));
+
+        // Register /postbox command
+        Objects.requireNonNull(getCommand("postbox")).setExecutor(new PostBoxCommand(this));
+        Objects.requireNonNull(getCommand("postbox")).setTabCompleter(new PostBoxTabCompleter(this));
 
         // Check for a data folder, create it if needed
         helpers.checkForDataFolder();

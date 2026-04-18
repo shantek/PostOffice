@@ -21,7 +21,7 @@ public class UpdateChecker {
 
         PostOffice postOffice = PostOffice.getInstance();
 
-        String updateUrl = "https://api.shantek.dev/postoffice.txt";
+        String updateUrl = "https://shantek.dev/post-office/version";
         try {
             URL url = new URL(updateUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();

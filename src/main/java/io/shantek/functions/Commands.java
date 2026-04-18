@@ -1134,7 +1134,7 @@ public class Commands implements CommandExecutor {
         }
 
         // Get player history limit from config
-        int playerHistoryDays = postOffice.getConfig().getInt("player-history-days", 30);
+        int playerHistoryDays = postOffice.playerHistoryDays;
 
         int entriesPerPage = 10;
         List<LogManager.LogEntry> history = postOffice.logManager.getPlayerHistory(playerUUID, playerHistoryDays, page, entriesPerPage);
