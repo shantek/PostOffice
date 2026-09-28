@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.nio.file.*;
 import java.util.*;
@@ -33,6 +36,8 @@ public final class PostOffice extends JavaPlugin {
     public File mailFile;
     public int previousItemCount = 0;
     public int newItemCount = 0;
+    // Chunks held loaded while a player has a post box open remotely (keyed by viewer)
+    private final Map<UUID, Chunk> remoteBoxChunks = new HashMap<>();
     public Set<String> playersWithMail = new HashSet<>();
     public boolean updateNotificationEnabled = true;
     public boolean postBoxProtection = true;
@@ -138,6 +143,25 @@ public final class PostOffice extends JavaPlugin {
         // Close the log database connection
         if (logManager != null) {
             logManager.close();
+        }
+    }
+
+    /**
+     * Keep the chunk of a remotely opened post box loaded while the player views it.
+     * Without this the chunk can unload a few seconds later, which makes the server
+     * consider the barrel invalid and force-close the inventory.
+     */
+    public void holdRemoteBoxChunk(Player player, Block barrelBlock) {
+        releaseRemoteBoxChunk(player.getUniqueId());
+        Chunk chunk = barrelBlock.getChunk();
+        chunk.addPluginChunkTicket(this);
+        remoteBoxChunks.put(player.getUniqueId(), chunk);
+    }
+
+    public void releaseRemoteBoxChunk(UUID playerUUID) {
+        Chunk chunk = remoteBoxChunks.remove(playerUUID);
+        if (chunk != null && !remoteBoxChunks.containsValue(chunk)) {
+            chunk.removePluginChunkTicket(this);
         }
     }
 

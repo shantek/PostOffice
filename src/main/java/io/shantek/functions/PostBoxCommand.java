@@ -105,6 +105,7 @@ public class PostBoxCommand implements CommandExecutor {
                 barrel.getInventory().getContents());
 
         player.openInventory(barrel.getInventory());
+        postOffice.holdRemoteBoxChunk(player, primaryBox);
 
         if (postOffice.debugLogs) {
             String ownerName = postOffice.helpers.getPlayerName(ownerUUID);

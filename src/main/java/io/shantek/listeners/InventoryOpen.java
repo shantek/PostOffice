@@ -65,6 +65,7 @@ public class InventoryOpen implements Listener {
                                 // This bypasses any WorldGuard/claim protections on the primary location
                                 // since we're opening a virtual inventory, not interacting with the actual block
                                 player.openInventory(primaryBarrel.getInventory());
+                                postOffice.holdRemoteBoxChunk(player, primaryBox);
                                 
                                 // Set item count from the primary box
                                 postOffice.previousItemCount = postOffice.helpers.countNonNullItems(

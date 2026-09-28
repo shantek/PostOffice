@@ -31,6 +31,9 @@ public class InventoryClose implements Listener {
         Inventory inventory = event.getInventory();
         Player player = (Player) event.getPlayer();
 
+        // Release any chunk held loaded for a remotely opened post box
+        plugin.releaseRemoteBoxChunk(player.getUniqueId());
+
         // Skip any non-barrel or virtual inventories (no location)
         if (inventory.getType() != InventoryType.BARREL || inventory.getLocation() == null) {
             return;
