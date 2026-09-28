@@ -92,23 +92,28 @@ public class Helpers {
         if (barrelsConfig.contains("barrels")) {
             ConfigurationSection barrelsSection = barrelsConfig.getConfigurationSection("barrels");
 
-            // Loop through all barrels to check if any are owned by this player
+            // Loop through all barrels to check if this player owns a primary (claimed) box.
+            // Secondary boxes are ignored; use countPlayerSecondaryBoxes for those.
             assert barrelsSection != null;
             for (String barrelLocation : barrelsSection.getKeys(false)) {
                 String ownerUUIDString = barrelsConfig.getString("barrels." + barrelLocation + ".owner");
-                if (ownerUUIDString != null && ownerUUIDString.equals(playerUUID.toString())) {
-                    return true; // The player already owns a post box
+                String state = barrelsConfig.getString("barrels." + barrelLocation + ".state");
+                if (ownerUUIDString != null && ownerUUIDString.equals(playerUUID.toString())
+                        && "claimed".equals(state)) {
+                    return true; // The player already owns a primary post box
                 }
             }
         }
-        return false; // The player does not have a post box
+        return false; // The player does not have a primary post box
     }
 
     public String getPlayerPostBoxLocation(UUID playerUUID) {
         FileConfiguration barrelsConfig = getBarrelsConfig();
         for (String barrelLocation : Objects.requireNonNull(barrelsConfig.getConfigurationSection("barrels")).getKeys(false)) {
             String ownerUUIDString = barrelsConfig.getString("barrels." + barrelLocation + ".owner");
-            if (ownerUUIDString != null && ownerUUIDString.equals(playerUUID.toString())) {
+            String state = barrelsConfig.getString("barrels." + barrelLocation + ".state");
+            if (ownerUUIDString != null && ownerUUIDString.equals(playerUUID.toString())
+                    && "claimed".equals(state)) {
                 Block barrelBlock = getBlockFromLocationString(barrelLocation);
                 if (barrelBlock != null) {
                     return barrelBlock.getWorld().getName() + " [" + barrelBlock.getX() + ", " + barrelBlock.getY() + ", " + barrelBlock.getZ() + "]";
