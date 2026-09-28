@@ -493,7 +493,7 @@ public class Commands implements CommandExecutor {
             String targetPlayerName = args[1];
             OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(targetPlayerName);
 
-            if (!targetPlayer.hasPlayedBefore()) {
+            if (!postOffice.helpers.hasJoinedServer(targetPlayer)) {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&',
                         postOffice.language.notPlayedBefore
                                 .replace("%player%", targetPlayer.toString())
@@ -658,7 +658,7 @@ public class Commands implements CommandExecutor {
         String targetPlayerName = args[1];
         OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(targetPlayerName);
 
-        if (!targetPlayer.hasPlayedBefore()) {
+        if (!postOffice.helpers.hasJoinedServer(targetPlayer)) {
             admin.sendMessage(ChatColor.RED + "That player has never joined the server.");
             return true;
         }
@@ -746,7 +746,7 @@ public class Commands implements CommandExecutor {
         String targetPlayerName = args[1];
         OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(targetPlayerName);
 
-        if (!targetPlayer.hasPlayedBefore()) {
+        if (!postOffice.helpers.hasJoinedServer(targetPlayer)) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.playerNotFound));
             return true;
         }
@@ -873,7 +873,7 @@ public class Commands implements CommandExecutor {
         String targetPlayerName = args[1];
         OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(targetPlayerName);
 
-        if (!targetPlayer.hasPlayedBefore()) {
+        if (!postOffice.helpers.hasJoinedServer(targetPlayer)) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', postOffice.language.playerNotFound));
             return true;
         }

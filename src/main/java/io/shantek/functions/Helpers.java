@@ -137,6 +137,12 @@ public class Helpers {
         return Bukkit.getOfflinePlayer(uuid);
     }
 
+    // hasPlayedBefore() stays false for a player's entire first session (until their
+    // player data is saved), so also treat anyone currently online as having joined.
+    public boolean hasJoinedServer(OfflinePlayer player) {
+        return player != null && (player.isOnline() || player.hasPlayedBefore());
+    }
+
     public boolean isPostBoxOwner(Block block, Player player) {
         UUID playerUUID = player.getUniqueId();
         return getOwnerUUID(block).equals(playerUUID);

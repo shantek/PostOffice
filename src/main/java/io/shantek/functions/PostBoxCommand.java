@@ -72,7 +72,7 @@ public class PostBoxCommand implements CommandExecutor {
         // Resolve target player (online or offline)
         OfflinePlayer target = resolvePlayer(targetName);
 
-        if (target == null || !target.hasPlayedBefore()) {
+        if (!postOffice.helpers.hasJoinedServer(target)) {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&',
                     postOffice.language.remoteOpenPlayerNotFound));
             return true;
